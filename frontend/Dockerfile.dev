@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+# Installer pnpm
+RUN corepack enable pnpm
+
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY package.json pnpm-lock.yaml* ./
+
+# Installer les dépendances
+RUN pnpm install
+
+# Exposer le port
+EXPOSE 3000
+
+# Commande par défaut (sera overridée dans docker-compose)
+CMD ["pnpm", "dev"]
+
+
+

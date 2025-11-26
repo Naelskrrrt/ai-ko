@@ -1,0 +1,635 @@
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+/* Import des variables et classes de layout unifié */
+@import "./layout.css";
+
+/* ========================================
+   CLASSES UTILITAIRES POUR LES SCROLLBARS
+   ======================================== */
+
+/* Masquer les scrollbars tout en gardant la fonctionnalité de scroll */
+.scrollbar-hide {
+  /* Firefox */
+  scrollbar-width: none;
+  /* Safari et Chrome */
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Force la restauration des styles HeroUI/Tailwind */
+* {
+  box-sizing: border-box !important;
+}
+
+/* Protection des bordures HeroUI */
+.border {
+  border-style: solid !important;
+}
+
+/* Protection des variables CSS HeroUI */
+:root {
+  --nextui-radius-small: 6px;
+  --nextui-radius-medium: 8px;
+  --nextui-radius-large: 12px;
+}
+
+/* Force les classes Tailwind/HeroUI importantes */
+.rounded-xl {
+  border-radius: 0.75rem !important;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem !important;
+}
+
+.shadow-lg {
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+}
+
+/* ========================================
+   SYSTÈME DE THÈME DE COULEUR DYNAMIQUE
+   ======================================== */
+
+/* Classes utilitaires pour les couleurs du thème */
+.text-theme-primary {
+  color: var(--color-theme-primary) !important;
+}
+
+.text-theme-primary-300 {
+  color: var(--color-theme-primary-300) !important;
+}
+
+.text-theme-primary-400 {
+  color: var(--color-theme-primary-400) !important;
+}
+
+.text-theme-primary-600 {
+  color: var(--color-theme-primary-600) !important;
+}
+
+.text-theme-primary-700 {
+  color: var(--color-theme-primary-700) !important;
+}
+
+.text-theme-secondary {
+  color: var(--color-theme-secondary) !important;
+}
+
+.text-theme-secondary-300 {
+  color: var(--color-theme-secondary-300) !important;
+}
+
+.text-theme-secondary-400 {
+  color: var(--color-theme-secondary-400) !important;
+}
+
+.text-theme-secondary-600 {
+  color: var(--color-theme-secondary-600) !important;
+}
+
+.text-theme-secondary-700 {
+  color: var(--color-theme-secondary-700) !important;
+}
+
+.text-theme-primary\/70 {
+  color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 70%,
+    transparent
+  ) !important;
+}
+
+.text-theme-primary\/80 {
+  color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 80%,
+    transparent
+  ) !important;
+}
+
+.text-theme-secondary\/70 {
+  color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 70%,
+    transparent
+  ) !important;
+}
+
+.text-theme-secondary\/80 {
+  color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 80%,
+    transparent
+  ) !important;
+}
+
+.text-theme-accent {
+  color: var(--color-theme-accent, var(--color-theme-primary)) !important;
+}
+
+.text-theme-accent-400 {
+  color: var(
+    --color-theme-accent-400,
+    var(--color-theme-primary-400)
+  ) !important;
+}
+
+.text-theme-accent-600 {
+  color: var(
+    --color-theme-accent-600,
+    var(--color-theme-primary-600)
+  ) !important;
+}
+
+.bg-theme-primary {
+  background-color: var(--color-theme-primary) !important;
+}
+
+.bg-theme-primary-50 {
+  background-color: var(--color-theme-primary-50) !important;
+}
+
+.bg-theme-primary-100 {
+  background-color: var(--color-theme-primary-100) !important;
+}
+
+.bg-theme-primary-200 {
+  background-color: var(--color-theme-primary-200) !important;
+}
+
+.bg-theme-primary-800 {
+  background-color: var(--color-theme-primary-800) !important;
+}
+
+.bg-theme-primary-950 {
+  background-color: var(--color-theme-primary-950) !important;
+}
+
+.bg-theme-secondary-50 {
+  background-color: var(--color-theme-secondary-50) !important;
+}
+
+.bg-theme-secondary-100 {
+  background-color: var(--color-theme-secondary-100) !important;
+}
+
+.bg-theme-secondary-200 {
+  background-color: var(--color-theme-secondary-200) !important;
+}
+
+.bg-theme-secondary-800 {
+  background-color: var(--color-theme-secondary-800) !important;
+}
+
+.bg-theme-secondary-950 {
+  background-color: var(--color-theme-secondary-950) !important;
+}
+
+.bg-theme-primary\/10 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 10%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-primary\/20 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 20%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-primary\/30 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 30%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-secondary {
+  background-color: var(--color-theme-secondary) !important;
+}
+
+.bg-theme-secondary\/10 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 10%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-secondary\/20 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 20%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-secondary\/30 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 30%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-accent {
+  background-color: var(
+    --color-theme-accent,
+    var(--color-theme-primary)
+  ) !important;
+}
+
+.bg-theme-accent-50 {
+  background-color: var(
+    --color-theme-accent-50,
+    var(--color-theme-primary-50)
+  ) !important;
+}
+
+.bg-theme-accent-950 {
+  background-color: var(
+    --color-theme-accent-950,
+    var(--color-theme-primary-950)
+  ) !important;
+}
+
+.bg-theme-accent\/10 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 10%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-accent\/20 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 20%,
+    transparent
+  ) !important;
+}
+
+.bg-theme-accent\/30 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 30%,
+    transparent
+  ) !important;
+}
+
+.border-theme-primary {
+  border-color: var(--color-theme-primary) !important;
+}
+
+.border-theme-primary-200 {
+  border-color: var(--color-theme-primary-200) !important;
+}
+
+.border-theme-primary-800 {
+  border-color: var(--color-theme-primary-800) !important;
+}
+
+.border-theme-primary\/20 {
+  border-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 20%,
+    transparent
+  ) !important;
+}
+
+.border-theme-primary\/50 {
+  border-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 50%,
+    transparent
+  ) !important;
+}
+
+.border-theme-secondary {
+  border-color: var(--color-theme-secondary) !important;
+}
+
+.border-theme-secondary-200 {
+  border-color: var(--color-theme-secondary-200) !important;
+}
+
+.border-theme-secondary-800 {
+  border-color: var(--color-theme-secondary-800) !important;
+}
+
+.border-theme-accent {
+  border-color: var(
+    --color-theme-accent,
+    var(--color-theme-primary)
+  ) !important;
+}
+
+.border-theme-accent-200 {
+  border-color: var(
+    --color-theme-accent-200,
+    var(--color-theme-primary-200)
+  ) !important;
+}
+
+.border-theme-accent-800 {
+  border-color: var(
+    --color-theme-accent-800,
+    var(--color-theme-primary-800)
+  ) !important;
+}
+
+/* Hover states pour le thème */
+.hover\:bg-theme-primary:hover {
+  background-color: var(--color-theme-primary) !important;
+}
+
+.hover\:bg-theme-primary\/20:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 20%,
+    transparent
+  ) !important;
+}
+
+.hover\:bg-theme-primary\/30:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 30%,
+    transparent
+  ) !important;
+}
+
+.hover\:text-theme-primary:hover {
+  color: var(--color-theme-primary) !important;
+}
+
+.hover\:text-theme-primary\/80:hover {
+  color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 80%,
+    transparent
+  ) !important;
+}
+
+.hover\:border-theme-primary:hover {
+  border-color: var(--color-theme-primary) !important;
+}
+
+.hover\:bg-theme-secondary\/20:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 20%,
+    transparent
+  ) !important;
+}
+
+.hover\:bg-theme-secondary\/30:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 30%,
+    transparent
+  ) !important;
+}
+
+.hover\:bg-theme-accent\/20:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 20%,
+    transparent
+  ) !important;
+}
+
+.hover\:bg-theme-accent\/30:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 30%,
+    transparent
+  ) !important;
+}
+
+/* Focus states pour le thème */
+.focus\:ring-theme-primary:focus {
+  --tw-ring-color: var(--color-theme-primary) !important;
+}
+
+.focus\:border-theme-primary:focus {
+  border-color: var(--color-theme-primary) !important;
+}
+
+/* Dark mode variants pour le thème */
+.dark .dark\:bg-theme-primary\/20 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 20%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:bg-theme-primary\/30 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 30%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:bg-theme-primary-950\/50 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary-950) 50%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:bg-theme-secondary-950\/50 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary-950) 50%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:border-theme-primary-800\/50 {
+  border-color: color-mix(
+    in srgb,
+    var(--color-theme-primary-800) 50%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:border-theme-secondary-800\/50 {
+  border-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary-800) 50%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:hover\:bg-theme-primary\/30:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 30%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:hover\:bg-theme-primary\/40:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-primary) 40%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:hover\:bg-theme-secondary\/30:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-secondary) 30%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:bg-theme-accent\/20 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 20%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:bg-theme-accent\/30 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 30%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:bg-theme-accent-950\/50 {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent-950, var(--color-theme-primary-950)) 50%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:border-theme-accent-800\/50 {
+  border-color: color-mix(
+    in srgb,
+    var(--color-theme-accent-800, var(--color-theme-primary-800)) 50%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:text-theme-accent-400 {
+  color: var(
+    --color-theme-accent-400,
+    var(--color-theme-primary-400)
+  ) !important;
+}
+
+.dark .dark\:hover\:bg-theme-accent\/30:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-theme-accent, var(--color-theme-primary)) 30%,
+    transparent
+  ) !important;
+}
+
+.dark .dark\:text-theme-primary-300 {
+  color: var(--color-theme-primary-300) !important;
+}
+
+.dark .dark\:text-theme-primary-400 {
+  color: var(--color-theme-primary-400) !important;
+}
+
+.dark .dark\:text-theme-secondary-300 {
+  color: var(--color-theme-secondary-300) !important;
+}
+
+.dark .dark\:text-theme-secondary-400 {
+  color: var(--color-theme-secondary-400) !important;
+}
+
+/* Classes utilitaires pour les anciennes couleurs (compatibilité) */
+.text-color-primary {
+  color: var(--color-text-primary);
+}
+
+.text-color-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-color-tertiary {
+  color: var(--color-text-tertiary);
+}
+
+.bg-color-primary {
+  background-color: var(--color-bg-primary);
+}
+
+.bg-color-secondary {
+  background-color: var(--color-bg-secondary);
+}
+
+.bg-color-tertiary {
+  background-color: var(--color-bg-tertiary);
+}
+
+.border-color {
+  border-color: var(--color-border);
+}
+
+.border-color-subtle {
+  border-color: var(--color-border-subtle);
+}
+
+/* Utilitaires pour l'overlay */
+.overlay-default {
+  background-color: var(--color-overlay);
+}
+
+.overlay-strong {
+  background-color: var(--color-overlay-strong);
+}
+
+/* Optimisations pour la vue calendrier full-height */
+/* Styles calendrier supprimés */
+
+/* ========================================
+   ANIMATIONS POUR LES TOASTS
+   ======================================== */
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}

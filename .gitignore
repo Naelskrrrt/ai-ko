@@ -1,0 +1,205 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+test_venv/
+backend/venv/
+backend/test_venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+coverage/
+.venv/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+nginx/logs/
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+backend/app.db
+backend/instance/
+*.sql
+*.sql.gz
+
+# Uploads (si volumé localement)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Docker
+.docker/
+
+# SSL Certificates (ne pas commiter les certificats)
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/live/
+nginx/ssl/archive/
+nginx/ssl/keys/
+nginx/ssl/renewal/
+!nginx/ssl/.gitkeep
+
+# Monitoring data
+prometheus_data/
+grafana_data/
+
+# Backups
+backups/
+*.backup
+*.bak
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Windows reserved names
+nul
+NUL
+CON
+PRN
+AUX
+COM1
+COM2
+COM3
+COM4
+COM5
+COM6
+COM7
+COM8
+COM9
+LPT1
+LPT2
+LPT3
+LPT4
+LPT5
+LPT6
+LPT7
+LPT8
+LPT9
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.npm
+.eslintcache
+
+# Build artifacts
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# Type checking
+.pytype/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+test_venv/
+
+# Claude AI
+.claude/
+
+# Specs (optionnel - décommentez si vous ne voulez pas commiter les specs)
+# .specs/
+

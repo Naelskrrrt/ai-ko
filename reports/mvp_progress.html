@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport MVP - 21.7%</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        h1 { color: #333; }
+        .progress-bar { width: 100%; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden; margin: 20px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #45a049); transition: width 0.3s; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #4CAF50; }
+        .category { margin: 30px 0; }
+        .item { padding: 10px; margin: 5px 0; background: #f9f9f9; border-radius: 5px; }
+        .item.completed { border-left: 4px solid #4CAF50; }
+        .item.pending { border-left: 4px solid #f44336; }
+        .details { font-size: 0.9em; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Rapport de Progression MVP</h1>
+        <p><strong>Date:</strong> 2025-11-21 22:32:48</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 21.666666666666668%"></div>
+        </div>
+        <p style="text-align: center; font-size: 1.2em;">
+            <strong>21.7%</strong> 
+            (13/60 items)
+        </p>
+        
+        <div class="stats">
+
+            <div class="stat-card">
+                <h3>API Endpoints</h3>
+                <p>0/13 (0.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Authentification</h3>
+                <p>5/5 (100.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Backend</h3>
+                <p>2/5 (40.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Base de Données</h3>
+                <p>2/10 (20.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Documentation</h3>
+                <p>2/2 (100.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Déploiement</h3>
+                <p>2/4 (50.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Frontend</h3>
+                <p>0/5 (0.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Frontend Pages</h3>
+                <p>0/6 (0.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>IA/ML</h3>
+                <p>0/5 (0.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Module 1</h3>
+                <p>0/2 (0.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Module 3</h3>
+                <p>0/1 (0.0%)</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Tests</h3>
+                <p>0/2 (0.0%)</p>
+            </div>
+
+        </div>
+        
+        <h2>Détails par Catégorie</h2>
+<div class="category"><h3>API Endpoints</h3></div>
+        <div class="item pending">
+            <strong>❌ GET /api/correction/results/{etudiant_id}</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ GET /api/evaluation/{resultat_id}</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ GET /api/qcm/preview/{id}</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ GET /api/qcm/{id}/corriges</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ GET /api/statistics/enseignant/dashboard</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ GET /api/statistics/etudiant/dashboard</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ GET /api/statistics/export/csv</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ POST /api/correction/batch</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ POST /api/correction/submit</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ POST /api/evaluation/feedback</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ POST /api/qcm/from-document</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ POST /api/qcm/generate</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ POST /api/qcm/{id}/generate-corriges</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div><div class="category"><h3>Authentification</h3></div>
+        <div class="item completed">
+            <strong>✅ Gestion des sessions (JWT)</strong>
+<div class="details">Trouvé dans 38 fichier(s)</div></div>
+        <div class="item completed">
+            <strong>✅ Protection CSRF (Flask-WTF)</strong>
+<div class="details">Trouvé dans 16 fichier(s)</div></div>
+        <div class="item completed">
+            <strong>✅ Protection des routes sensibles par rôle</strong>
+<div class="details">Trouvé dans 38 fichier(s)</div></div>
+        <div class="item completed">
+            <strong>✅ Rôles utilisateurs (Enseignant, Étudiant, Admin)</strong>
+<div class="details">Trouvé dans 49 fichier(s)</div></div>
+        <div class="item completed">
+            <strong>✅ Validation des données (Marshmallow/Pydantic)</strong>
+<div class="details">Trouvé dans 19 fichier(s)</div></div><div class="category"><h3>Backend</h3></div>
+        <div class="item pending">
+            <strong>❌ Architecture Clean Architecture (Repository, Service, Controller)</strong>
+<div class="details">Repositories: [], Services: [], Controllers: [('backend\\app\\__init__.py', 110), ('backend\\app\\__init__.py', 114), ('backend\\app\\__init__.py', 115), ('backend\\app\\__init__.py', 116), ('backend\\app\\api\\auth.py', 4), ('backend\\app\\api\\auth.py', 14), ('backend\\app\\api\\auth.py', 22), ('backend\\app\\api\\auth.py', 81), ('backend\\app\\api\\auth.py', 120), ('backend\\app\\api\\auth.py', 139), ('backend\\app\\api\\auth.py', 171), ('backend\\app\\api\\auth.py', 195), ('backend\\app\\api\\docs.py', 4), ('backend\\app\\api\\docs.py', 9), ('backend\\app\\api\\docs.py', 80), ('backend\\app\\api\\docs.py', 93), ('backend\\app\\api\\docs.py', 108), ('backend\\app\\api\\docs.py', 122), ('backend\\app\\api\\docs.py', 136), ('backend\\app\\api\\docs.py', 152), ('backend\\app\\api\\docs.py', 169), ('backend\\app\\api\\docs.py', 182), ('backend\\app\\api\\docs.py', 197), ('backend\\app\\api\\docs.py', 211), ('backend\\app\\api\\health.py', 4), ('backend\\app\\api\\health.py', 9), ('backend\\app\\api\\health.py', 11), ('backend\\app\\api\\health.py', 16), ('backend\\app\\api\\health.py', 51), ('backend\\app\\api\\health.py', 68), ('backend\\app\\api\\__init__.py', 2), ('backend\\app\\utils\\decorators.py', 15)]</div></div>
+        <div class="item completed">
+            <strong>✅ Celery pour tâches asynchrones</strong>
+<div class="details">Trouvé dans 10 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Logs structurés configurés</strong>
+<div class="details">Trouvé dans 3 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Rate limiting (Flask-Limiter)</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item completed">
+            <strong>✅ Structure Flask</strong>
+<div class="details">app.py ou app/__init__.py</div></div><div class="category"><h3>Base de Données</h3></div>
+        <div class="item completed">
+            <strong>✅ Migrations créées (Flask-Migrate)</strong>
+</div>
+        <div class="item pending">
+            <strong>❌ Modèle Document</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle Matiere</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle NiveauParcours</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle OptionReponse</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle QCM</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle Question</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle ReponseComposee</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle Resultat</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item completed">
+            <strong>✅ Modèle User</strong>
+<div class="details">Trouvé dans 1 fichier(s)</div></div><div class="category"><h3>Documentation</h3></div>
+        <div class="item completed">
+            <strong>✅ Documentation API (Swagger/OpenAPI)</strong>
+</div>
+        <div class="item completed">
+            <strong>✅ README avec instructions d'installation</strong>
+</div><div class="category"><h3>Déploiement</h3></div>
+        <div class="item pending">
+            <strong>❌ CI/CD configuré (GitHub Actions)</strong>
+</div>
+        <div class="item completed">
+            <strong>✅ Docker Compose configuré</strong>
+</div>
+        <div class="item completed">
+            <strong>✅ Health check endpoint (/health)</strong>
+<div class="details">Trouvé dans 16 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Variables d'environnement documentées (.env.example)</strong>
+</div><div class="category"><h3>Frontend</h3></div>
+        <div class="item pending">
+            <strong>❌ Feedback utilisateur (toasts, messages)</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Framework Frontend</strong>
+<div class="details">Aucun framework détecté</div></div>
+        <div class="item pending">
+            <strong>❌ Gestion des erreurs côté client</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Interface responsive (mobile-friendly)</strong>
+<div class="details">Tailwind: 0, Responsive: 0</div></div>
+        <div class="item pending">
+            <strong>❌ États de chargement (loading states)</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div><div class="category"><h3>Frontend Pages</h3></div>
+        <div class="item pending">
+            <strong>❌ Création QCM</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Dashboard enseignant</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Dashboard étudiant</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Login/Register</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Passage examen</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Visualisation résultats</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div><div class="category"><h3>IA/ML</h3></div>
+        <div class="item pending">
+            <strong>❌ Intégration Hugging Face</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle BERT configuré</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle GPT-2 configuré</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle Sentence-BERT configuré</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Modèle T5 configuré</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div><div class="category"><h3>Module 1</h3></div>
+        <div class="item pending">
+            <strong>❌ Génération de questions avec T5/GPT-2</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div>
+        <div class="item pending">
+            <strong>❌ Upload et extraction de documents (PDF, DOCX, TXT)</strong>
+<div class="details">Trouvé dans 0 fichier(s)</div></div><div class="category"><h3>Module 3</h3></div>
+        <div class="item pending">
+            <strong>❌ Correction automatique (similarité sémantique)</strong>
+<div class="details">Trouvé dans 2 fichier(s)</div></div><div class="category"><h3>Tests</h3></div>
+        <div class="item pending">
+            <strong>❌ Tests backend (pytest/unittest)</strong>
+<div class="details">Aucun test trouvé</div></div>
+        <div class="item pending">
+            <strong>❌ Tests frontend (Jest/Vitest)</strong>
+<div class="details">Aucun test trouvé</div></div>
+    </div>
+</body>
+</html>

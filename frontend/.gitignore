@@ -1,0 +1,13 @@
+# Next.js specific files (not covered by root .gitignore)
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Vercel deployment
+.vercel
+
+# Lock files (keep only npm)
+pnpm-lock.yaml
+yarn.lock
+bun.lockb

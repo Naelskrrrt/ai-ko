@@ -1,0 +1,26 @@
+{
+  "name": "Capt IA",
+  "short_name": "Capt IA",
+  "description": "Plateforme de bien-être au travail et de prévention des risques",
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0a0f0a",
+  "background_color": "#ecfdf5",
+  "display": "standalone",
+  "start_url": "/"
+}

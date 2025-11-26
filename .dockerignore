@@ -1,0 +1,71 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+nginx/logs/
+
+# Data & Backups
+volumes/
+backups/
+*.sql
+*.sql.gz
+*.rdb
+*.rdb.gz
+
+# Monitoring data
+prometheus_data/
+grafana_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Node
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+coverage/
+.nyc_output/
+
+# Scripts (ne pas copier dans les images)
+scripts/
+
+
+

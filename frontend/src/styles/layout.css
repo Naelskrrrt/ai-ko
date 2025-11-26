@@ -1,0 +1,306 @@
+/* Variables CSS pour le système de layout unifié */
+:root {
+  /* Dimensions des composants de layout */
+  --layout-header-height: 4rem; /* 64px fixe pour le header */
+  --layout-footer-height: 3rem; /* 48px fixe pour le footer */
+  --layout-sidebar-width: 256px; /* 256px fixe pour la sidebar desktop */
+  --layout-sidebar-width-mobile: 80vw; /* 80% de la largeur d'écran sur mobile (overlay) */
+  
+  /* Espacement et padding */
+  --layout-content-padding-sm: 1rem; /* 16px */
+  --layout-content-padding-md: 1.5rem; /* 24px */
+  --layout-content-padding-lg: 2rem; /* 32px */
+  
+  /* Z-index pour les couches de layout */
+  --layout-z-header: 40;
+  --layout-z-sidebar: 30;
+  --layout-z-sidebar-overlay: 50; /* Plus élevé pour mobile */
+  --layout-z-footer: 20;
+  --layout-z-content: 10;
+  
+  /* Transitions pour les animations de layout */
+  --layout-transition-duration: 0.2s;
+  --layout-transition-timing: ease-in-out;
+}
+
+/* ========================================
+   VARIABLES DE COULEURS (LEGACY)
+   Ces variables sont conservées pour rétrocompatibilité
+   mais ne sont plus recommandées.
+   Préférez utiliser le système de thèmes dynamiques.
+   ======================================== */
+
+/* Couleurs adaptées au mode clair (par défaut) */
+:root {
+  /* Couleurs de texte et de fond neutres */
+  --color-text-primary: #0f172a; /* Texte principal */
+  --color-text-secondary: #475569; /* Texte secondaire */
+  --color-text-tertiary: #94a3b8; /* Texte tertiaire/désactivé */
+  --color-text-inverse: #ffffff; /* Texte inverse (sur fond sombre) */
+  
+  /* Fonds neutres */
+  --color-bg-primary: #ffffff; /* Fond principal */
+  --color-bg-secondary: #f8fafc; /* Fond secondaire */
+  --color-bg-tertiary: #f1f5f9; /* Fond tertiaire */
+  --color-bg-inverse: #0f172a; /* Fond inverse (très sombre) */
+  
+  /* Bordures et dividers */
+  --color-border: #e2e8f0; /* Bordure standard */
+  --color-border-subtle: #f1f5f9; /* Bordure subtile */
+  --color-divider: #e2e8f0; /* Divider */
+  
+  /* Éléments UI */
+  --color-ui-hover: #f1f5f9; /* Survol */
+  --color-ui-active: #e2e8f0; /* État actif */
+  --color-ui-disabled: #cbd5e1; /* Désactivé */
+  
+  /* Overlay */
+  --color-overlay: rgba(0, 0, 0, 0.15);
+  --color-overlay-strong: rgba(0, 0, 0, 0.5);
+}
+
+/* Couleurs adaptées au mode sombre */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Couleurs de texte et de fond neutres */
+    --color-text-primary: #f1f5f9; /* Texte principal */
+    --color-text-secondary: #cbd5e1; /* Texte secondaire */
+    --color-text-tertiary: #64748b; /* Texte tertiaire/désactivé */
+    --color-text-inverse: #0f172a; /* Texte inverse (sur fond clair) */
+    
+    /* Fonds neutres */
+    --color-bg-primary: #0f172a; /* Fond principal */
+    --color-bg-secondary: #1e293b; /* Fond secondaire */
+    --color-bg-tertiary: #334155; /* Fond tertiaire */
+    --color-bg-inverse: #ffffff; /* Fond inverse (très clair) */
+    
+    /* Bordures et dividers */
+    --color-border: #334155; /* Bordure standard */
+    --color-border-subtle: #1e293b; /* Bordure subtile */
+    --color-divider: #334155; /* Divider */
+    
+    /* Éléments UI */
+    --color-ui-hover: #1e293b; /* Survol */
+    --color-ui-active: #334155; /* État actif */
+    --color-ui-disabled: #475569; /* Désactivé */
+    
+    /* Overlay */
+    --color-overlay: rgba(15, 23, 42, 0.5);
+    --color-overlay-strong: rgba(15, 23, 42, 0.8);
+  }
+}
+
+/* Adaptations spécifiques pour la classe dark (utilisée par next-themes) */
+html.dark {
+  /* Couleurs de texte et de fond neutres */
+  --color-text-primary: #f1f5f9; /* Texte principal */
+  --color-text-secondary: #cbd5e1; /* Texte secondaire */
+  --color-text-tertiary: #64748b; /* Texte tertiaire/désactivé */
+  --color-text-inverse: #0f172a; /* Texte inverse (sur fond clair) */
+  
+  /* Fonds neutres */
+  --color-bg-primary: #0f172a; /* Fond principal */
+  --color-bg-secondary: #1e293b; /* Fond secondaire */
+  --color-bg-tertiary: #334155; /* Fond tertiaire */
+  --color-bg-inverse: #ffffff; /* Fond inverse (très clair) */
+  
+  /* Bordures et dividers */
+  --color-border: #334155; /* Bordure standard */
+  --color-border-subtle: #1e293b; /* Bordure subtile */
+  --color-divider: #334155; /* Divider */
+  
+  /* Éléments UI */
+  --color-ui-hover: #1e293b; /* Survol */
+  --color-ui-active: #334155; /* État actif */
+  --color-ui-disabled: #475569; /* Désactivé */
+  
+  /* Overlay */
+  --color-overlay: rgba(15, 23, 42, 0.5);
+  --color-overlay-strong: rgba(15, 23, 42, 0.8);
+}
+
+/* Layout Frame - Structure principale pour les vues avec sidebar */
+.layout-frame {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Classes utilitaires pour les dimensions */
+.layout-header-height {
+  height: var(--layout-header-height);
+  min-height: var(--layout-header-height);
+  max-height: var(--layout-header-height);
+  flex-shrink: 0;
+}
+
+.layout-footer-height {
+  height: var(--layout-footer-height);
+  min-height: var(--layout-footer-height);
+  max-height: var(--layout-footer-height);
+  flex-shrink: 0;
+}
+
+.layout-sidebar-width {
+  width: var(--layout-sidebar-width);
+  min-width: var(--layout-sidebar-width);
+  max-width: var(--layout-sidebar-width);
+  flex-shrink: 0;
+}
+
+/* Sidebar responsive */
+@media (max-width: 1024px) {
+  .layout-sidebar-width {
+    width: var(--layout-sidebar-width-mobile);
+    min-width: var(--layout-sidebar-width-mobile);
+    max-width: var(--layout-sidebar-width-mobile);
+  }
+}
+
+/* Zone de contenu avec scroll contrôlé */
+.layout-content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.layout-content-area.no-scroll {
+  overflow: hidden;
+}
+
+/* Animations pour les transitions de layout */
+.layout-transition {
+  transition: all var(--layout-transition-duration) var(--layout-transition-timing);
+}
+
+/* Classes pour les différents types de padding */
+.layout-padding-none {
+  padding: 0;
+}
+
+.layout-padding-sm {
+  padding: var(--layout-content-padding-sm);
+}
+
+.layout-padding-md {
+  padding: var(--layout-content-padding-md);
+}
+
+.layout-padding-lg {
+  padding: var(--layout-content-padding-lg);
+}
+
+/* Responsive padding */
+@media (max-width: 640px) {
+  .layout-padding-md {
+    padding: var(--layout-content-padding-sm);
+  }
+  
+  .layout-padding-lg {
+    padding: var(--layout-content-padding-md);
+  }
+}
+
+/* Container unifié pour le contenu responsive */
+.layout-unified-container {
+  max-width: min(1400px, 95vw);
+  margin-left: auto;
+  margin-right: auto;
+  padding: var(--layout-content-padding-lg);
+  width: 100%;
+}
+
+.layout-container-full {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Classes spécialisées pour les vues fullscreen comme la carte */
+.layout-fullscreen-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.layout-fullscreen-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive container adaptatif */
+@media (max-width: 1280px) {
+  .layout-unified-container {
+    max-width: min(1200px, 92vw);
+    padding: var(--layout-content-padding-md);
+  }
+}
+
+@media (max-width: 1024px) {
+  .layout-unified-container {
+    max-width: min(1000px, 90vw);
+    padding: var(--layout-content-padding-md);
+  }
+}
+
+@media (max-width: 640px) {
+  .layout-unified-container {
+    max-width: 100%;
+    padding: var(--layout-content-padding-sm);
+  }
+}
+
+/* Ajustements pour le header et footer */
+.layout-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--layout-z-header);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 2px solid hsl(var(--divider) / 0.6);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.layout-footer {
+  z-index: var(--layout-z-footer);
+  border-top: 2px solid hsl(var(--divider) / 0.6);
+  box-shadow: 0 -1px 3px 0 rgb(0 0 0 / 0.1), 0 -1px 2px -1px rgb(0 0 0 / 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Sidebar fixe sur desktop, overlay sur mobile */
+.layout-sidebar {
+  z-index: var(--layout-z-sidebar);
+  position: relative;
+  border-right: 2px solid hsl(var(--divider) / 0.6);
+  box-shadow: 1px 0 3px 0 rgb(0 0 0 / 0.1);
+}
+
+@media (max-width: 1024px) {
+  .layout-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: var(--layout-z-sidebar-overlay);
+    transform: translateX(-100%);
+    box-shadow: 4px 0 6px -1px rgb(0 0 0 / 0.1), 2px 0 4px -2px rgb(0 0 0 / 0.1);
+    will-change: transform;
+    pointer-events: auto;
+  }
+  
+  .layout-sidebar.open {
+    transform: translateX(0);
+  }
+}

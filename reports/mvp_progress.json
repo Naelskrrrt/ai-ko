@@ -1,0 +1,478 @@
+{
+  "date": "2025-11-21T22:32:51.011679",
+  "completion_percentage": 21.666666666666668,
+  "total_items": 60,
+  "completed_items": 13,
+  "categories": {
+    "Backend": {
+      "total": 5,
+      "completed": 2
+    },
+    "Authentification": {
+      "total": 5,
+      "completed": 5
+    },
+    "Base de Données": {
+      "total": 10,
+      "completed": 2
+    },
+    "API Endpoints": {
+      "total": 13,
+      "completed": 0
+    },
+    "IA/ML": {
+      "total": 5,
+      "completed": 0
+    },
+    "Module 1": {
+      "total": 2,
+      "completed": 0
+    },
+    "Module 3": {
+      "total": 1,
+      "completed": 0
+    },
+    "Déploiement": {
+      "total": 4,
+      "completed": 2
+    },
+    "Frontend": {
+      "total": 5,
+      "completed": 0
+    },
+    "Frontend Pages": {
+      "total": 6,
+      "completed": 0
+    },
+    "Tests": {
+      "total": 2,
+      "completed": 0
+    },
+    "Documentation": {
+      "total": 2,
+      "completed": 2
+    }
+  },
+  "items": [
+    {
+      "category": "Backend",
+      "item": "Structure Flask",
+      "status": true,
+      "details": "app.py ou app/__init__.py",
+      "file_path": null
+    },
+    {
+      "category": "Backend",
+      "item": "Architecture Clean Architecture (Repository, Service, Controller)",
+      "status": [],
+      "details": "Repositories: [], Services: [], Controllers: [('backend\\\\app\\\\__init__.py', 110), ('backend\\\\app\\\\__init__.py', 114), ('backend\\\\app\\\\__init__.py', 115), ('backend\\\\app\\\\__init__.py', 116), ('backend\\\\app\\\\api\\\\auth.py', 4), ('backend\\\\app\\\\api\\\\auth.py', 14), ('backend\\\\app\\\\api\\\\auth.py', 22), ('backend\\\\app\\\\api\\\\auth.py', 81), ('backend\\\\app\\\\api\\\\auth.py', 120), ('backend\\\\app\\\\api\\\\auth.py', 139), ('backend\\\\app\\\\api\\\\auth.py', 171), ('backend\\\\app\\\\api\\\\auth.py', 195), ('backend\\\\app\\\\api\\\\docs.py', 4), ('backend\\\\app\\\\api\\\\docs.py', 9), ('backend\\\\app\\\\api\\\\docs.py', 80), ('backend\\\\app\\\\api\\\\docs.py', 93), ('backend\\\\app\\\\api\\\\docs.py', 108), ('backend\\\\app\\\\api\\\\docs.py', 122), ('backend\\\\app\\\\api\\\\docs.py', 136), ('backend\\\\app\\\\api\\\\docs.py', 152), ('backend\\\\app\\\\api\\\\docs.py', 169), ('backend\\\\app\\\\api\\\\docs.py', 182), ('backend\\\\app\\\\api\\\\docs.py', 197), ('backend\\\\app\\\\api\\\\docs.py', 211), ('backend\\\\app\\\\api\\\\health.py', 4), ('backend\\\\app\\\\api\\\\health.py', 9), ('backend\\\\app\\\\api\\\\health.py', 11), ('backend\\\\app\\\\api\\\\health.py', 16), ('backend\\\\app\\\\api\\\\health.py', 51), ('backend\\\\app\\\\api\\\\health.py', 68), ('backend\\\\app\\\\api\\\\__init__.py', 2), ('backend\\\\app\\\\utils\\\\decorators.py', 15)]",
+      "file_path": null
+    },
+    {
+      "category": "Authentification",
+      "item": "Gestion des sessions (JWT)",
+      "status": true,
+      "details": "Trouvé dans 38 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Authentification",
+      "item": "Rôles utilisateurs (Enseignant, Étudiant, Admin)",
+      "status": true,
+      "details": "Trouvé dans 49 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Authentification",
+      "item": "Protection des routes sensibles par rôle",
+      "status": true,
+      "details": "Trouvé dans 38 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Authentification",
+      "item": "Validation des données (Marshmallow/Pydantic)",
+      "status": true,
+      "details": "Trouvé dans 19 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Authentification",
+      "item": "Protection CSRF (Flask-WTF)",
+      "status": true,
+      "details": "Trouvé dans 16 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle User",
+      "status": true,
+      "details": "Trouvé dans 1 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle QCM",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle Question",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle OptionReponse",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle Resultat",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle ReponseComposee",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle Document",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle Matiere",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Modèle NiveauParcours",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Base de Données",
+      "item": "Migrations créées (Flask-Migrate)",
+      "status": true,
+      "details": "",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "POST /api/qcm/generate",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "POST /api/qcm/from-document",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "GET /api/qcm/preview/{id}",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "POST /api/qcm/{id}/generate-corriges",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "GET /api/qcm/{id}/corriges",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "POST /api/correction/submit",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "POST /api/correction/batch",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "GET /api/correction/results/{etudiant_id}",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "GET /api/evaluation/{resultat_id}",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "POST /api/evaluation/feedback",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "GET /api/statistics/enseignant/dashboard",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "GET /api/statistics/etudiant/dashboard",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "API Endpoints",
+      "item": "GET /api/statistics/export/csv",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "IA/ML",
+      "item": "Intégration Hugging Face",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "IA/ML",
+      "item": "Modèle T5 configuré",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "IA/ML",
+      "item": "Modèle BERT configuré",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "IA/ML",
+      "item": "Modèle Sentence-BERT configuré",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "IA/ML",
+      "item": "Modèle GPT-2 configuré",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Module 1",
+      "item": "Génération de questions avec T5/GPT-2",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Module 3",
+      "item": "Correction automatique (similarité sémantique)",
+      "status": false,
+      "details": "Trouvé dans 2 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Module 1",
+      "item": "Upload et extraction de documents (PDF, DOCX, TXT)",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Backend",
+      "item": "Celery pour tâches asynchrones",
+      "status": true,
+      "details": "Trouvé dans 10 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Backend",
+      "item": "Rate limiting (Flask-Limiter)",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Backend",
+      "item": "Logs structurés configurés",
+      "status": false,
+      "details": "Trouvé dans 3 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Déploiement",
+      "item": "Health check endpoint (/health)",
+      "status": true,
+      "details": "Trouvé dans 16 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend",
+      "item": "Framework Frontend",
+      "status": false,
+      "details": "Aucun framework détecté",
+      "file_path": null
+    },
+    {
+      "category": "Frontend",
+      "item": "Interface responsive (mobile-friendly)",
+      "status": false,
+      "details": "Tailwind: 0, Responsive: 0",
+      "file_path": null
+    },
+    {
+      "category": "Frontend Pages",
+      "item": "Login/Register",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend Pages",
+      "item": "Dashboard enseignant",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend Pages",
+      "item": "Dashboard étudiant",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend Pages",
+      "item": "Création QCM",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend Pages",
+      "item": "Passage examen",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend Pages",
+      "item": "Visualisation résultats",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend",
+      "item": "États de chargement (loading states)",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend",
+      "item": "Gestion des erreurs côté client",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Frontend",
+      "item": "Feedback utilisateur (toasts, messages)",
+      "status": false,
+      "details": "Trouvé dans 0 fichier(s)",
+      "file_path": null
+    },
+    {
+      "category": "Déploiement",
+      "item": "Docker Compose configuré",
+      "status": true,
+      "details": "",
+      "file_path": null
+    },
+    {
+      "category": "Déploiement",
+      "item": "CI/CD configuré (GitHub Actions)",
+      "status": false,
+      "details": "",
+      "file_path": null
+    },
+    {
+      "category": "Déploiement",
+      "item": "Variables d'environnement documentées (.env.example)",
+      "status": false,
+      "details": "",
+      "file_path": null
+    },
+    {
+      "category": "Tests",
+      "item": "Tests backend (pytest/unittest)",
+      "status": false,
+      "details": "Aucun test trouvé",
+      "file_path": null
+    },
+    {
+      "category": "Tests",
+      "item": "Tests frontend (Jest/Vitest)",
+      "status": false,
+      "details": "Aucun test trouvé",
+      "file_path": null
+    },
+    {
+      "category": "Documentation",
+      "item": "README avec instructions d'installation",
+      "status": true,
+      "details": "",
+      "file_path": null
+    },
+    {
+      "category": "Documentation",
+      "item": "Documentation API (Swagger/OpenAPI)",
+      "status": true,
+      "details": "",
+      "file_path": null
+    }
+  ]
+}
