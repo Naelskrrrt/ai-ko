@@ -406,7 +406,7 @@ export default function QCMDetailPage({ params }: QCMDetailPageProps) {
                       isInvalid={!!errors.matiereId}
                     >
                       {matieres.map((matiere) => (
-                        <SelectItem key={matiere.id} value={matiere.id}>
+                        <SelectItem key={matiere.id}>
                           {matiere.nom} ({matiere.code})
                         </SelectItem>
                       ))}
@@ -639,7 +639,7 @@ export default function QCMDetailPage({ params }: QCMDetailPageProps) {
                       })
                     }
                   }}
-                  onDelete={() => {
+                  onDelete={async () => {
                     setQuestionToDelete(question.id)
                     onDeleteQuestionConfirmOpen()
                   }}
@@ -772,9 +772,21 @@ function QuestionEditor({
 }: QuestionEditorProps) {
   const [enonce, setEnonce] = React.useState(question?.enonce || '')
   const [points, setPoints] = React.useState(question?.points || 1)
-  const [typeQuestion, setTypeQuestion] = React.useState<'qcm' | 'vrai_faux' | 'texte_libre'>(question?.typeQuestion || 'qcm')
+
+  // Map incoming typeQuestion values to valid types
+  const normalizeTypeQuestion = (type?: string): 'qcm' | 'vrai_faux' | 'texte_libre' => {
+    if (type === 'text') return 'texte_libre'
+    if (type === 'qcm_multiple') return 'qcm'
+    if (type === 'vrai_faux') return 'vrai_faux'
+    if (type === 'texte_libre') return 'texte_libre'
+    return 'qcm'
+  }
+
+  const [typeQuestion, setTypeQuestion] = React.useState<'qcm' | 'vrai_faux' | 'texte_libre'>(normalizeTypeQuestion(question?.typeQuestion))
   const [options, setOptions] = React.useState<any[]>(question?.options || [])
-  const [reponseCorrecte, setReponseCorrecte] = React.useState(question?.reponseCorrecte || '')
+  const [reponseCorrecte, setReponseCorrecte] = React.useState<string>(
+    typeof question?.reponseCorrecte === 'string' ? question.reponseCorrecte : ''
+  )
   const [explication, setExplication] = React.useState(question?.explication || '')
   const [isSaving, setIsSaving] = React.useState(false)
 
@@ -782,9 +794,9 @@ function QuestionEditor({
     if (question) {
       setEnonce(question.enonce || '')
       setPoints(question.points || 1)
-      setTypeQuestion(question.typeQuestion || 'qcm')
+      setTypeQuestion(normalizeTypeQuestion(question.typeQuestion))
       setOptions(question.options || [])
-      setReponseCorrecte(question.reponseCorrecte || '')
+      setReponseCorrecte(typeof question.reponseCorrecte === 'string' ? question.reponseCorrecte : '')
       setExplication(question.explication || '')
     } else {
       // Nouvelle question

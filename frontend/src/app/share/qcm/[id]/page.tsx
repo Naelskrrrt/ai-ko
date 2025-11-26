@@ -206,12 +206,6 @@ export default function ShareQCMPage({ params }: ShareQCMPageProps) {
                 <p className="font-medium">{qcm.duree} minutes</p>
               </div>
             )}
-            {qcm.createur && (
-              <div>
-                <p className="text-sm text-default-500">Créateur</p>
-                <p className="font-medium">{qcm.createur.name || qcm.createur.email}</p>
-              </div>
-            )}
           </div>
         </CardBody>
       </Card>

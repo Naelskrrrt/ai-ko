@@ -90,13 +90,7 @@ services:
     command: >
       sh -c "
         flask db upgrade &&
-        gunicorn --bind 0.0.0.0:5000
-                 --workers ${GUNICORN_WORKERS:-4}
-                 --timeout 300
-                 --access-logfile -
-                 --error-logfile -
-                 --log-level info
-                 run:app
+        gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 300 --access-logfile - --error-logfile - --log-level info run:app
       "
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]

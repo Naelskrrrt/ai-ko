@@ -46,9 +46,7 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
     return (
       <Card
         key={event.id}
-        className="cursor-pointer transition-all hover:shadow-md dark:hover:shadow-lg select-none"
-        isPressable
-        onPress={() => handleEventClick(event)}
+        className="transition-all hover:shadow-md dark:hover:shadow-lg select-none"
       >
         <CardBody className="p-4">
           <div className="flex items-start gap-3">
@@ -56,7 +54,7 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
             <div
               className={clsx(
                 "w-3 h-3 rounded-full flex-shrink-0 mt-1",
-                COLOR_CLASSES[event.color].split(" ")[0] // Prendre seulement la classe bg
+                COLOR_CLASSES[event.color].bg
               )}
             />
 
