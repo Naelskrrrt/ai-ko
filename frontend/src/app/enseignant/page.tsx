@@ -1,14 +1,15 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { useAuth } from '@/core/providers/AuthProvider'
-import { StatsCards } from '@/features/enseignant/components/dashboard/StatsCards'
-import { RecentQCMs } from '@/features/enseignant/components/dashboard/RecentQCMs'
-import { UpcomingSessions } from '@/features/enseignant/components/dashboard/UpcomingSessions'
+import * as React from "react";
+
+import { useAuth } from "@/core/providers/AuthProvider";
+import { StatsCards } from "@/features/enseignant/components/dashboard/StatsCards";
+import { RecentQCMs } from "@/features/enseignant/components/dashboard/RecentQCMs";
+import { UpcomingSessions } from "@/features/enseignant/components/dashboard/UpcomingSessions";
 
 export default function EnseignantDashboardPage() {
-  const { user } = useAuth()
-  const userId = user?.id || ''
+  const { user } = useAuth();
+  const userId = user?.id || "";
 
   return (
     <div className="space-y-6">
@@ -21,5 +22,5 @@ export default function EnseignantDashboardPage() {
         <UpcomingSessions userId={userId} />
       </div>
     </div>
-  )
+  );
 }

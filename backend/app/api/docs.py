@@ -69,6 +69,20 @@ api.add_namespace(classe_api, path='/classes')
 api.add_namespace(session_api, path='/sessions')
 api.add_namespace(resultat_api, path='/resultats')
 
+# Import et ajout des nouveaux namespaces (Refonte - Enseignants/Étudiants)
+from app.api.etablissement import api as etablissement_api
+from app.api.mention import api as mention_api
+from app.api.parcours import api as parcours_api
+from app.api.enseignant import api as enseignant_api
+from app.api.etudiant import api as etudiant_api
+
+# Ajouter les nouveaux namespaces (refonte)
+api.add_namespace(etablissement_api, path='/etablissements')
+api.add_namespace(mention_api, path='/mentions')
+api.add_namespace(parcours_api, path='/parcours')
+api.add_namespace(enseignant_api, path='/enseignants')
+api.add_namespace(etudiant_api, path='/etudiants')
+
 # Modèles de données pour la documentation
 register_model = api.model('RegisterRequest', {
     'name': fields.String(required=True, description='Nom de l\'utilisateur', example='John Doe'),

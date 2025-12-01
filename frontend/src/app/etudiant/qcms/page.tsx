@@ -1,7 +1,8 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { QCMsList } from '@/features/etudiant/components/qcms/QCMsList'
+import * as React from "react";
+
+import { QCMsList } from "@/features/etudiant/components/qcms/QCMsList";
 
 export default function QCMsPage() {
   return (
@@ -15,12 +16,5 @@ export default function QCMsPage() {
 
       <QCMsList />
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-

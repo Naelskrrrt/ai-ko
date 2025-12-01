@@ -1,5 +1,4 @@
 import * as React from "react";
-import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useIsSSR } from "@react-aria/ssr";
 import { GraduationCap } from "lucide-react";
@@ -24,7 +23,7 @@ export const Logo: React.FC<{
 
   return (
     <div className="flex items-center gap-2 bg-theme-primary p-2 rounded-md">
-    {/* <Image
+      {/* <Image
           unoptimized
           alt="Capt IA Logo"
           className={`object-contain ${className || ""}`}
@@ -32,10 +31,9 @@ export const Logo: React.FC<{
           src={logoSrc}
           width={logoWidth}
         /> */}
-        <GraduationCap className="w-6 h-6 text-white" />
-        <span className="text-md font-bold text-white">AI-KO</span>
+      <GraduationCap className="w-6 h-6 text-white" />
+      <span className="text-md font-bold text-white">AI-KO</span>
     </div>
-    
   );
 };
 

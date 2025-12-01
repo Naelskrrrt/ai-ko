@@ -4,8 +4,10 @@ Repository pour la gestion des Sessions d'Examen
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 from sqlalchemy import or_, and_
+from sqlalchemy.orm import joinedload
 from app.repositories.base_repository import BaseRepository
 from app.models.session_examen import SessionExamen
+from app.models.qcm import QCM
 
 
 class SessionExamenRepository(BaseRepository[SessionExamen]):
@@ -14,17 +16,29 @@ class SessionExamenRepository(BaseRepository[SessionExamen]):
     def __init__(self):
         super().__init__(SessionExamen)
 
+    def get_by_id(self, id: str) -> Optional[SessionExamen]:
+        """Récupère une session par son ID avec le QCM et sa matière chargés"""
+        return self.session.query(SessionExamen).options(
+            joinedload(SessionExamen.qcm).joinedload(QCM.matiere_obj)
+        ).filter(SessionExamen.id == id).first()
+
     def get_by_qcm(self, qcm_id: str) -> List[SessionExamen]:
         """Récupère toutes les sessions d'un QCM"""
-        return self.session.query(SessionExamen).filter(SessionExamen.qcm_id == qcm_id).order_by(SessionExamen.date_debut.desc()).all()
+        return self.session.query(SessionExamen).options(
+            joinedload(SessionExamen.qcm).joinedload(QCM.matiere_obj)
+        ).filter(SessionExamen.qcm_id == qcm_id).order_by(SessionExamen.date_debut.desc()).all()
 
     def get_by_classe(self, classe_id: str) -> List[SessionExamen]:
         """Récupère toutes les sessions d'une classe"""
-        return self.session.query(SessionExamen).filter(SessionExamen.classe_id == classe_id).order_by(SessionExamen.date_debut.desc()).all()
+        return self.session.query(SessionExamen).options(
+            joinedload(SessionExamen.qcm).joinedload(QCM.matiere_obj)
+        ).filter(SessionExamen.classe_id == classe_id).order_by(SessionExamen.date_debut.desc()).all()
 
     def get_by_createur(self, createur_id: str) -> List[SessionExamen]:
         """Récupère toutes les sessions créées par un enseignant"""
-        return self.session.query(SessionExamen).filter(SessionExamen.createur_id == createur_id).order_by(SessionExamen.date_debut.desc()).all()
+        return self.session.query(SessionExamen).options(
+            joinedload(SessionExamen.qcm).joinedload(QCM.matiere_obj)
+        ).filter(SessionExamen.createur_id == createur_id).order_by(SessionExamen.date_debut.desc()).all()
 
     def get_by_status(self, status: str) -> List[SessionExamen]:
         """Récupère toutes les sessions d'un certain statut"""
@@ -43,7 +57,9 @@ class SessionExamenRepository(BaseRepository[SessionExamen]):
         La date de début n'est plus une restriction - seule la date de fin (limite de soumission) compte
         """
         now = datetime.utcnow()
-        return self.session.query(SessionExamen).filter(
+        return self.session.query(SessionExamen).options(
+            joinedload(SessionExamen.qcm).joinedload(QCM.matiere_obj)
+        ).filter(
             and_(
                 SessionExamen.status.in_(['programmee', 'en_cours']),
                 SessionExamen.date_fin >= now  # Seule la date de fin (limite de soumission) est vérifiée
@@ -52,7 +68,10 @@ class SessionExamenRepository(BaseRepository[SessionExamen]):
 
     def get_all_paginated(self, skip: int = 0, limit: int = 100, filters: Optional[Dict[str, Any]] = None) -> tuple[List[SessionExamen], int]:
         """Récupère les sessions avec pagination et filtres"""
-        query = self.session.query(SessionExamen)
+        # Charger le QCM et sa relation matiere_obj en une seule requête
+        query = self.session.query(SessionExamen).options(
+            joinedload(SessionExamen.qcm).joinedload(QCM.matiere_obj)
+        )
 
         if filters:
             if 'status' in filters and filters['status']:

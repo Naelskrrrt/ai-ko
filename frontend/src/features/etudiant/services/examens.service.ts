@@ -1,42 +1,48 @@
-import axios from 'axios'
 import type {
   Examen,
   StartExamResponse,
-  SubmitExamRequest,
   SubmitExamResponse,
-} from '../types/examens.types'
-import { transformSessionToExamen, transformQuestionToQuestion } from '../utils/transformers'
+} from "../types/examens.types";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import axios from "axios";
+
+import {
+  transformSessionToExamen,
+  transformQuestionToQuestion,
+} from "../utils/transformers";
+
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const examensApi = axios.create({
   baseURL: `${API_URL}/api`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
-})
+});
 
 // Intercepteur pour ajouter le token JWT aux requêtes
 examensApi.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     // Essayer d'abord les cookies
     let token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('auth_token='))
-      ?.split('=')[1]
+      .split("; ")
+      .find((row) => row.startsWith("auth_token="))
+      ?.split("=")[1];
 
     // Si pas dans les cookies, essayer localStorage
     if (!token) {
-      token = localStorage.getItem('auth_token')
+      token = localStorage.getItem("auth_token") || undefined;
     }
 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
   }
-  return config
-})
+
+  return config;
+});
 
 // Intercepteur pour logger les erreurs
 examensApi.interceptors.response.use(
@@ -45,22 +51,25 @@ examensApi.interceptors.response.use(
     // Ne pas logger les erreurs 404/400 comme des erreurs critiques
     // (peut être normal si l'endpoint n'existe pas encore ou si userId est invalide)
     if (error.response?.status === 404 || error.response?.status === 400) {
-      console.warn('⚠️ API Warning:', {
+      // eslint-disable-next-line no-console
+      console.warn("⚠️ API Warning:", {
         url: error.config?.url,
         status: error.response?.status,
-        message: error.response?.data?.message || 'Ressource non trouvée',
-      })
+        message: error.response?.data?.message || "Ressource non trouvée",
+      });
     } else {
-      console.error('❌ API Error:', {
+      // eslint-disable-next-line no-console
+      console.error("❌ API Error:", {
         url: error.config?.url,
         status: error.response?.status,
         data: error.response?.data,
         message: error.message,
-      })
+      });
     }
-    return Promise.reject(error)
-  }
-)
+
+    return Promise.reject(error);
+  },
+);
 
 export const examensService = {
   /**
@@ -69,19 +78,22 @@ export const examensService = {
   async getAll(userId: string): Promise<Examen[]> {
     // Récupérer les sessions disponibles formatées
     const response = await examensApi.get<any[]>(
-      `/sessions/disponibles?format=examen`
-    )
-    
+      `/sessions/disponibles?format=examen`,
+    );
+
     // Transformer en format Examen[]
-    return response.data.map((session) => transformSessionToExamen(session))
+    return response.data.map((session) => transformSessionToExamen(session));
   },
 
   /**
    * Récupère un examen par son ID (sessionId)
    */
   async getById(examId: string): Promise<Examen> {
-    const response = await examensApi.get<any>(`/sessions/${examId}?format=examen`)
-    return transformSessionToExamen(response.data)
+    const response = await examensApi.get<any>(
+      `/sessions/${examId}?format=examen`,
+    );
+
+    return transformSessionToExamen(response.data);
   },
 
   /**
@@ -89,21 +101,25 @@ export const examensService = {
    * Note: examId est en fait le sessionId
    */
   async startExam(examId: string, userId: string): Promise<StartExamResponse> {
-    const response = await examensApi.post<any>(
-      `/resultats/demarrer`,
-      { sessionId: examId }
-    )
-    
+    const response = await examensApi.post<any>(`/resultats/demarrer`, {
+      sessionId: examId,
+    });
+
     // Le backend retourne déjà le format StartExamResponse
     // Mais on doit s'assurer que les questions sont bien formatées
-    const data = response.data
-    
+    const data = response.data;
+
     // Vérifier que les questions sont présentes
-    if (!data.questions || !Array.isArray(data.questions) || data.questions.length === 0) {
-      console.error('Aucune question retournée par le backend:', data)
-      throw new Error('Aucune question disponible pour cet examen')
+    if (
+      !data.questions ||
+      !Array.isArray(data.questions) ||
+      data.questions.length === 0
+    ) {
+      // eslint-disable-next-line no-console
+      console.error("Aucune question retournée par le backend:", data);
+      throw new Error("Aucune question disponible pour cet examen");
     }
-    
+
     return {
       session_id: data.session_id,
       examen: data.examen,
@@ -112,7 +128,7 @@ export const examensService = {
       duree_totale_secondes: data.duree_totale_secondes,
       questions: data.questions.map((q: any) => transformQuestionToQuestion(q)),
       reponses_sauvegardees: data.reponses_sauvegardees || {},
-    }
+    };
   },
 
   /**
@@ -123,11 +139,12 @@ export const examensService = {
   async saveAnswers(
     examId: string,
     sessionId: string,
-    reponses: Record<string, any>
+    reponses: Record<string, any>,
   ): Promise<void> {
     // TODO: Implémenter un endpoint de sauvegarde automatique si nécessaire
     // Pour l'instant, on ne fait rien car les réponses sont soumises à la fin
-    console.log('Auto-save non implémenté côté backend pour le moment')
+    // eslint-disable-next-line no-console
+    console.log("Auto-save non implémenté côté backend pour le moment");
   },
 
   /**
@@ -135,15 +152,16 @@ export const examensService = {
    * Note: examId est en fait le resultatId (session_id retourné par startExam)
    */
   async getTimeRemaining(examId: string): Promise<{
-    duree_restante_secondes: number
-    date_debut_examen: string
-    duree_totale_secondes: number
-    temps_ecoule_secondes: number
+    duree_restante_secondes: number;
+    date_debut_examen: string;
+    duree_totale_secondes: number;
+    temps_ecoule_secondes: number;
   }> {
     const response = await examensApi.get<any>(
-      `/resultats/${examId}/temps-restant`
-    )
-    return response.data
+      `/resultats/${examId}/temps-restant`,
+    );
+
+    return response.data;
   },
 
   /**
@@ -154,21 +172,22 @@ export const examensService = {
     examId: string,
     userId: string,
     reponses: Record<string, any>,
-    tempsTotal?: number
+    tempsTotal?: number,
   ): Promise<SubmitExamResponse> {
     // examId est en fait le resultatId (session_id du StartExamResponse)
     const response = await examensApi.post<any>(
       `/resultats/${examId}/soumettre`,
-      { reponses }
-    )
-    
-    const data = response.data
+      { reponses },
+    );
+
+    const data = response.data;
+
     return {
       resultat_id: data.id,
-      message: 'Examen soumis avec succès',
+      message: "Examen soumis avec succès",
       note: data.noteSur20,
       note_max: 20,
       pourcentage: data.pourcentage,
-    }
+    };
   },
-}
+};

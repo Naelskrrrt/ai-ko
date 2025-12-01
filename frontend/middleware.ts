@@ -56,7 +56,9 @@ function isProtectedRoute(pathname: string): boolean {
 }
 
 function isDisabledRoute(pathname: string): boolean {
-  return DISABLED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  return DISABLED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
 }
 
 // ================================================
@@ -85,12 +87,15 @@ export async function middleware(request: NextRequest) {
     // Si l'utilisateur a un token et essaie d'accéder à /login ou /register, rediriger
     if (pathname === "/login" || pathname === "/register") {
       const token = request.cookies.get("auth_token")?.value;
+
       if (token) {
         // Rediriger vers /admin par défaut (ou la page d'accueil)
         const redirectUrl = new URL("/admin", request.url);
+
         return NextResponse.redirect(redirectUrl);
       }
     }
+
     return NextResponse.next();
   }
 

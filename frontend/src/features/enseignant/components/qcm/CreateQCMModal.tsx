@@ -1,65 +1,72 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import * as React from "react";
 import {
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useDisclosure,
-} from '@heroui/modal'
-import { Button } from '@heroui/button'
-import { Sparkles } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { QCMGenerateForm } from './QCMGenerateForm'
+} from "@heroui/modal";
+import { Button } from "@heroui/button";
+import { Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import { QCMGenerateForm } from "./QCMGenerateForm";
 
 interface CreateQCMModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess?: (qcmId: string) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: (qcmId: string) => void;
 }
 
-export function CreateQCMModal({ isOpen, onClose, onSuccess }: CreateQCMModalProps) {
-  const router = useRouter()
-  const formRef = React.useRef<HTMLFormElement>(null)
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [isPolling, setIsPolling] = React.useState(false)
+export function CreateQCMModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: CreateQCMModalProps) {
+  const router = useRouter();
+  const formRef = React.useRef<HTMLFormElement>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isPolling, setIsPolling] = React.useState(false);
 
   const handleSuccess = (qcmId: string) => {
     if (onSuccess) {
-      onSuccess(qcmId)
+      onSuccess(qcmId);
     }
     // Fermer le modal et rediriger vers la page de détails du QCM
-    onClose()
-    router.push(`/enseignant/qcm/${qcmId}`)
-  }
+    onClose();
+    router.push(`/enseignant/qcm/${qcmId}`);
+  };
 
   const handleSubmit = () => {
     if (formRef.current) {
-      formRef.current.requestSubmit()
+      formRef.current.requestSubmit();
     }
-  }
+  };
 
-  const handleStateChange = (state: { isSubmitting: boolean; isPolling: boolean }) => {
-    setIsSubmitting(state.isSubmitting)
-    setIsPolling(state.isPolling)
-  }
+  const handleStateChange = (state: {
+    isSubmitting: boolean;
+    isPolling: boolean;
+  }) => {
+    setIsSubmitting(state.isSubmitting);
+    setIsPolling(state.isPolling);
+  };
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={isSubmitting || isPolling ? undefined : onClose}
-      size="4xl"
-      scrollBehavior="inside"
+      classNames={{
+        base: "bg-background",
+        header: "border-b border-divider",
+        body: "py-6",
+        footer: "border-t border-divider",
+      }}
       isDismissable={!isSubmitting && !isPolling}
       isKeyboardDismissDisabled={isSubmitting || isPolling}
-      classNames={{
-        base: 'bg-background',
-        header: 'border-b border-divider',
-        body: 'py-6',
-        footer: 'border-t border-divider',
-      }}
+      isOpen={isOpen}
+      scrollBehavior="inside"
+      size="4xl"
+      onClose={isSubmitting || isPolling ? undefined : onClose}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
@@ -70,33 +77,32 @@ export function CreateQCMModal({ isOpen, onClose, onSuccess }: CreateQCMModalPro
         </ModalHeader>
         <ModalBody>
           <QCMGenerateForm
+            formRef={formRef}
             isModal={true}
             onClose={onClose}
-            onSuccess={handleSuccess}
-            formRef={formRef}
             onStateChange={handleStateChange}
+            onSuccess={handleSuccess}
           />
         </ModalBody>
         <ModalFooter>
           <Button
+            isDisabled={isSubmitting || isPolling}
             variant="light"
             onPress={onClose}
-            isDisabled={isSubmitting || isPolling}
           >
             Annuler
           </Button>
           <Button
             color="primary"
-            onPress={handleSubmit}
-            isLoading={isSubmitting || isPolling}
             isDisabled={isPolling}
+            isLoading={isSubmitting || isPolling}
             startContent={<Sparkles className="w-4 h-4" />}
+            onPress={handleSubmit}
           >
-            {isPolling ? 'Génération en cours...' : 'Générer le QCM'}
+            {isPolling ? "Génération en cours..." : "Générer le QCM"}
           </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
+  );
 }
-

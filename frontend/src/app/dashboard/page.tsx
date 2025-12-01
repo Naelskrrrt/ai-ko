@@ -40,7 +40,9 @@ export default function GeneralDashboard() {
           <CardBody className="text-center">
             <TrendingUp className="w-8 h-8 text-theme-primary mx-auto mb-2" />
             <h3 className="text-2xl font-bold text-theme-primary">+15.2%</h3>
-            <p className="text-sm text-default-600 dark:text-default-400">Croissance mensuelle</p>
+            <p className="text-sm text-default-600 dark:text-default-400">
+              Croissance mensuelle
+            </p>
           </CardBody>
         </Card>
 
@@ -48,7 +50,9 @@ export default function GeneralDashboard() {
           <CardBody className="text-center">
             <Users className="w-8 h-8 text-theme-secondary mx-auto mb-2" />
             <h3 className="text-2xl font-bold text-theme-secondary">1,247</h3>
-            <p className="text-sm text-default-600 dark:text-default-400">Utilisateurs actifs</p>
+            <p className="text-sm text-default-600 dark:text-default-400">
+              Utilisateurs actifs
+            </p>
           </CardBody>
         </Card>
 
@@ -56,7 +60,9 @@ export default function GeneralDashboard() {
           <CardBody className="text-center">
             <ShoppingCart className="w-8 h-8 text-theme-accent mx-auto mb-2" />
             <h3 className="text-2xl font-bold text-theme-accent">€89,420</h3>
-            <p className="text-sm text-default-600 dark:text-default-400">Revenus ce mois</p>
+            <p className="text-sm text-default-600 dark:text-default-400">
+              Revenus ce mois
+            </p>
           </CardBody>
         </Card>
 
@@ -92,7 +98,9 @@ export default function GeneralDashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Nouveaux clients</span>
-                <span className="font-semibold text-theme-secondary">+8.2%</span>
+                <span className="font-semibold text-theme-secondary">
+                  +8.2%
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Taux de conversion</span>
@@ -237,9 +245,7 @@ export default function GeneralDashboard() {
           <CardBody>
             <div className="space-y-3">
               <div className="flex items-start gap-3 p-3 bg-theme-primary/10 dark:bg-theme-primary/20 rounded-lg">
-                <div className="text-theme-primary font-bold text-sm">
-                  LUN
-                </div>
+                <div className="text-theme-primary font-bold text-sm">LUN</div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">Réunion équipe</p>
                   <p className="text-xs text-color-secondary">9h00 - 10h30</p>
@@ -255,18 +261,14 @@ export default function GeneralDashboard() {
                 </div>
               </div>
               <div className="flex items-start gap-3 p-3 bg-theme-accent/10 dark:bg-theme-accent/20 rounded-lg">
-                <div className="text-theme-accent font-bold text-sm">
-                  MER
-                </div>
+                <div className="text-theme-accent font-bold text-sm">MER</div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">Formation équipe</p>
                   <p className="text-xs text-color-secondary">10h00 - 12h00</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-3 bg-theme-primary/10 dark:bg-theme-primary/20 rounded-lg">
-                <div className="text-theme-primary font-bold text-sm">
-                  JEU
-                </div>
+                <div className="text-theme-primary font-bold text-sm">JEU</div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">Revue de code</p>
                   <p className="text-xs text-color-secondary">15h00 - 17h00</p>
@@ -311,9 +313,7 @@ export default function GeneralDashboard() {
 
               <div className="p-4 border-l-4 border-success bg-success/10 dark:bg-success/20">
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-medium text-success">
-                    API v2.0
-                  </h4>
+                  <h4 className="font-medium text-success">API v2.0</h4>
                   <span className="text-xs bg-success text-white px-2 py-1 rounded">
                     Terminé
                   </span>
@@ -915,9 +915,7 @@ export default function GeneralDashboard() {
                   <h4 className="font-semibold text-theme-primary mb-2">
                     Temps de réponse
                   </h4>
-                  <p className="text-2xl font-bold text-theme-primary">
-                    147ms
-                  </p>
+                  <p className="text-2xl font-bold text-theme-primary">147ms</p>
                   <p className="text-sm text-theme-primary/80">
                     Moyenne sur 7 jours
                   </p>
@@ -930,12 +928,8 @@ export default function GeneralDashboard() {
                   <h4 className="font-semibold text-success mb-2">
                     Disponibilité
                   </h4>
-                  <p className="text-2xl font-bold text-success">
-                    99.97%
-                  </p>
-                  <p className="text-sm text-success/80">
-                    Uptime mensuel
-                  </p>
+                  <p className="text-2xl font-bold text-success">99.97%</p>
+                  <p className="text-sm text-success/80">Uptime mensuel</p>
                   <div className="mt-2 text-xs text-success/70">
                     ✅ Objectif SLA atteint
                   </div>
@@ -945,9 +939,7 @@ export default function GeneralDashboard() {
                   <h4 className="font-semibold text-theme-secondary mb-2">
                     Charge CPU
                   </h4>
-                  <p className="text-2xl font-bold text-theme-secondary">
-                    34%
-                  </p>
+                  <p className="text-2xl font-bold text-theme-secondary">34%</p>
                   <p className="text-sm text-theme-secondary/80">
                     Utilisation moyenne
                   </p>
@@ -963,21 +955,27 @@ export default function GeneralDashboard() {
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <p className="text-default-600 dark:text-default-400">Requêtes/min</p>
-                    <p className="font-bold text-lg text-foreground">
-                      2,847
+                    <p className="text-default-600 dark:text-default-400">
+                      Requêtes/min
                     </p>
+                    <p className="font-bold text-lg text-foreground">2,847</p>
                   </div>
                   <div>
-                    <p className="text-default-600 dark:text-default-400">Erreurs 4xx</p>
+                    <p className="text-default-600 dark:text-default-400">
+                      Erreurs 4xx
+                    </p>
                     <p className="font-bold text-lg text-warning">0.3%</p>
                   </div>
                   <div>
-                    <p className="text-default-600 dark:text-default-400">Erreurs 5xx</p>
+                    <p className="text-default-600 dark:text-default-400">
+                      Erreurs 5xx
+                    </p>
                     <p className="font-bold text-lg text-danger">0.02%</p>
                   </div>
                   <div>
-                    <p className="text-default-600 dark:text-default-400">Cache Hit</p>
+                    <p className="text-default-600 dark:text-default-400">
+                      Cache Hit
+                    </p>
                     <p className="font-bold text-lg text-success">94.2%</p>
                   </div>
                 </div>
@@ -1008,7 +1006,7 @@ export default function GeneralDashboard() {
       </div>
 
       {/* Footer du dashboard avec informations système */}
-              <Card className="mb-8">
+      <Card className="mb-8">
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-default-600 dark:text-default-400">
             <div>
@@ -1051,9 +1049,7 @@ export default function GeneralDashboard() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-foreground mb-2">
-                🔒 Sécurité
-              </h4>
+              <h4 className="font-medium text-foreground mb-2">🔒 Sécurité</h4>
               <ul className="space-y-1">
                 <li>
                   SSL: <span className="text-success font-medium">Valide</span>

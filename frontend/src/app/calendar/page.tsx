@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
+
 import { DashboardContentArea } from "@/components/layout/content-area";
 import { CalendarToolbar } from "@/components/calendar/calendar-toolbar";
 import { MonthView } from "@/components/calendar/month-view";
@@ -12,7 +13,7 @@ import { useCalendar } from "@/core/hooks/useCalendar";
 import { CalendarEvent } from "@/core/types/calendar";
 // Metadata déplacée vers le layout parent
 
-export default function CalendarPage() {
+function CalendarPageContent() {
   const {
     currentDate,
     selectedDate,
@@ -20,7 +21,7 @@ export default function CalendarPage() {
     events,
     shouldScrollToDefault,
     scrollTriggerRef,
-    setCurrentDate,
+    setCurrentDate: _setCurrentDate,
     setSelectedDate,
     setView,
     createEvent,
@@ -36,7 +37,7 @@ export default function CalendarPage() {
   // État pour le popover d'événement
   const [isEventPopoverOpen, setIsEventPopoverOpen] = React.useState(false);
   const [editingEvent, setEditingEvent] = React.useState<CalendarEvent | null>(
-    null
+    null,
   );
   const [defaultEventDate, setDefaultEventDate] = React.useState<
     Date | undefined
@@ -52,8 +53,10 @@ export default function CalendarPage() {
 
   // Déclencher le scroll par défaut quand on change de vue vers semaine ou jour
   React.useEffect(() => {
+    // eslint-disable-next-line no-console
     console.log("CalendarPage view changed:", { view, shouldScrollToDefault });
     if (view === "week" || view === "day") {
+      // eslint-disable-next-line no-console
       console.log("Triggering scroll to default for view:", view);
       triggerScrollToDefault();
     }
@@ -73,7 +76,7 @@ export default function CalendarPage() {
     date: Date,
     startTime: string,
     endTime: string,
-    triggerElement?: HTMLElement
+    triggerElement?: HTMLElement,
   ) => {
     setDefaultEventDate(date);
     setDefaultStartTime(startTime);
@@ -85,7 +88,7 @@ export default function CalendarPage() {
 
   const handleEditEvent = (
     event: CalendarEvent,
-    triggerElement?: HTMLElement
+    triggerElement?: HTMLElement,
   ) => {
     setEditingEvent(event);
     // Ne pas écraser les valeurs par défaut lors de l'édition
@@ -95,14 +98,18 @@ export default function CalendarPage() {
   };
 
   const handleSaveEvent = (event: CalendarEvent) => {
+    // eslint-disable-next-line no-console
     console.log("handleSaveEvent called with:", event);
     if (editingEvent) {
       // Pour l'édition, on passe l'événement complet
+      // eslint-disable-next-line no-console
       console.log("Updating event:", event.id);
       updateEvent(event.id, event);
     } else {
       // Pour la création, on passe seulement les données sans id, createdAt, updatedAt
       const { id, createdAt, updatedAt, ...eventData } = event;
+
+      // eslint-disable-next-line no-console
       console.log("Creating new event with data:", eventData);
       createEvent(eventData);
     }
@@ -165,26 +172,26 @@ export default function CalendarPage() {
         return (
           <WeekView
             {...commonProps}
+            scrollTriggerRef={scrollTriggerRef}
+            shouldScrollToDefault={shouldScrollToDefault}
             onEventClick={(
               event: CalendarEvent,
-              triggerElement?: HTMLElement
+              triggerElement?: HTMLElement,
             ) => handleEditEvent(event, triggerElement)}
             onEventCreate={(
               date: Date,
               startTime: string,
               endTime: string,
-              triggerElement?: HTMLElement
+              triggerElement?: HTMLElement,
             ) =>
               handleCreateEventWithTime(
                 date,
                 startTime,
                 endTime,
-                triggerElement
+                triggerElement,
               )
             }
             onEventResize={handleEventResize}
-            shouldScrollToDefault={shouldScrollToDefault}
-            scrollTriggerRef={scrollTriggerRef}
             onScrollCompleted={markScrollCompleted}
           />
         );
@@ -194,26 +201,26 @@ export default function CalendarPage() {
           <DayView
             currentDate={selectedDate}
             events={events}
+            scrollTriggerRef={scrollTriggerRef}
+            shouldScrollToDefault={shouldScrollToDefault}
             onEventClick={(
               event: CalendarEvent,
-              triggerElement?: HTMLElement
+              triggerElement?: HTMLElement,
             ) => handleEditEvent(event, triggerElement)}
             onEventCreate={(
               date: Date,
               startTime: string,
               endTime: string,
-              triggerElement?: HTMLElement
+              triggerElement?: HTMLElement,
             ) =>
               handleCreateEventWithTime(
                 date,
                 startTime,
                 endTime,
-                triggerElement
+                triggerElement,
               )
             }
             onEventResize={handleEventResize}
-            shouldScrollToDefault={shouldScrollToDefault}
-            scrollTriggerRef={scrollTriggerRef}
             onScrollCompleted={markScrollCompleted}
           />
         );
@@ -233,9 +240,9 @@ export default function CalendarPage() {
 
   return (
     <DashboardContentArea
-      fullWidth={true}
-      enableScroll={false}
       className="flex flex-col h-full p-0"
+      enableScroll={false}
+      fullWidth={true}
     >
       {/* Toolbar de navigation */}
       <div className="pb-0 flex-shrink-0">
@@ -243,20 +250,20 @@ export default function CalendarPage() {
           currentDate={currentDate}
           selectedDate={selectedDate}
           view={view}
-          onViewChange={setView}
-          onNavigatePrevious={navigateToPrevious}
-          onNavigateNext={navigateToNext}
-          onNavigateToday={navigateToToday}
-          onCreateEvent={() => handleCreateEvent()}
           onBusinessView={() => triggerScrollToDefault()}
+          onCreateEvent={() => handleCreateEvent()}
+          onNavigateNext={navigateToNext}
+          onNavigatePrevious={navigateToPrevious}
+          onNavigateToday={navigateToToday}
+          onViewChange={setView}
         />
       </div>
 
       {/* Contenu principal du calendrier */}
       <DashboardContentArea
-        fullWidth={true}
-        enableScroll={view !== "month"}
         className="flex-1 flex flex-col min-h-0 scrollbar-hide"
+        enableScroll={view !== "month"}
+        fullWidth={true}
       >
         <div className="flex-1 flex flex-col min-h-0">
           {renderCurrentView()}
@@ -265,16 +272,24 @@ export default function CalendarPage() {
 
       {/* Popover d'événement */}
       <EventPopover
-        isOpen={isEventPopoverOpen}
-        onClose={handleClosePopover}
-        event={editingEvent}
         defaultDate={defaultEventDate}
-        defaultStartTime={defaultStartTime}
         defaultEndTime={defaultEndTime}
-        onSave={handleSaveEvent}
-        onDelete={editingEvent ? handleDeleteEvent : undefined}
+        defaultStartTime={defaultStartTime}
+        event={editingEvent}
+        isOpen={isEventPopoverOpen}
         triggerElement={popoverTriggerElement}
+        onClose={handleClosePopover}
+        onDelete={editingEvent ? handleDeleteEvent : undefined}
+        onSave={handleSaveEvent}
       />
     </DashboardContentArea>
+  );
+}
+
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-full">Chargement...</div>}>
+      <CalendarPageContent />
+    </Suspense>
   );
 }

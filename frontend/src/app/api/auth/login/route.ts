@@ -135,6 +135,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Login error:", error);
 
     return NextResponse.json(

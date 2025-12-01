@@ -42,6 +42,7 @@ export function useAuth(): UseAuthReturn {
 
   // Afficher le mode au premier appel
   if (typeof window !== "undefined" && !window.__authModeLogged) {
+    // eslint-disable-next-line no-console
     console.log(
       `🔐 Mode d'authentification : ${isDemo ? "🎭 DÉMO" : "🔒 PRODUCTION"}`,
     );

@@ -46,6 +46,16 @@ class QCM(db.Model):
         lazy='dynamic'
     )
 
+    # Relations spécifiques (niveau, mention, parcours)
+    niveau_id = db.Column(db.String(36), db.ForeignKey('niveaux.id'), nullable=True, index=True)
+    niveau = db.relationship('Niveau', foreign_keys=[niveau_id], backref='qcms_principaux')
+
+    mention_id = db.Column(db.String(36), db.ForeignKey('mentions.id'), nullable=True, index=True)
+    mention = db.relationship('Mention', backref='qcms')
+
+    parcours_id = db.Column(db.String(36), db.ForeignKey('parcours.id'), nullable=True, index=True)
+    parcours = db.relationship('Parcours', backref='qcms')
+
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -94,9 +104,32 @@ class QCM(db.Model):
             } if self.createur else None,
             'nombreQuestions': len(self.questions) if self.questions else 0,
             'niveaux': [n.to_dict() for n in self.niveaux] if self.niveaux else [],
-            'createdAt': format_date(self.created_at),
-            'updatedAt': format_date(self.updated_at),
         }
+        
+        # Ajouter les nouveaux champs si disponibles (après migration)
+        try:
+            data['niveauId'] = self.niveau_id
+            data['niveau'] = self.niveau.to_dict() if self.niveau else None
+        except (AttributeError, KeyError):
+            data['niveauId'] = None
+            data['niveau'] = None
+        
+        try:
+            data['mentionId'] = self.mention_id
+            data['mention'] = self.mention.to_dict(include_etablissement=False) if self.mention else None
+        except (AttributeError, KeyError):
+            data['mentionId'] = None
+            data['mention'] = None
+        
+        try:
+            data['parcoursId'] = self.parcours_id
+            data['parcours'] = self.parcours.to_dict(include_mention=False) if self.parcours else None
+        except (AttributeError, KeyError):
+            data['parcoursId'] = None
+            data['parcours'] = None
+        
+        data['createdAt'] = format_date(self.created_at)
+        data['updatedAt'] = format_date(self.updated_at)
 
         return data
 

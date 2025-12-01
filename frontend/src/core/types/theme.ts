@@ -116,10 +116,7 @@ export function generateColorPalette(baseColor: string): ColorPalette {
   };
 
   // Fonction pour éclaircir/assombrir une couleur
-  const adjustColor = (
-    hex: string,
-    percent: number,
-  ): string => {
+  const adjustColor = (hex: string, percent: number): string => {
     const { r, g, b } = hexToRgb(hex);
 
     if (percent > 0) {
@@ -153,8 +150,7 @@ export function generateColorPalette(baseColor: string): ColorPalette {
     return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
   };
 
-  const foregroundColor =
-    getLuminance(baseColor) > 0.5 ? "#000000" : "#ffffff";
+  const foregroundColor = getLuminance(baseColor) > 0.5 ? "#000000" : "#ffffff";
 
   return {
     50: adjustColor(baseColor, 0.95),

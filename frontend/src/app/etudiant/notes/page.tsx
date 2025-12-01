@@ -1,38 +1,40 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import useSWR from 'swr'
-import { Award, TrendingUp, TrendingDown, Eye } from 'lucide-react'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Button } from '@heroui/button'
-import { Chip } from '@heroui/chip'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/core/providers/AuthProvider'
-import { notesService } from '@/features/etudiant/services/notes.service'
+import * as React from "react";
+import useSWR from "swr";
+import { Award, TrendingUp, TrendingDown, Eye } from "lucide-react";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import { useRouter } from "next/navigation";
+
+import { useAuth } from "@/core/providers/AuthProvider";
+import { notesService } from "@/features/etudiant/services/notes.service";
 
 export default function NotesPage() {
-  const router = useRouter()
-  const { user } = useAuth()
-  const userId = user?.id || ''
-  
+  const router = useRouter();
+  const { user } = useAuth();
+  const userId = user?.id || "";
+
   const { data: historique, isLoading } = useSWR(
-    userId ? ['historique-notes', userId] : null,
+    userId ? ["historique-notes", userId] : null,
     () => notesService.getHistorique(userId),
     {
       revalidateOnFocus: false,
       errorRetryCount: 0,
       shouldRetryOnError: false,
-    }
-  )
+    },
+  );
 
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
-  }
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   if (isLoading) {
     return (
@@ -40,11 +42,14 @@ export default function NotesPage() {
         <div className="h-32 bg-default-100 animate-pulse rounded-lg" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 bg-default-100 animate-pulse rounded-lg" />
+            <div
+              key={i}
+              className="h-24 bg-default-100 animate-pulse rounded-lg"
+            />
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -143,8 +148,8 @@ export default function NotesPage() {
           ) : (
             <div className="space-y-3">
               {historique.resultats.map((resultat) => {
-                const isReussi = resultat.pourcentage >= 50
-                const noteColor = isReussi ? 'success' : 'danger'
+                const isReussi = resultat.pourcentage >= 50;
+                const noteColor = isReussi ? "success" : "danger";
 
                 return (
                   <div
@@ -157,9 +162,9 @@ export default function NotesPage() {
                           <h3 className="font-semibold">
                             {resultat.examen_titre}
                           </h3>
-                          {resultat.statut === 'en_attente' && (
-                            <Chip size="sm" color="warning" variant="flat">
-                              En attente
+                          {(!resultat.estPublie || resultat.statut === "en_attente") && (
+                            <Chip color="warning" size="sm" variant="flat">
+                              Correction en cours
                             </Chip>
                           )}
                         </div>
@@ -172,29 +177,44 @@ export default function NotesPage() {
 
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <div className="flex items-center gap-2">
-                            {isReussi ? (
-                              <TrendingUp className="h-4 w-4 text-success" />
-                            ) : (
-                              <TrendingDown className="h-4 w-4 text-danger" />
-                            )}
-                            <span className={`text-xl font-bold text-${noteColor}`}>
-                              {resultat.note}/{resultat.note_max}
-                            </span>
-                          </div>
-                          <p className="text-xs text-default-500">
-                            {resultat.pourcentage}%
-                          </p>
+                          {!resultat.estPublie || resultat.statut === "en_attente" ? (
+                            <div className="text-center">
+                              <span className="text-xl font-bold text-default-400">
+                                —
+                              </span>
+                              <p className="text-xs text-default-400">
+                                En attente
+                              </p>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2">
+                                {isReussi ? (
+                                  <TrendingUp className="h-4 w-4 text-success" />
+                                ) : (
+                                  <TrendingDown className="h-4 w-4 text-danger" />
+                                )}
+                                <span
+                                  className={`text-xl font-bold text-${noteColor}`}
+                                >
+                                  {resultat.note}/{resultat.note_max}
+                                </span>
+                              </div>
+                              <p className="text-xs text-default-500">
+                                {resultat.pourcentage}%
+                              </p>
+                            </>
+                          )}
                         </div>
 
-                        {resultat.statut === 'corrige' && (
+                        {resultat.statut === "corrige" && (resultat.estPublie !== false) && (
                           <Button
+                            isIconOnly
                             size="sm"
                             variant="flat"
-                            isIconOnly
                             onPress={() =>
                               router.push(
-                                `/etudiant/examens/${resultat.id}/resultat`
+                                `/etudiant/notes/${resultat.id}`,
                               )
                             }
                           >
@@ -204,12 +224,12 @@ export default function NotesPage() {
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           )}
         </CardBody>
       </Card>
     </div>
-  )
+  );
 }

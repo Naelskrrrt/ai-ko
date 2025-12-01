@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import useSWR from 'swr'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Chip } from '@heroui/chip'
-import { Tabs, Tab } from '@heroui/tabs'
+import useSWR from "swr";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Chip } from "@heroui/chip";
+import { Tabs, Tab } from "@heroui/tabs";
 import {
   Award,
   TrendingUp,
@@ -11,22 +11,27 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-} from 'lucide-react'
-import { qcmsService } from '../../services/qcms.service'
-import { FeedbackPanel } from '../resultats/FeedbackPanel'
+} from "lucide-react";
+
+import { qcmsService } from "../../services/qcms.service";
+import { FeedbackPanel } from "../resultats/FeedbackPanel";
 
 interface QCMResultatViewProps {
-  resultatId: string
+  resultatId: string;
 }
 
 export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
-  const { data: resultat, isLoading, error } = useSWR(
-    ['qcm-resultat', resultatId],
+  const {
+    data: resultat,
+    isLoading,
+    error,
+  } = useSWR(
+    ["qcm-resultat", resultatId],
     () => qcmsService.getResultat(resultatId),
     {
       revalidateOnFocus: false,
-    }
-  )
+    },
+  );
 
   if (isLoading) {
     return (
@@ -38,7 +43,7 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
           />
         ))}
       </div>
-    )
+    );
   }
 
   if (error || !resultat) {
@@ -50,63 +55,69 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
             Erreur lors du chargement du résultat
           </p>
           <p className="text-sm text-default-500 mt-2">
-            {error?.message || 'Une erreur est survenue'}
+            {error?.message || "Une erreur est survenue"}
           </p>
         </CardBody>
       </Card>
-    )
+    );
   }
 
   // Transformer le résultat pour correspondre au format attendu par ResultatView
-  const isReussi = resultat.pourcentage >= 50
-  const noteColor = isReussi ? 'success' : 'danger'
+  const isReussi = resultat.pourcentage >= 50;
+  const noteColor = isReussi ? "success" : "danger";
 
   const formatDuree = (secondes: number): string => {
-    if (!secondes) return 'N/A'
-    const minutes = Math.floor(secondes / 60)
-    const secs = secondes % 60
-    return `${minutes}min ${secs}s`
-  }
+    if (!secondes) return "N/A";
+    const minutes = Math.floor(secondes / 60);
+    const secs = secondes % 60;
+
+    return `${minutes}min ${secs}s`;
+  };
 
   const formatDate = (dateString: string): string => {
-    if (!dateString) return 'N/A'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   // Extraire les réponses détaillées
-  const reponsesDetail = resultat.reponsesDetail || {}
+  const reponsesDetail = resultat.reponsesDetail || {};
   const reponses = Object.values(reponsesDetail).map((r: any) => ({
-    question_id: r.question_id || '',
-    question_enonce: r.question_enonce || '',
+    question_id: r.question_id || "",
+    question_enonce: r.question_enonce || "",
     question_numero: r.question_numero || 0,
-    reponse_etudiant: r.answer || r.reponse_etudiant || '',
+    reponse_etudiant: r.answer || r.reponse_etudiant || "",
     reponse_correcte: r.correct_answer || r.reponse_correcte,
     est_correcte: r.correct || r.est_correcte || false,
     points_obtenus: r.score || r.points_obtenus || 0,
     points_max: r.max_score || r.points_max || 0,
-    feedback: r.feedback || '',
-  }))
+    feedback: r.feedback || "",
+  }));
 
   // Séparer les réponses en correctes et incorrectes
-  const reponsesCorrectes = reponses.filter((r) => r.est_correcte)
-  const reponsesIncorrectes = reponses.filter((r) => !r.est_correcte)
+  const reponsesCorrectes = reponses.filter((r) => r.est_correcte);
+  const reponsesIncorrectes = reponses.filter((r) => !r.est_correcte);
 
-  const qcmTitre = resultat.qcm?.titre || 'QCM'
-  const qcmMatiere = resultat.qcm?.matiere || 'Non spécifiée'
+  const qcmTitre = resultat.qcm?.titre || "QCM";
+  const qcmMatiere = resultat.qcm?.matiere || "Non spécifiée";
 
   return (
     <div className="space-y-6">
       {/* Carte de résumé */}
-      <Card className={`border-2 ${isReussi ? 'border-success-500' : 'border-danger-500'}`}>
+      <Card
+        className={`border-2 ${isReussi ? "border-success-500" : "border-danger-500"}`}
+      >
         <CardHeader className="flex gap-3">
-          <div className={`p-3 rounded-lg ${isReussi ? 'bg-success-100' : 'bg-danger-100'}`}>
+          <div
+            className={`p-3 rounded-lg ${isReussi ? "bg-success-100" : "bg-danger-100"}`}
+          >
             {isReussi ? (
               <Award className={`h-8 w-8 text-${noteColor}`} />
             ) : (
@@ -117,8 +128,8 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
             <h2 className="text-2xl font-bold">{qcmTitre}</h2>
             <p className="text-default-500">{qcmMatiere}</p>
           </div>
-          <Chip size="lg" color={noteColor} variant="solid">
-            {isReussi ? 'Réussi' : 'À améliorer'}
+          <Chip color={noteColor} size="lg" variant="solid">
+            {isReussi ? "Réussi" : "À améliorer"}
           </Chip>
         </CardHeader>
 
@@ -149,7 +160,8 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
                 <p className="text-xs text-default-500">Réponses correctes</p>
               </div>
               <p className="text-lg font-semibold">
-                {resultat.questionsCorrectes || 0} / {resultat.questionsTotal || 0}
+                {resultat.questionsCorrectes || 0} /{" "}
+                {resultat.questionsTotal || 0}
               </p>
             </div>
 
@@ -159,7 +171,8 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
                 <p className="text-xs text-default-500">Réponses incorrectes</p>
               </div>
               <p className="text-lg font-semibold">
-                {(resultat.questionsTotal || 0) - (resultat.questionsCorrectes || 0)}
+                {(resultat.questionsTotal || 0) -
+                  (resultat.questionsCorrectes || 0)}
               </p>
             </div>
 
@@ -178,7 +191,9 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
                 <TrendingUp className="h-4 w-4 text-warning" />
                 <p className="text-xs text-default-500">Taux de réussite</p>
               </div>
-              <p className="text-lg font-semibold">{resultat.pourcentage?.toFixed(1) || 0}%</p>
+              <p className="text-lg font-semibold">
+                {resultat.pourcentage?.toFixed(1) || 0}%
+              </p>
             </div>
           </div>
 
@@ -211,12 +226,12 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
           <CardBody>
             <Tabs
               aria-label="Filtres réponses"
-              variant="underlined"
               classNames={{
-                tabList: 'gap-6',
-                cursor: 'w-full bg-theme-primary',
-                tab: 'max-w-fit px-0 h-12',
+                tabList: "gap-6",
+                cursor: "w-full bg-theme-primary",
+                tab: "max-w-fit px-0 h-12",
               }}
+              variant="underlined"
             >
               <Tab
                 key="toutes"
@@ -231,7 +246,10 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
               >
                 <div className="mt-6 space-y-4">
                   {reponses.map((reponse) => (
-                    <FeedbackPanel key={reponse.question_id} reponse={reponse} />
+                    <FeedbackPanel
+                      key={reponse.question_id}
+                      reponse={reponse}
+                    />
                   ))}
                 </div>
               </Tab>
@@ -294,6 +312,5 @@ export function QCMResultatView({ resultatId }: QCMResultatViewProps) {
         </Card>
       )}
     </div>
-  )
+  );
 }
-

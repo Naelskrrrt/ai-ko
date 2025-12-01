@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
+import clsx from "clsx";
+
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
+
 import { useAuth } from "@/core/providers/AuthProvider";
-import clsx from "clsx";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -91,9 +93,9 @@ export function DashboardLayout({
       {/* Header fixe en haut */}
       <Header
         showSidebarToggle={true}
-        onSidebarToggle={toggleSidebar}
-        title={getTitle()}
         subtitle={getSubtitle()}
+        title={getTitle()}
+        onSidebarToggle={toggleSidebar}
       />
 
       {/* Zone principale avec sidebar et contenu */}
@@ -114,4 +116,3 @@ export function DashboardLayout({
     </div>
   );
 }
-

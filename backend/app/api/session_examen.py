@@ -39,7 +39,9 @@ session_model = api.model('SessionExamen', {
     'melangeOptions': fields.Boolean(description='Mélanger les options', default=True),
     'afficherCorrection': fields.Boolean(description='Afficher la correction', default=True),
     'notePassage': fields.Float(description='Note de passage', default=10.0),
-    'status': fields.String(description='Statut', enum=['programmee', 'en_cours', 'terminee', 'annulee']),
+    'status': fields.String(description='Statut', enum=['programmee', 'en_cours', 'en_pause', 'terminee', 'annulee']),
+    'resultatsPublies': fields.Boolean(description='Résultats publiés', default=False),
+    'matiere': fields.String(description='Matière récupérée depuis le QCM associé'),
     'qcmId': fields.String(required=True, description='ID du QCM'),
     'qcm': fields.Nested(qcm_ref, description='Informations du QCM'),
     'classeId': fields.String(description='ID de la classe (optionnel)'),
@@ -71,7 +73,10 @@ session_create_model = api.model('SessionExamenCreate', {
     'notePassage': fields.Float(description='Note de passage', default=10.0),
     'status': fields.String(description='Statut', enum=['programmee', 'en_cours', 'terminee', 'annulee'], default='programmee'),
     'qcmId': fields.String(required=True, description='ID du QCM'),
-    'classeId': fields.String(description='ID de la classe (optionnel)')
+    'classeId': fields.String(description='ID de la classe (optionnel)'),
+    'niveauId': fields.String(description='ID du niveau académique (optionnel)'),
+    'mentionId': fields.String(description='ID de la mention académique (optionnel)'),
+    'parcoursId': fields.String(description='ID du parcours académique (optionnel)')
 })
 
 # Service
@@ -325,6 +330,44 @@ class SessionTerminer(Resource):
             api.abort(400, str(e))
         except Exception as e:
             logger.error(f"Erreur terminaison session: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+@api.route('/<string:session_id>/pause')
+@api.param('session_id', 'ID de la session')
+class SessionPause(Resource):
+    @api.doc('pause_session', security='Bearer')
+    @api.marshal_with(session_model)
+    @jwt_required()
+    def patch(self, session_id):
+        """Met une session en pause (admin/enseignant)"""
+        try:
+            require_admin_or_teacher()
+            session = session_service.mettre_en_pause(session_id)
+            return session, 200
+        except ValueError as e:
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur mise en pause session: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+@api.route('/<string:session_id>/reprendre')
+@api.param('session_id', 'ID de la session')
+class SessionReprendre(Resource):
+    @api.doc('reprendre_session', security='Bearer')
+    @api.marshal_with(session_model)
+    @jwt_required()
+    def patch(self, session_id):
+        """Reprend une session en pause (admin/enseignant)"""
+        try:
+            require_admin_or_teacher()
+            session = session_service.reprendre_session(session_id)
+            return session, 200
+        except ValueError as e:
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur reprise session: {e}", exc_info=True)
             api.abort(500, f"Erreur interne: {str(e)}")
 
 

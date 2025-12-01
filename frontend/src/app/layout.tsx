@@ -3,9 +3,9 @@ import { Metadata, Viewport } from "next";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
+
 import { AuthProvider } from "@/core/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toast";
-
 import { siteConfig } from "@/core/config/site";
 import { fontSans } from "@/core/config/fonts";
 

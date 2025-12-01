@@ -24,10 +24,10 @@ class UserRoleType(TypeDecorator):
     """Type personnalisé pour mapper UserRole enum vers String"""
     impl = String(20)
     cache_ok = True
-    
+
     def __init__(self):
         super().__init__(length=20)
-    
+
     def process_bind_param(self, value, dialect):
         """Convertit UserRole enum vers string pour la base de données"""
         if value is None:
@@ -35,7 +35,7 @@ class UserRoleType(TypeDecorator):
         if isinstance(value, UserRole):
             return value.value
         return str(value)
-    
+
     def process_result_value(self, value, dialect):
         """Convertit string de la base de données vers UserRole enum"""
         if value is None:
@@ -54,86 +54,47 @@ class User(db.Model):
     """Modèle utilisateur avec support OAuth"""
     __tablename__ = 'users'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.String(36), primary_key=True,
+                   default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     name = db.Column(db.String(255), nullable=True)
-    password_hash = db.Column(db.String(255), nullable=True)  # Nullable pour OAuth
-    
+    password_hash = db.Column(
+        db.String(255), nullable=True)  # Nullable pour OAuth
+
     # Rôle utilisateur - utiliser TypeDecorator personnalisé pour éviter les problèmes d'enum
     role = db.Column(UserRoleType(), default=UserRole.ADMIN, nullable=False)
-    
+
     # OAuth fields
-    google_id = db.Column(db.String(255), unique=True, nullable=True, index=True)
+    google_id = db.Column(db.String(255), unique=True,
+                          nullable=True, index=True)
     avatar = db.Column(db.String(500), nullable=True)
     email_verified = db.Column(db.Boolean, default=False, nullable=False)
-    
-    # Informations complémentaires pour les étudiants/professeurs
-    numero_etudiant = db.Column(db.String(50), unique=True, nullable=True, index=True)  # Numéro d'étudiant
-    numero_enseignant = db.Column(db.String(50), unique=True, nullable=True, index=True)  # Numéro d'enseignant
+
+    # Informations complémentaires (coordonnées générales)
     telephone = db.Column(db.String(20), nullable=True)
     adresse = db.Column(db.Text, nullable=True)
     date_naissance = db.Column(db.Date, nullable=True)
 
-    # Relations many-to-many (seront définies après l'import des tables d'association)
-    # Pour les professeurs
-    matieres_enseignees = db.relationship(
-        'Matiere',
-        secondary='professeur_matieres',
-        backref='professeurs',
-        lazy='dynamic'
-    )
-
-    niveaux_enseignes = db.relationship(
-        'Niveau',
-        secondary='professeur_niveaux',
-        backref='professeurs',
-        lazy='dynamic'
-    )
-
-    classes_enseignees = db.relationship(
-        'Classe',
-        secondary='professeur_classes',
-        backref='professeurs',
-        lazy='dynamic'
-    )
-
-    # Pour les étudiants
-    niveaux_etudiants = db.relationship(
-        'Niveau',
-        secondary='etudiant_niveaux',
-        backref='etudiants',
-        lazy='dynamic'
-    )
-
-    classes_etudiants = db.relationship(
-        'Classe',
-        secondary='etudiant_classes',
-        backref=db.backref('etudiants', lazy='dynamic'),
-        lazy='dynamic'
-    )
-
-    matieres_etudiees = db.relationship(
-        'Matiere',
-        secondary='etudiant_matieres',
-        backref='etudiants',
-        lazy='dynamic'
-    )
+    # NOTE: Les relations many-to-many ont été déplacées vers les modèles Enseignant et Etudiant
+    # Les backref 'enseignant_profil' et 'etudiant_profil' sont définis dans ces modèles
 
     # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
+    created_at = db.Column(
+        db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
+                           onupdate=datetime.utcnow, nullable=False)
+
     def set_password(self, password):
         """Hash et stocke le mot de passe"""
         self.password_hash = generate_password_hash(password)
-    
+
     def check_password(self, password):
         """Vérifie le mot de passe"""
         if not self.password_hash:
             return False
         return check_password_hash(self.password_hash, password)
-    
-    def to_dict(self, include_relations=False):
+
+    def to_dict(self, include_profil=False):
         """Convertit l'utilisateur en dictionnaire"""
         # Gérer les dates - s'assurer qu'elles sont toujours des objets datetime
         def format_date(date_value):
@@ -159,30 +120,28 @@ class User(db.Model):
             'role': self.role.value if self.role else None,
             'avatar': self.avatar,
             'emailVerified': self.email_verified,
-            'numeroEtudiant': self.numero_etudiant,
-            'numeroEnseignant': self.numero_enseignant,
             'telephone': self.telephone,
+            'adresse': self.adresse,
             'dateNaissance': format_date(self.date_naissance),
             'createdAt': format_date(self.created_at),
             'updatedAt': format_date(self.updated_at),
         }
 
-        # Inclure les relations si demandé
-        if include_relations:
-            # Pour les professeurs
+        # Inclure le profil spécifique si demandé
+        if include_profil:
+            # Pour les enseignants
             if self.role == UserRole.ENSEIGNANT or self.role == UserRole.PROFESSEUR:
-                data['matieresEnseignees'] = [m.to_dict() for m in self.matieres_enseignees]
-                data['niveauxEnseignes'] = [n.to_dict() for n in self.niveaux_enseignes]
-                data['classesEnseignees'] = [c.to_dict() for c in self.classes_enseignees]
+                if hasattr(self, 'enseignant_profil') and self.enseignant_profil:
+                    data['enseignantProfil'] = self.enseignant_profil.to_dict(
+                        include_relations=False)
 
             # Pour les étudiants
             if self.role == UserRole.ETUDIANT:
-                data['niveaux'] = [n.to_dict() for n in self.niveaux_etudiants]
-                data['classes'] = [c.to_dict() for c in self.classes_etudiants]
-                data['matieres'] = [m.to_dict() for m in self.matieres_etudiees]
+                if hasattr(self, 'etudiant_profil') and self.etudiant_profil:
+                    data['etudiantProfil'] = self.etudiant_profil.to_dict(
+                        include_relations=False)
 
         return data
-    
+
     def __repr__(self):
         return f'<User {self.email}>'
-

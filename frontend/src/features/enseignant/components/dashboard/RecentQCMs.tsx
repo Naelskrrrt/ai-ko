@@ -1,58 +1,60 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Button } from '@heroui/button'
-import { Chip } from '@heroui/chip'
-import { FileText, Plus } from 'lucide-react'
-import useSWR from 'swr'
-import { useRouter } from 'next/navigation'
-import { qcmService } from '../../services/qcm.service'
-import type { QCM } from '../../types/enseignant.types'
-import { CreateQCMModal } from '../qcm/CreateQCMModal'
-import { useDisclosure } from '@heroui/modal'
+import type { QCM } from "../../types/enseignant.types";
+
+import * as React from "react";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import { FileText, Plus } from "lucide-react";
+import useSWR from "swr";
+import { useRouter } from "next/navigation";
+import { useDisclosure } from "@heroui/modal";
+
+import { qcmService } from "../../services/qcm.service";
+import { CreateQCMModal } from "../qcm/CreateQCMModal";
 
 interface RecentQCMsProps {
-  userId: string
+  userId: string;
 }
 
 export function RecentQCMs({ userId }: RecentQCMsProps) {
-  const router = useRouter()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Récupérer les QCMs récents
   const { data, isLoading, error } = useSWR(
-    ['enseignant-recent-qcms', userId],
-    () => qcmService.getQCMs({ limit: 5 })
-  )
+    ["enseignant-recent-qcms", userId],
+    () => qcmService.getQCMs({ limit: 5 }),
+  );
 
-  const qcms = data?.data || []
+  const qcms = data?.data || [];
 
-  const getStatusColor = (status: QCM['status']) => {
+  const getStatusColor = (status: QCM["status"]) => {
     switch (status) {
-      case 'published':
-        return 'success'
-      case 'draft':
-        return 'warning'
-      case 'archived':
-        return 'default'
+      case "published":
+        return "success";
+      case "draft":
+        return "warning";
+      case "archived":
+        return "default";
       default:
-        return 'default'
+        return "default";
     }
-  }
+  };
 
-  const getStatusLabel = (status: QCM['status']) => {
+  const getStatusLabel = (status: QCM["status"]) => {
     switch (status) {
-      case 'published':
-        return 'Publié'
-      case 'draft':
-        return 'Brouillon'
-      case 'archived':
-        return 'Archivé'
+      case "published":
+        return "Publié";
+      case "draft":
+        return "Brouillon";
+      case "archived":
+        return "Archivé";
       default:
-        return status
+        return status;
     }
-  }
+  };
 
   return (
     <Card className="border-none shadow-sm">
@@ -62,10 +64,10 @@ export function RecentQCMs({ userId }: RecentQCMsProps) {
           <h3 className="text-lg font-semibold">QCMs Récents</h3>
         </div>
         <Button
-          size="sm"
           color="primary"
-          variant="flat"
+          size="sm"
           startContent={<Plus className="w-4 h-4" />}
+          variant="flat"
           onPress={onOpen}
         >
           Nouveau QCM
@@ -89,11 +91,11 @@ export function RecentQCMs({ userId }: RecentQCMsProps) {
             <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>Aucun QCM créé</p>
             <Button
-              size="sm"
-              color="primary"
-              variant="flat"
               className="mt-3"
+              color="primary"
+              size="sm"
               startContent={<Plus className="w-4 h-4" />}
+              variant="flat"
               onPress={onOpen}
             >
               Créer votre premier QCM
@@ -110,12 +112,16 @@ export function RecentQCMs({ userId }: RecentQCMsProps) {
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium truncate">{qcm.titre}</h4>
                   <div className="flex items-center gap-2 mt-1 text-sm text-default-500">
-                    <span>{qcm.matiere || 'Non spécifiée'}</span>
+                    <span>{qcm.matiere || "Non spécifiée"}</span>
                     <span>•</span>
                     <span>{qcm.nombreQuestions} questions</span>
                   </div>
                 </div>
-                <Chip size="sm" color={getStatusColor(qcm.status)} variant="flat">
+                <Chip
+                  color={getStatusColor(qcm.status)}
+                  size="sm"
+                  variant="flat"
+                >
                   {getStatusLabel(qcm.status)}
                 </Chip>
               </div>
@@ -129,10 +135,10 @@ export function RecentQCMs({ userId }: RecentQCMsProps) {
         isOpen={isOpen}
         onClose={onClose}
         onSuccess={(qcmId) => {
-          onClose()
+          onClose();
           // Optionnel : recharger les données
         }}
       />
     </Card>
-  )
+  );
 }

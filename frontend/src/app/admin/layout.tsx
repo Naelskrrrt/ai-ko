@@ -1,9 +1,10 @@
 "use client";
 
-import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { useAuth } from "@/core/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { useAuth } from "@/core/providers/AuthProvider";
 
 export default function AdminLayout({
   children,
@@ -19,20 +20,29 @@ export default function AdminLayout({
     // Ne rien faire pendant le chargement
     if (loading) {
       setShouldRedirect(null);
+
       return;
     }
 
     // Si pas d'utilisateur, marquer pour redirection vers login
     if (!user) {
-      console.log("[AdminLayout] Pas d'utilisateur, préparation redirection vers /login");
+      // eslint-disable-next-line no-console
+      console.log(
+        "[AdminLayout] Pas d'utilisateur, préparation redirection vers /login",
+      );
       setShouldRedirect("/login");
+
       return;
     }
 
     // Si utilisateur connecté mais pas admin, marquer pour redirection vers home
     if (!hasRole("admin")) {
-      console.log("[AdminLayout] Utilisateur n'est pas admin, préparation redirection vers /");
+      // eslint-disable-next-line no-console
+      console.log(
+        "[AdminLayout] Utilisateur n'est pas admin, préparation redirection vers /",
+      );
       setShouldRedirect("/");
+
       return;
     }
 
@@ -43,6 +53,7 @@ export default function AdminLayout({
   // Effectuer la redirection dans un useEffect séparé
   useEffect(() => {
     if (shouldRedirect) {
+      // eslint-disable-next-line no-console
       console.log(`[AdminLayout] Redirection vers ${shouldRedirect}`);
       router.replace(shouldRedirect);
     }
@@ -53,7 +64,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
           <p className="text-default-500">Vérification des permissions...</p>
         </div>
       </div>
@@ -65,7 +76,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
           <p className="text-default-500">Redirection...</p>
         </div>
       </div>
@@ -77,7 +88,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
           <p className="text-default-500">Accès en cours...</p>
         </div>
       </div>

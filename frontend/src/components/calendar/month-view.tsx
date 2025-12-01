@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
+import clsx from "clsx";
+
 import { CalendarEvent, MonthViewProps } from "@/core/types/calendar";
 import {
   generateCalendarMonth,
@@ -10,7 +11,6 @@ import {
   DAYS_OF_WEEK,
   COLOR_CLASSES,
 } from "@/core/lib/calendar-utils";
-import clsx from "clsx";
 
 export function MonthView({
   currentDate,
@@ -24,7 +24,7 @@ export function MonthView({
   const calendarMonth = generateCalendarMonth(
     currentDate.getFullYear(),
     currentDate.getMonth(),
-    selectedDate
+    selectedDate,
   );
 
   const handleDateClick = (date: Date) => {
@@ -54,7 +54,7 @@ export function MonthView({
   const renderEvent = (
     event: CalendarEvent,
     index: number,
-    maxVisible: number = 3
+    maxVisible: number = 3,
   ) => {
     if (index >= maxVisible) return null;
 
@@ -63,10 +63,10 @@ export function MonthView({
         key={event.id}
         className={clsx(
           "text-xs px-2 py-1 rounded cursor-pointer transition-colors hover:opacity-80 truncate select-none",
-          COLOR_CLASSES[event.color]
+          COLOR_CLASSES[event.color],
         )}
-        onClick={(e) => handleEventClick(event, e)}
         title={`${event.title}${event.allDay ? " (Toute la journée)" : ""}`}
+        onClick={(e) => handleEventClick(event, e)}
       >
         {event.title}
       </div>
@@ -126,11 +126,11 @@ export function MonthView({
                     day.isToday &&
                       "bg-theme-primary/10 dark:bg-theme-primary/20",
                     day.isSelected &&
-                      "bg-theme-primary/20 dark:bg-theme-primary/30"
+                      "bg-theme-primary/20 dark:bg-theme-primary/30",
                   )}
+                  title="Cliquez pour sélectionner, double-cliquez pour voir la vue jour"
                   onClick={() => handleDateClick(day.date)}
                   onDoubleClick={() => handleDateDoubleClick(day.date)}
-                  title="Cliquez pour sélectionner, double-cliquez pour voir la vue jour"
                 >
                   {/* Numéro du jour */}
                   <div className="flex items-center justify-between mb-1 flex-shrink-0">
@@ -140,7 +140,7 @@ export function MonthView({
                         day.isToday && "text-theme-primary font-bold",
                         !day.isCurrentMonth &&
                           "text-default-500 dark:text-default-400",
-                        day.isCurrentMonth && !day.isToday && "text-foreground"
+                        day.isCurrentMonth && !day.isToday && "text-foreground",
                       )}
                     >
                       {day.date.getDate()}
@@ -149,9 +149,9 @@ export function MonthView({
                     {/* Bouton + pour créer un événement */}
                     <Button
                       isIconOnly
+                      className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 min-w-5"
                       size="sm"
                       variant="light"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 min-w-5"
                       onClick={(e) => handleCreateEvent(day.date, e)}
                     >
                       <span className="text-xs">+</span>
@@ -163,7 +163,7 @@ export function MonthView({
                     {dayEvents
                       .slice(0, maxVisibleEvents)
                       .map((event, index) =>
-                        renderEvent(event, index, maxVisibleEvents)
+                        renderEvent(event, index, maxVisibleEvents),
                       )}
 
                     {renderMoreEventsIndicator(day.date, maxVisibleEvents)}

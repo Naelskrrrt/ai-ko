@@ -89,7 +89,7 @@ export interface CalendarActions {
   setSelectedDate: (date: Date) => void;
   setView: (view: CalendarView) => void;
   createEvent: (
-    event: Omit<CalendarEvent, "id" | "createdAt" | "updatedAt">
+    event: Omit<CalendarEvent, "id" | "createdAt" | "updatedAt">,
   ) => void;
   updateEvent: (id: string, event: Partial<CalendarEvent>) => void;
   deleteEvent: (id: string) => void;
@@ -123,7 +123,7 @@ export interface WeekViewProps {
     date: Date,
     startTime: string,
     endTime: string,
-    triggerElement?: HTMLElement
+    triggerElement?: HTMLElement,
   ) => void;
   onEventResize?: (eventId: string, newStart: Date, newEnd: Date) => void;
 }
@@ -135,7 +135,7 @@ export interface DayViewProps {
     date: Date,
     startTime: string,
     endTime: string,
-    triggerElement?: HTMLElement
+    triggerElement?: HTMLElement,
   ) => void;
   onEventResize?: (eventId: string, newStart: Date, newEnd: Date) => void;
 }

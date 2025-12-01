@@ -28,7 +28,10 @@ class SessionExamen(db.Model):
 
     # Statut
     status = db.Column(db.String(20), default='programmee', nullable=False)
-    # Statuts: programmee, en_cours, terminee, annulee
+    # Statuts: programmee, en_cours, en_pause, terminee, annulee
+    
+    # Publication des résultats
+    resultats_publies = db.Column(db.Boolean, default=False, nullable=False)  # Validation globale des résultats
 
     # Relations
     qcm_id = db.Column(db.String(36), db.ForeignKey('qcms.id'), nullable=False)
@@ -40,13 +43,35 @@ class SessionExamen(db.Model):
     createur_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     createur = db.relationship('User', foreign_keys=[createur_id])
 
+    # Relations spécifiques (niveau, mention, parcours)
+    niveau_id = db.Column(db.String(36), db.ForeignKey('niveaux.id'), nullable=True, index=True)
+    niveau = db.relationship('Niveau', foreign_keys=[niveau_id], backref='sessions_examen')
+
+    mention_id = db.Column(db.String(36), db.ForeignKey('mentions.id'), nullable=True, index=True)
+    mention = db.relationship('Mention', foreign_keys=[mention_id], backref='sessions_examen')
+
+    parcours_id = db.Column(db.String(36), db.ForeignKey('parcours.id'), nullable=True, index=True)
+    parcours = db.relationship('Parcours', foreign_keys=[parcours_id], backref='sessions_examen')
+
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     def to_dict(self):
         """Convertit la session en dictionnaire"""
-        return {
+        # Récupérer la matière depuis le QCM
+        matiere_nom = None
+        if self.qcm:
+            if self.qcm.matiere_obj:
+                matiere_nom = self.qcm.matiere_obj.nom
+            elif self.qcm.matiere:
+                matiere_nom = self.qcm.matiere
+            else:
+                matiere_nom = 'Non spécifiée'
+        else:
+            matiere_nom = 'Non spécifiée'
+
+        result = {
             'id': self.id,
             'titre': self.titre,
             'description': self.description,
@@ -59,6 +84,8 @@ class SessionExamen(db.Model):
             'afficherCorrection': self.afficher_correction,
             'notePassage': self.note_passage,
             'status': self.status,
+            'resultatsPublies': self.resultats_publies,
+            'matiere': matiere_nom,
             'qcmId': self.qcm_id,
             'qcm': {
                 'id': self.qcm.id,
@@ -75,6 +102,30 @@ class SessionExamen(db.Model):
             'createdAt': self.created_at.isoformat() if self.created_at else None,
             'updatedAt': self.updated_at.isoformat() if self.updated_at else None
         }
+        
+        # Ajouter les nouveaux champs si disponibles (après migration)
+        try:
+            result['niveauId'] = self.niveau_id
+            result['niveau'] = self.niveau.to_dict() if self.niveau else None
+        except (AttributeError, KeyError):
+            result['niveauId'] = None
+            result['niveau'] = None
+        
+        try:
+            result['mentionId'] = self.mention_id
+            result['mention'] = self.mention.to_dict(include_etablissement=False) if self.mention else None
+        except (AttributeError, KeyError):
+            result['mentionId'] = None
+            result['mention'] = None
+        
+        try:
+            result['parcoursId'] = self.parcours_id
+            result['parcours'] = self.parcours.to_dict(include_mention=False) if self.parcours else None
+        except (AttributeError, KeyError):
+            result['parcoursId'] = None
+            result['parcours'] = None
+
+        return result
 
     def __repr__(self):
         return f'<SessionExamen {self.titre}>'

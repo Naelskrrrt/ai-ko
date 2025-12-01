@@ -1,69 +1,72 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Button } from '@heroui/button'
-import { Chip } from '@heroui/chip'
-import { Calendar, Plus, Clock } from 'lucide-react'
-import useSWR from 'swr'
-import { useRouter } from 'next/navigation'
-import { sessionService } from '../../services/session.service'
-import type { SessionExamen } from '../../types/enseignant.types'
+import type { SessionExamen } from "../../types/enseignant.types";
+
+import * as React from "react";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import { Calendar, Plus, Clock } from "lucide-react";
+import useSWR from "swr";
+import { useRouter } from "next/navigation";
+
+import { sessionService } from "../../services/session.service";
 
 interface UpcomingSessionsProps {
-  userId: string
+  userId: string;
 }
 
 export function UpcomingSessions({ userId }: UpcomingSessionsProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   // Récupérer les sessions à venir
   const { data, isLoading, error } = useSWR(
-    ['enseignant-upcoming-sessions', userId],
-    () => sessionService.getSessions({ limit: 5, status: 'programmee' })
-  )
+    ["enseignant-upcoming-sessions", userId],
+    () => sessionService.getSessions({ limit: 5, status: "programmee" }),
+  );
 
-  const sessions = data?.data || []
+  const sessions = data?.data || [];
 
-  const getStatusColor = (status: SessionExamen['status']) => {
+  const getStatusColor = (status: SessionExamen["status"]) => {
     switch (status) {
-      case 'en_cours':
-        return 'success'
-      case 'programmee':
-        return 'primary'
-      case 'terminee':
-        return 'default'
-      case 'annulee':
-        return 'danger'
+      case "en_cours":
+        return "success";
+      case "programmee":
+        return "primary";
+      case "terminee":
+        return "default";
+      case "annulee":
+        return "danger";
       default:
-        return 'default'
+        return "default";
     }
-  }
+  };
 
-  const getStatusLabel = (status: SessionExamen['status']) => {
+  const getStatusLabel = (status: SessionExamen["status"]) => {
     switch (status) {
-      case 'en_cours':
-        return 'En cours'
-      case 'programmee':
-        return 'Programmée'
-      case 'terminee':
-        return 'Terminée'
-      case 'annulee':
-        return 'Annulée'
+      case "en_cours":
+        return "En cours";
+      case "programmee":
+        return "Programmée";
+      case "terminee":
+        return "Terminée";
+      case "annulee":
+        return "Annulée";
       default:
-        return status
+        return status;
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date)
-  }
+    const date = new Date(dateString);
+
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
 
   return (
     <Card className="border-none shadow-sm">
@@ -73,11 +76,11 @@ export function UpcomingSessions({ userId }: UpcomingSessionsProps) {
           <h3 className="text-lg font-semibold">Sessions Programmées</h3>
         </div>
         <Button
-          size="sm"
           color="primary"
-          variant="flat"
+          size="sm"
           startContent={<Plus className="w-4 h-4" />}
-          onPress={() => router.push('/enseignant/sessions/nouvelle')}
+          variant="flat"
+          onPress={() => router.push("/enseignant/sessions/nouvelle")}
         >
           Nouvelle Session
         </Button>
@@ -99,7 +102,6 @@ export function UpcomingSessions({ userId }: UpcomingSessionsProps) {
           <div className="text-center py-8 text-default-400">
             <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>Aucune session programmée</p>
-            
           </div>
         ) : (
           <div className="space-y-3">
@@ -107,7 +109,9 @@ export function UpcomingSessions({ userId }: UpcomingSessionsProps) {
               <div
                 key={session.id}
                 className="flex items-start gap-3 p-3 rounded-lg border border-default-200 hover:bg-default-100 cursor-pointer transition-colors"
-                onClick={() => router.push(`/enseignant/sessions/${session.id}`)}
+                onClick={() =>
+                  router.push(`/enseignant/sessions/${session.id}`)
+                }
               >
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium truncate">{session.titre}</h4>
@@ -116,6 +120,12 @@ export function UpcomingSessions({ userId }: UpcomingSessionsProps) {
                     <span>{formatDate(session.dateDebut)}</span>
                     <span>•</span>
                     <span>{session.dureeMinutes} min</span>
+                    {session.matiere && (
+                      <>
+                        <span>•</span>
+                        <span>{session.matiere}</span>
+                      </>
+                    )}
                   </div>
                   {session.qcm && (
                     <p className="text-xs text-default-400 mt-1">
@@ -123,7 +133,11 @@ export function UpcomingSessions({ userId }: UpcomingSessionsProps) {
                     </p>
                   )}
                 </div>
-                <Chip size="sm" color={getStatusColor(session.status)} variant="flat">
+                <Chip
+                  color={getStatusColor(session.status)}
+                  size="sm"
+                  variant="flat"
+                >
                   {getStatusLabel(session.status)}
                 </Chip>
               </div>
@@ -132,5 +146,5 @@ export function UpcomingSessions({ userId }: UpcomingSessionsProps) {
         )}
       </CardBody>
     </Card>
-  )
+  );
 }

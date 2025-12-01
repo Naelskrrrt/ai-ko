@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import useSWR from 'swr'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { FileText, TrendingUp, Award, Clock } from 'lucide-react'
-import { etudiantService } from '../../services/etudiant.service'
-import type { EtudiantStats } from '../../types/etudiant.types'
+import useSWR from "swr";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { FileText, TrendingUp, Award, Clock } from "lucide-react";
+
+import { etudiantService } from "../../services/etudiant.service";
 
 interface StatsCardsProps {
-  userId: string
+  userId: string;
 }
 
 export function StatsCards({ userId }: StatsCardsProps) {
   const { data: stats, isLoading } = useSWR(
-    userId ? ['etudiant-stats', userId] : null,
+    userId ? ["etudiant-stats", userId] : null,
     () => etudiantService.getStats(userId),
     {
       revalidateOnFocus: false,
@@ -20,8 +20,8 @@ export function StatsCards({ userId }: StatsCardsProps) {
       dedupingInterval: 2000,
       errorRetryCount: 0,
       shouldRetryOnError: false,
-    }
-  )
+    },
+  );
 
   if (isLoading) {
     return (
@@ -33,44 +33,45 @@ export function StatsCards({ userId }: StatsCardsProps) {
           </Card>
         ))}
       </div>
-    )
+    );
   }
 
   const cards = [
     {
-      title: 'Examens passés',
+      title: "Examens passés",
       value: stats?.examens_passes || 0,
       icon: FileText,
-      color: 'text-theme-primary',
-      bgColor: 'bg-theme-primary/10',
+      color: "text-theme-primary",
+      bgColor: "bg-theme-primary/10",
     },
     {
-      title: 'Moyenne générale',
+      title: "Moyenne générale",
       value: `${stats?.moyenne_generale?.toFixed(2) || 0}/20`,
       icon: TrendingUp,
-      color: 'text-success',
-      bgColor: 'bg-success-50',
+      color: "text-success",
+      bgColor: "bg-success-50",
     },
     {
-      title: 'Taux de réussite',
+      title: "Taux de réussite",
       value: `${stats?.taux_reussite || 0}%`,
       icon: Award,
-      color: 'text-secondary',
-      bgColor: 'bg-secondary-50',
+      color: "text-secondary",
+      bgColor: "bg-secondary-50",
     },
     {
-      title: 'Examens en attente',
+      title: "Examens en attente",
       value: stats?.examens_en_attente || 0,
       icon: Clock,
-      color: 'text-warning',
-      bgColor: 'bg-warning-50',
+      color: "text-warning",
+      bgColor: "bg-warning-50",
     },
-  ]
+  ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {cards.map((card) => {
-        const Icon = card.icon
+        const Icon = card.icon;
+
         return (
           <Card key={card.title} className="border-none shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
@@ -85,8 +86,8 @@ export function StatsCards({ userId }: StatsCardsProps) {
               <div className="text-2xl font-bold">{card.value}</div>
             </CardBody>
           </Card>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

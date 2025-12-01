@@ -80,6 +80,7 @@ export async function GET(request: NextRequest) {
       user: userData,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Session check error:", error);
 
     return NextResponse.json(

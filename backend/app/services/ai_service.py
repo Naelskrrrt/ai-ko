@@ -65,7 +65,8 @@ class AIService:
         self.timeout = 60
 
     def _build_prompt(self, text: str, num_questions: int, matiere: Optional[str] = None,
-                      niveau: Optional[str] = None) -> str:
+                      niveau: Optional[str] = None, mention: Optional[str] = None,
+                      parcours: Optional[str] = None) -> str:
         """
         Construit le prompt pour le modèle IA (format texte pour l'ancienne API)
         """
@@ -77,6 +78,8 @@ class AIService:
             num_questions: Nombre de questions à générer
             matiere: Matière concernée (optionnel)
             niveau: Niveau académique (L1, L2, L3, M1, M2) (optionnel)
+            mention: Mention académique (optionnel)
+            parcours: Parcours académique (optionnel)
 
         Returns:
             Prompt formaté pour le modèle
@@ -86,6 +89,10 @@ class AIService:
             context_parts.append(f"Matière: {matiere}")
         if niveau:
             context_parts.append(f"Niveau: {niveau}")
+        if mention:
+            context_parts.append(f"Mention: {mention}")
+        if parcours:
+            context_parts.append(f"Parcours: {parcours}")
 
         context = " - ".join(context_parts) if context_parts else "Contexte général"
 
@@ -129,7 +136,8 @@ Génère maintenant les {num_questions} questions:"""
         return prompt
 
     def _build_chat_messages(self, text: str, num_questions: int, matiere: Optional[str] = None,
-                             niveau: Optional[str] = None) -> list:
+                             niveau: Optional[str] = None, mention: Optional[str] = None,
+                             parcours: Optional[str] = None) -> list:
         """
         Construit les messages pour l'API Chat Completions (format conversationnel)
         """
@@ -138,6 +146,10 @@ Génère maintenant les {num_questions} questions:"""
             context_parts.append(f"Matière: {matiere}")
         if niveau:
             context_parts.append(f"Niveau: {niveau}")
+        if mention:
+            context_parts.append(f"Mention: {mention}")
+        if parcours:
+            context_parts.append(f"Parcours: {parcours}")
 
         context = " - ".join(context_parts) if context_parts else "Contexte général"
 
@@ -729,7 +741,9 @@ Génère maintenant les {num_questions} questions:"""
 
     def generate_questions(self, text: str, num_questions: int = 10,
                            matiere: Optional[str] = None,
-                           niveau: Optional[str] = None) -> List[Dict[str, Any]]:
+                           niveau: Optional[str] = None,
+                           mention: Optional[str] = None,
+                           parcours: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Génère des questions de QCM à partir d'un texte
 
@@ -738,6 +752,8 @@ Génère maintenant les {num_questions} questions:"""
             num_questions: Nombre de questions à générer
             matiere: Matière (optionnel)
             niveau: Niveau académique (optionnel)
+            mention: Mention académique (optionnel)
+            parcours: Parcours académique (optionnel)
 
         Returns:
             Liste de questions générées et validées
@@ -752,13 +768,13 @@ Génère maintenant les {num_questions} questions:"""
         if self.use_chat_api:
             # Construire les messages pour l'API chat
             messages = self._build_chat_messages(
-                text, num_questions, matiere, niveau)
+                text, num_questions, matiere, niveau, mention, parcours)
             # Appeler l'API Chat Completions
             response_text = self._call_huggingface_api_with_messages(
                 messages, num_questions=num_questions)
         else:
             # Ancienne méthode avec prompt texte
-            prompt = self._build_prompt(text, num_questions, matiere, niveau)
+            prompt = self._build_prompt(text, num_questions, matiere, niveau, mention, parcours)
             response_text = self._call_huggingface_api(prompt)
 
         # Extraire et parser le JSON
@@ -768,6 +784,107 @@ Génère maintenant les {num_questions} questions:"""
         validated_questions = self._validate_questions(questions_data)
 
         return validated_questions
+
+    def generate_commentaire_resultat(self, note_sur_20: float, pourcentage: float, 
+                                     questions_correctes: int, questions_total: int,
+                                     est_reussi: bool) -> str:
+        """
+        Génère un commentaire automatique pour un résultat d'examen
+        
+        Args:
+            note_sur_20: Note sur 20
+            pourcentage: Pourcentage de réussite
+            questions_correctes: Nombre de questions correctes
+            questions_total: Nombre total de questions
+            est_reussi: Si l'examen est réussi
+            
+        Returns:
+            Commentaire généré (max 200 caractères, idéal 100)
+        """
+        if not self.api_token:
+            # Fallback si pas de token IA
+            if est_reussi:
+                return "Excellent travail ! Continuez ainsi."
+            elif pourcentage >= 50:
+                return "Bon travail. Quelques révisions nécessaires."
+            else:
+                return "À améliorer. Revoyez les concepts de base."
+        
+        # Déterminer le ton selon le nombre de réponses correctes
+        est_strict = questions_correctes < 10
+        
+        if est_strict:
+            system_message = """Tu es un enseignant strict mais bienveillant qui rédige des commentaires constructifs et fermes sur les résultats d'examen.
+Génère UNIQUEMENT le commentaire, sans texte avant ou après. Le commentaire doit être en français, critique mais constructive, direct et inciter à plus d'efforts. Objectif: 100 caractères, maximum strict de 200 caractères. N'utilise JAMAIS de mentions de matières spécifiques."""
+        else:
+            system_message = """Tu es un enseignant bienveillant qui rédige des commentaires constructifs et fermes sur les résultats d'examen.
+Génère UNIQUEMENT le commentaire, sans texte avant ou après. Le commentaire doit être en français, critique mais constructive. Objectif: 100 caractères, maximum strict de 200 caractères. N'utilise JAMAIS de mentions de matières spécifiques."""
+
+        # Construire le prompt selon le niveau de performance
+        if est_strict:
+            ton_instruction = """Le commentaire doit :
+- Être critique mais constructive et ferme
+- Se concentrer uniquement sur la note et la performance
+- Encourager à plus d'efforts et de révisions
+- Être direct et motivant malgré les difficultés
+- NE PAS mentionner de matières spécifiques
+- Objectif: 100 caractères, maximum strict de 200 caractères
+- Être en français"""
+        else:
+            ton_instruction = """Le commentaire doit :
+- Être critique mais constructive et ferme
+- Se concentrer uniquement sur la note et la performance
+- Mentionner les points à améliorer de manière constructive
+- NE PAS mentionner de matières spécifiques
+- Objectif: 100 caractères, maximum strict de 200 caractères
+- Être en français"""
+
+        user_prompt = f"""Génère un commentaire critique mais constructif pour un résultat d'examen.
+
+Note: {note_sur_20:.1f}/20
+Pourcentage: {pourcentage:.1f}%
+Questions correctes: {questions_correctes}/{questions_total}
+Statut: {'Réussi' if est_reussi else 'Non réussi'}
+
+{ton_instruction}
+
+IMPORTANT: Critique la note de manière constructive mais ferme. N'utilise JAMAIS de mentions de matières spécifiques. Concentre-toi uniquement sur la performance et la note.
+
+Génère uniquement le commentaire, sans guillemets ni texte supplémentaire:"""
+
+        messages = [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_prompt}
+        ]
+
+        try:
+            response_text = self._call_huggingface_api_with_messages(
+                messages, num_questions=1
+            )
+            
+            # Nettoyer la réponse (enlever guillemets, espaces, etc.)
+            commentaire = response_text.strip()
+            # Enlever les guillemets s'ils sont présents
+            if commentaire.startswith('"') and commentaire.endswith('"'):
+                commentaire = commentaire[1:-1]
+            if commentaire.startswith("'") and commentaire.endswith("'"):
+                commentaire = commentaire[1:-1]
+            
+            # Limiter strictement à 200 caractères (pas de "...")
+            if len(commentaire) > 200:
+                commentaire = commentaire[:200]
+            
+            return commentaire.strip()
+            
+        except Exception as e:
+            logger.warning(f"Erreur génération commentaire IA: {e}, utilisation du fallback")
+            # Fallback si l'IA échoue
+            if est_reussi:
+                return "Excellent travail ! Continuez ainsi."
+            elif pourcentage >= 50:
+                return "Bon travail. Quelques révisions nécessaires."
+            else:
+                return "À améliorer. Revoyez les concepts de base."
 
 
 # Instance singleton

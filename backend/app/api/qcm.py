@@ -64,6 +64,9 @@ generate_from_text_model = api.model('GenerateFromText', {
     'text': fields.String(required=True, description='Texte source pour la génération'),
     'num_questions': fields.Integer(description='Nombre de questions à générer', default=5, min=1, max=20),
     'matiere': fields.String(description='Matière'),
+    'niveau_id': fields.String(description='ID du niveau académique'),
+    'mention_id': fields.String(description='ID de la mention académique'),
+    'parcours_id': fields.String(description='ID du parcours académique'),
     'duree': fields.Integer(description='Durée estimée en minutes')
 })
 
@@ -73,6 +76,9 @@ generate_from_document_model = api.model('GenerateFromDocument', {
     'file_type': fields.String(required=True, description='Type de fichier', enum=['pdf', 'docx']),
     'num_questions': fields.Integer(description='Nombre de questions à générer', default=5, min=1, max=20),
     'matiere': fields.String(description='Matière'),
+    'niveau_id': fields.String(description='ID du niveau académique'),
+    'mention_id': fields.String(description='ID de la mention académique'),
+    'parcours_id': fields.String(description='ID du parcours académique'),
     'duree': fields.Integer(description='Durée estimée en minutes')
 })
 
@@ -267,12 +273,49 @@ class GenerateFromText(Resource):
                     matiere_id = matiere_obj.id
                     matiere_text = matiere_obj.nom  # Utiliser le nom officiel
 
+            # Récupérer niveau, mention, parcours depuis les IDs ou codes
+            niveau_id = data.get('niveau_id') or data.get('niveauId')
+            mention_id = data.get('mention_id') or data.get('mentionId')
+            parcours_id = data.get('parcours_id') or data.get('parcoursId')
+            
+            niveau_nom = None
+            mention_nom = None
+            parcours_nom = None
+            
+            if niveau_id:
+                from app.repositories.niveau_repository import NiveauRepository
+                niveau_repo = NiveauRepository()
+                # Accepter soit un ID (UUID) soit un code (L1, L2, etc.)
+                niveau_obj = niveau_repo.get_by_id(niveau_id)
+                if not niveau_obj:
+                    niveau_obj = niveau_repo.get_by_code(niveau_id)
+                if niveau_obj:
+                    niveau_nom = niveau_obj.nom
+                    niveau_id = niveau_obj.id  # Utiliser l'ID réel
+            
+            if mention_id:
+                from app.repositories.mention_repository import MentionRepository
+                mention_repo = MentionRepository()
+                mention_obj = mention_repo.get_by_id(mention_id)
+                if mention_obj:
+                    mention_nom = mention_obj.nom
+            
+            if parcours_id:
+                from app.repositories.parcours_repository import ParcoursRepository
+                parcours_repo = ParcoursRepository()
+                parcours_obj = parcours_repo.get_by_id(parcours_id)
+                if parcours_obj:
+                    parcours_nom = parcours_obj.nom
+
             # Créer le QCM vide
             qcm_data = {
                 'titre': data['titre'],
                 'description': f"QCM généré automatiquement à partir de texte",
                 'matiere': matiere_text,
                 'matiereId': matiere_id,  # Ajouter matiereId si trouvé
+                'niveauId': niveau_id,
+                'mentionId': mention_id,
+                'parcoursId': parcours_id,
                 'duree': data.get('duree'),
                 'status': 'draft'
             }
@@ -291,7 +334,9 @@ class GenerateFromText(Resource):
                     data['text'],
                     num_questions,
                     data.get('matiere'),
-                    data.get('niveau')
+                    niveau_nom,  # Passer le nom du niveau
+                    mention_nom,  # Passer le nom de la mention
+                    parcours_nom  # Passer le nom du parcours
                 )
             
             # Lancer la tâche asynchrone (task_id sera passé automatiquement)
@@ -364,12 +409,49 @@ class GenerateFromDocument(Resource):
                     matiere_id = matiere_obj.id
                     matiere_text = matiere_obj.nom  # Utiliser le nom officiel
 
+            # Récupérer niveau, mention, parcours depuis les IDs ou codes
+            niveau_id = data.get('niveau_id') or data.get('niveauId')
+            mention_id = data.get('mention_id') or data.get('mentionId')
+            parcours_id = data.get('parcours_id') or data.get('parcoursId')
+            
+            niveau_nom = None
+            mention_nom = None
+            parcours_nom = None
+            
+            if niveau_id:
+                from app.repositories.niveau_repository import NiveauRepository
+                niveau_repo = NiveauRepository()
+                # Accepter soit un ID (UUID) soit un code (L1, L2, etc.)
+                niveau_obj = niveau_repo.get_by_id(niveau_id)
+                if not niveau_obj:
+                    niveau_obj = niveau_repo.get_by_code(niveau_id)
+                if niveau_obj:
+                    niveau_nom = niveau_obj.nom
+                    niveau_id = niveau_obj.id  # Utiliser l'ID réel
+            
+            if mention_id:
+                from app.repositories.mention_repository import MentionRepository
+                mention_repo = MentionRepository()
+                mention_obj = mention_repo.get_by_id(mention_id)
+                if mention_obj:
+                    mention_nom = mention_obj.nom
+            
+            if parcours_id:
+                from app.repositories.parcours_repository import ParcoursRepository
+                parcours_repo = ParcoursRepository()
+                parcours_obj = parcours_repo.get_by_id(parcours_id)
+                if parcours_obj:
+                    parcours_nom = parcours_obj.nom
+
             # Créer le QCM vide
             qcm_data = {
                 'titre': data['titre'],
                 'description': f"QCM généré automatiquement à partir d'un document {data['file_type'].upper()}",
                 'matiere': matiere_text,
                 'matiereId': matiere_id,  # Ajouter matiereId si trouvé
+                'niveauId': niveau_id,
+                'mentionId': mention_id,
+                'parcoursId': parcours_id,
                 'duree': data.get('duree'),
                 'status': 'draft'
             }
@@ -389,7 +471,9 @@ class GenerateFromDocument(Resource):
                     data['file_type'],
                     num_questions,
                     data.get('matiere'),
-                    data.get('niveau')
+                    niveau_nom,  # Passer le nom du niveau
+                    mention_nom,  # Passer le nom de la mention
+                    parcours_nom  # Passer le nom du parcours
                 )
             
             # Lancer la tâche asynchrone (task_id sera passé automatiquement)

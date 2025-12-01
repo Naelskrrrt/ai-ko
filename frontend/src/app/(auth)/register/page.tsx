@@ -9,15 +9,18 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Link } from "@heroui/link";
+import { Eye, EyeOff } from "lucide-react";
+
 import { useAuth } from "@/core/providers/AuthProvider";
 import { Logo } from "@/components/icons";
-import { Eye, EyeOff } from "lucide-react";
 
 const registerSchema = z
   .object({
     name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
     email: z.string().email("Email invalide"),
-    password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+    password: z
+      .string()
+      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -33,7 +36,8 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
 
   const {
     register,
@@ -66,18 +70,19 @@ export default function RegisterPage() {
 
   const handleGoogleRegister = async () => {
     try {
-      const apiUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
-      const response = await fetch(
-        `${apiUrl}/api/auth/oauth/google`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const apiUrl =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${apiUrl}/api/auth/oauth/google`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
+
       if (data.auth_url) {
         window.location.href = data.auth_url;
       }
@@ -110,41 +115,39 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <Input
                 {...register("name")}
-                type="text"
+                errorMessage={errors.name?.message}
+                isInvalid={!!errors.name}
                 label="Nom"
                 placeholder="Votre nom"
+                type="text"
                 variant="bordered"
-                isInvalid={!!errors.name}
-                errorMessage={errors.name?.message}
               />
 
               <Input
                 {...register("email")}
-                type="email"
+                errorMessage={errors.email?.message}
+                isInvalid={!!errors.email}
                 label="Email"
                 placeholder="votre@email.com"
+                type="email"
                 variant="bordered"
-                isInvalid={!!errors.email}
-                errorMessage={errors.email?.message}
               />
 
               <Input
                 {...register("password")}
-                type={isPasswordVisible ? "text" : "password"}
-                label="Mot de passe"
-                placeholder="••••••••"
-                variant="bordered"
-                isInvalid={!!errors.password}
-                errorMessage={errors.password?.message}
                 endContent={
                   <button
+                    aria-label={
+                      isPasswordVisible
+                        ? "Masquer le mot de passe"
+                        : "Afficher le mot de passe"
+                    }
                     className="focus:outline-none"
                     type="button"
                     onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                    aria-label={isPasswordVisible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                   >
                     {isPasswordVisible ? (
                       <EyeOff className="w-4 h-4 text-default-400" />
@@ -153,22 +156,28 @@ export default function RegisterPage() {
                     )}
                   </button>
                 }
+                errorMessage={errors.password?.message}
+                isInvalid={!!errors.password}
+                label="Mot de passe"
+                placeholder="••••••••"
+                type={isPasswordVisible ? "text" : "password"}
+                variant="bordered"
               />
 
               <Input
                 {...register("confirmPassword")}
-                type={isConfirmPasswordVisible ? "text" : "password"}
-                label="Confirmer le mot de passe"
-                placeholder="••••••••"
-                variant="bordered"
-                isInvalid={!!errors.confirmPassword}
-                errorMessage={errors.confirmPassword?.message}
                 endContent={
                   <button
+                    aria-label={
+                      isConfirmPasswordVisible
+                        ? "Masquer le mot de passe"
+                        : "Afficher le mot de passe"
+                    }
                     className="focus:outline-none"
                     type="button"
-                    onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-                    aria-label={isConfirmPasswordVisible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    onClick={() =>
+                      setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+                    }
                   >
                     {isConfirmPasswordVisible ? (
                       <EyeOff className="w-4 h-4 text-default-400" />
@@ -177,13 +186,19 @@ export default function RegisterPage() {
                     )}
                   </button>
                 }
+                errorMessage={errors.confirmPassword?.message}
+                isInvalid={!!errors.confirmPassword}
+                label="Confirmer le mot de passe"
+                placeholder="••••••••"
+                type={isConfirmPasswordVisible ? "text" : "password"}
+                variant="bordered"
               />
 
               <Button
-                type="submit"
                 className="w-full bg-theme-primary text-white hover:bg-theme-primary/90"
                 isLoading={isLoading}
                 size="lg"
+                type="submit"
               >
                 {isLoading ? "Inscription..." : "S'inscrire"}
               </Button>
@@ -201,10 +216,7 @@ export default function RegisterPage() {
             </div>
 
             <Button
-              type="button"
-              variant="bordered"
               className="w-full"
-              onClick={handleGoogleRegister}
               disabled={isLoading}
               startContent={
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -226,6 +238,9 @@ export default function RegisterPage() {
                   />
                 </svg>
               }
+              type="button"
+              variant="bordered"
+              onClick={handleGoogleRegister}
             >
               Continuer avec Google
             </Button>
@@ -234,7 +249,10 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-default-500">
           Déjà un compte ?{" "}
-          <Link href="/login" className="text-theme-primary hover:text-theme-primary/80">
+          <Link
+            className="text-theme-primary hover:text-theme-primary/80"
+            href="/login"
+          >
             Se connecter
           </Link>
         </p>
@@ -242,4 +260,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

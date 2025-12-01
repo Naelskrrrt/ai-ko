@@ -6,7 +6,7 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // output: 'standalone', // Disabled on Windows due to symlink permission issues
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -14,6 +14,18 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
+        pathname: '/**',
+      },
+    ],
   },
   webpack: (config) => {
     config.resolve.alias = {

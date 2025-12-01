@@ -1,6 +1,6 @@
 "use client";
 
-import { COLOR_THEMES, type ColorThemeId } from "@/core/types/theme";
+import { COLOR_THEMES } from "@/core/types/theme";
 import { useColorThemeContext } from "@/components/color-theme-provider";
 
 /**

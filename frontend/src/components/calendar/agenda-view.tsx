@@ -1,8 +1,11 @@
 "use client";
 
 import React from "react";
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
+import { Calendar, Clock, MapPin, Tag } from "lucide-react";
+import clsx from "clsx";
+
 import { CalendarEvent, AgendaViewProps } from "@/core/types/calendar";
 import {
   COLOR_CLASSES,
@@ -11,8 +14,6 @@ import {
   isSameDay,
   isToday,
 } from "@/core/lib/calendar-utils";
-import { Calendar, Clock, MapPin, Tag } from "lucide-react";
-import clsx from "clsx";
 
 export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
   // Grouper les événements par date
@@ -21,6 +22,7 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
 
     events.forEach((event) => {
       const dateKey = event.start.toDateString();
+
       if (!groups[dateKey]) {
         groups[dateKey] = [];
       }
@@ -29,7 +31,7 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
 
     // Trier les groupes par date
     const sortedGroups = Object.entries(groups).sort(
-      ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()
+      ([a], [b]) => new Date(a).getTime() - new Date(b).getTime(),
     );
 
     return sortedGroups.map(([dateKey, events]) => ({
@@ -46,7 +48,12 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
     return (
       <Card
         key={event.id}
+<<<<<<< HEAD
+        isPressable
+        className="cursor-pointer transition-all hover:shadow-md dark:hover:shadow-lg select-none"
+=======
         className="transition-all hover:shadow-md dark:hover:shadow-lg select-none"
+>>>>>>> 03a9ea2b25acd14f988bc0b992de0a4f3c768a74
       >
         <CardBody className="p-4">
           <div className="flex items-start gap-3">
@@ -54,7 +61,11 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
             <div
               className={clsx(
                 "w-3 h-3 rounded-full flex-shrink-0 mt-1",
+<<<<<<< HEAD
+                COLOR_CLASSES[event.color].split(" ")[0], // Prendre seulement la classe bg
+=======
                 COLOR_CLASSES[event.color].bg
+>>>>>>> 03a9ea2b25acd14f988bc0b992de0a4f3c768a74
               )}
             />
 
@@ -131,7 +142,7 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
               isPast && "text-default-400 dark:text-default-500",
               !isTodayDate &&
                 !isPast &&
-                "bg-default-100 dark:bg-default-50 text-default-700 dark:text-default-300"
+                "bg-default-100 dark:bg-default-50 text-default-700 dark:text-default-300",
             )}
           >
             <Calendar className="w-4 h-4" />
@@ -195,7 +206,7 @@ export function AgendaView({ events, onEventCreate }: AgendaViewProps) {
         {/* Liste des événements groupés par date */}
         <div className="space-y-6">
           {groupedEvents.map(({ date, events }) =>
-            renderDateGroup(date, events)
+            renderDateGroup(date, events),
           )}
         </div>
 

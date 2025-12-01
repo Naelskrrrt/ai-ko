@@ -45,22 +45,23 @@ export const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
     if (pathname.startsWith("/admin")) {
       return siteConfig.adminSidebarNavItems || [];
     }
-    
+
     // Si on est sur une page étudiant, utiliser la navigation étudiant
     if (pathname.startsWith("/etudiant")) {
       return siteConfig.etudiantSidebarNavItems || [];
     }
-    
+
     // Si on est sur une page enseignant, utiliser la navigation enseignant (à créer)
     if (pathname.startsWith("/enseignant")) {
       return siteConfig.enseignantSidebarNavItems || [];
     }
-    
+
     // Sinon, filtrer les items selon le rôle de l'utilisateur
     if (!user || !user.role) return [];
-    
+
     return siteConfig.sidebarNavItems.filter((item: any) => {
       if (!item.roles) return true;
+
       return item.roles.includes(user.role);
     });
   }, [pathname, user]);
@@ -119,11 +120,20 @@ export const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
             <div className="space-y-2">
               {navigationItems.length > 0 ? (
                 navigationItems.map((item) => {
-                  const IconComponent =
-                    item.icon ? iconMap[item.icon as keyof typeof iconMap] : null;
-                  const isActive =
-                    pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`);
+                  const IconComponent = item.icon
+                    ? iconMap[item.icon as keyof typeof iconMap]
+                    : null;
+                  
+                  // Pour les routes de base (dashboard), utiliser une égalité exacte
+                  // Pour les autres routes, vérifier si le pathname commence par le href
+                  const isBaseDashboard = 
+                    item.href === "/admin" || 
+                    item.href === "/enseignant" || 
+                    item.href === "/etudiant";
+                  
+                  const isActive = isBaseDashboard
+                    ? pathname === item.href
+                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
                   return (
                     <Button
@@ -139,7 +149,9 @@ export const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
                       )}
                       href={item.href}
                       startContent={
-                        IconComponent ? <IconComponent className="w-5 h-5" /> : null
+                        IconComponent ? (
+                          <IconComponent className="w-5 h-5" />
+                        ) : null
                       }
                       variant={isActive ? "flat" : "light"}
                       onClick={onClose}

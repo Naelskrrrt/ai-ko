@@ -4,6 +4,7 @@
 
 import React, { useState, useCallback, useMemo } from "react";
 import { useQueryState } from "nuqs";
+
 import {
   CalendarEvent,
   CalendarView,
@@ -85,10 +86,11 @@ export function useCalendar(): CalendarHook {
         setError(null);
       } catch (err) {
         setError("Erreur lors de la création de l'événement");
+        // eslint-disable-next-line no-console
         console.error("Erreur création événement:", err);
       }
     },
-    []
+    [],
   );
 
   const updateEvent = useCallback(
@@ -102,16 +104,17 @@ export function useCalendar(): CalendarHook {
                   ...eventData,
                   updatedAt: new Date(),
                 }
-              : event
-          )
+              : event,
+          ),
         );
         setError(null);
       } catch (err) {
         setError("Erreur lors de la mise à jour de l'événement");
+        // eslint-disable-next-line no-console
         console.error("Erreur mise à jour événement:", err);
       }
     },
-    []
+    [],
   );
 
   const deleteEvent = useCallback((id: string) => {
@@ -120,6 +123,7 @@ export function useCalendar(): CalendarHook {
       setError(null);
     } catch (err) {
       setError("Erreur lors de la suppression de l'événement");
+      // eslint-disable-next-line no-console
       console.error("Erreur suppression événement:", err);
     }
   }, []);
@@ -169,6 +173,7 @@ export function useCalendar(): CalendarHook {
 
   const navigateToToday = useCallback(() => {
     const today = new Date();
+
     setCurrentDate(today);
     setSelectedDate(today);
     // Déclencher le scroll par défaut après navigation
@@ -180,14 +185,14 @@ export function useCalendar(): CalendarHook {
     (date: Date) => {
       return getEventsForDate(events, date);
     },
-    [events]
+    [events],
   );
 
   const getEventsForDateRangeCallback = useCallback(
     (start: Date, end: Date) => {
       return getEventsForDateRange(events, start, end);
     },
-    [events]
+    [events],
   );
 
   // Actions pour la gestion de l'état
@@ -210,20 +215,24 @@ export function useCalendar(): CalendarHook {
         const monthStart = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth(),
-          1
+          1,
         );
         const monthEnd = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth() + 1,
-          0
+          0,
         );
+
         return getEventsForDateRange(events, monthStart, monthEnd);
 
       case "week":
         const weekStart = new Date(currentDate);
+
         weekStart.setDate(currentDate.getDate() - currentDate.getDay() + 1); // Lundi
         const weekEnd = new Date(weekStart);
+
         weekEnd.setDate(weekStart.getDate() + 6); // Dimanche
+
         return getEventsForDateRange(events, weekStart, weekEnd);
 
       case "day":
@@ -233,9 +242,11 @@ export function useCalendar(): CalendarHook {
         // Pour l'agenda, on affiche les événements des 30 prochains jours
         const agendaStart = new Date();
         const agendaEnd = new Date();
+
         agendaEnd.setDate(agendaStart.getDate() + 30);
+
         return getEventsForDateRange(events, agendaStart, agendaEnd).sort(
-          (a, b) => a.start.getTime() - b.start.getTime()
+          (a, b) => a.start.getTime() - b.start.getTime(),
         );
 
       default:
@@ -250,7 +261,7 @@ export function useCalendar(): CalendarHook {
     const thisWeekEvents = getEventsForDateRange(
       events,
       new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000),
-      new Date(today.getTime() + (6 - today.getDay()) * 24 * 60 * 60 * 1000)
+      new Date(today.getTime() + (6 - today.getDay()) * 24 * 60 * 60 * 1000),
     );
 
     return {
@@ -263,12 +274,14 @@ export function useCalendar(): CalendarHook {
 
   // Fonctions pour gérer le scroll par défaut
   const triggerScrollToDefault = useCallback(() => {
+    // eslint-disable-next-line no-console
     console.log("triggerScrollToDefault called");
     setShouldScrollToDefault(true);
     scrollTriggerRef.current += 1; // Incrémenter pour forcer le re-render
   }, []);
 
   const markScrollCompleted = useCallback(() => {
+    // eslint-disable-next-line no-console
     console.log("markScrollCompleted called");
     setShouldScrollToDefault(false);
   }, []);
@@ -360,12 +373,14 @@ export function useEventForm(initialEvent?: CalendarEvent | null) {
       if (errors[field]) {
         setErrors((prev) => {
           const newErrors = { ...prev };
+
           delete newErrors[field];
+
           return newErrors;
         });
       }
     },
-    [errors]
+    [errors],
   );
 
   const validateForm = useCallback(() => {
@@ -402,6 +417,7 @@ export function useEventForm(initialEvent?: CalendarEvent | null) {
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 

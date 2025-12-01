@@ -23,11 +23,12 @@ function notify() {
 export function dismissToast(id: string) {
   // Annuler le timeout si il existe
   const timeout = toastTimeouts.get(id);
+
   if (timeout) {
     clearTimeout(timeout);
     toastTimeouts.delete(id);
   }
-  
+
   toasts = toasts.filter((t) => t.id !== id);
   notify();
 }
@@ -43,7 +44,7 @@ export function toast({
 }) {
   const id = Math.random().toString(36).substring(7);
   const newToast: Toast = { id, title, description, variant };
-  
+
   toasts = [newToast, ...toasts].slice(0, 5);
   notify();
 
@@ -52,7 +53,7 @@ export function toast({
     toastTimeouts.delete(id);
     notify();
   }, 5000);
-  
+
   toastTimeouts.set(id, timeout);
 
   return {
@@ -68,16 +69,21 @@ export function useToast() {
 
   React.useEffect(() => {
     toastListeners.push(setState);
+
     return () => {
       toastListeners = toastListeners.filter((l) => l !== setState);
     };
   }, []);
 
   const showToast = useCallback(
-    (props: { title: string; description?: string; variant?: ToastVariant }) => {
+    (props: {
+      title: string;
+      description?: string;
+      variant?: ToastVariant;
+    }) => {
       toast(props);
     },
-    []
+    [],
   );
 
   const dismiss = useCallback((id: string) => {
@@ -90,4 +96,3 @@ export function useToast() {
     dismiss,
   };
 }
-

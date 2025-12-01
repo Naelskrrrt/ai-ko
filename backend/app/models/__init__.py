@@ -9,6 +9,14 @@ from app.models.matiere import Matiere
 from app.models.classe import Classe
 from app.models.session_examen import SessionExamen
 from app.models.resultat import Resultat
+from app.models.ai_config import AIModelConfig
+
+# Importer les nouveaux modèles (refonte)
+from app.models.etablissement import Etablissement
+from app.models.mention import Mention
+from app.models.parcours import Parcours
+from app.models.enseignant import Enseignant
+from app.models.etudiant import Etudiant
 
 # Importer les tables d'association
 from app.models.associations import (
@@ -16,8 +24,16 @@ from app.models.associations import (
     professeur_niveaux,
     etudiant_niveaux,
     etudiant_classes,
+    etudiant_matieres,
     professeur_classes,
-    qcm_niveaux
+    qcm_niveaux,
+    # Nouvelles tables d'association
+    enseignant_matieres,
+    enseignant_niveaux,
+    enseignant_parcours,
+    enseignant_mentions,
+    etudiant_matieres_v2,
+    etudiant_classes_v2
 )
 
 __all__ = [
@@ -32,13 +48,28 @@ __all__ = [
     'Classe',
     'SessionExamen',
     'Resultat',
-    # Tables d'association
+    'AIModelConfig',
+    # Nouveaux modèles (refonte)
+    'Etablissement',
+    'Mention',
+    'Parcours',
+    'Enseignant',
+    'Etudiant',
+    # Tables d'association (anciennes)
     'professeur_matieres',
     'professeur_niveaux',
     'etudiant_niveaux',
     'etudiant_classes',
+    'etudiant_matieres',
     'professeur_classes',
-    'qcm_niveaux'
+    'qcm_niveaux',
+    # Tables d'association (nouvelles)
+    'enseignant_matieres',
+    'enseignant_niveaux',
+    'enseignant_parcours',
+    'enseignant_mentions',
+    'etudiant_matieres_v2',
+    'etudiant_classes_v2'
 ]
 
 

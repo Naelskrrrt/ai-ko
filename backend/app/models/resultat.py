@@ -52,6 +52,7 @@ class Resultat(db.Model):
 
     est_reussi = db.Column(db.Boolean, default=False, nullable=False)
     est_valide = db.Column(db.Boolean, default=True, nullable=False)  # Pour détecter la triche
+    est_publie = db.Column(db.Boolean, default=False, nullable=False)  # Contrôle visibilité pour l'étudiant
 
     # Feedback et commentaires
     feedback_auto = db.Column(db.Text, nullable=True)  # Feedback automatique généré
@@ -145,6 +146,7 @@ class Resultat(db.Model):
                 'status': self.status,
                 'estReussi': self.est_reussi,
                 'estValide': self.est_valide,
+                'estPublie': self.est_publie,
                 'feedbackAuto': self.feedback_auto,
                 'commentaireProf': self.commentaire_prof,
                 'noteProf': self.note_prof,

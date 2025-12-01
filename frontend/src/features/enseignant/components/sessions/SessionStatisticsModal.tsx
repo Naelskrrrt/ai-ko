@@ -1,93 +1,111 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from '@heroui/modal'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Chip } from '@heroui/chip'
-import { Button } from '@heroui/button'
+import type { ResultatEtudiant } from "../../types/enseignant.types";
+
+import * as React from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Chip } from "@heroui/chip";
+import { Button } from "@heroui/button";
 import {
   BarChart3,
   Users,
   TrendingUp,
   Award,
-  Clock,
   CheckCircle,
   XCircle,
   RefreshCw,
-} from 'lucide-react'
-import useSWR from 'swr'
-import { sessionService } from '../../services/session.service'
-import type { ResultatEtudiant } from '../../types/enseignant.types'
+} from "lucide-react";
+import useSWR from "swr";
+
+import { sessionService } from "../../services/session.service";
 
 interface SessionStatisticsModalProps {
-  isOpen: boolean
-  onClose: () => void
-  sessionId: string
+  isOpen: boolean;
+  onClose: () => void;
+  sessionId: string;
 }
 
 interface SessionStatistics {
-  nombre_participants: number
-  moyenne: number
-  note_min: number
-  note_max: number
-  taux_reussite: number
+  nombre_participants: number;
+  moyenne: number;
+  note_min: number;
+  note_max: number;
+  taux_reussite: number;
 }
 
-export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionStatisticsModalProps) {
-  const { data: stats, isLoading: isLoadingStats, error: errorStats, mutate: mutateStats, isValidating: isValidatingStats } = useSWR<SessionStatistics>(
-    isOpen ? ['session-statistics', sessionId] : null,
+export function SessionStatisticsModal({
+  isOpen,
+  onClose,
+  sessionId,
+}: SessionStatisticsModalProps) {
+  const {
+    data: stats,
+    isLoading: isLoadingStats,
+    error: errorStats,
+    mutate: mutateStats,
+    isValidating: isValidatingStats,
+  } = useSWR<SessionStatistics>(
+    isOpen ? ["session-statistics", sessionId] : null,
     () => sessionService.getSessionStatistics(sessionId),
     {
       revalidateOnFocus: false,
-    }
-  )
+    },
+  );
 
-  const { data: resultats, isLoading: isLoadingResultats, error: errorResultats, mutate: mutateResultats } = useSWR<ResultatEtudiant[]>(
-    isOpen ? ['resultats-session', sessionId] : null,
+  const {
+    data: resultats,
+    isLoading: isLoadingResultats,
+    error: errorResultats,
+    mutate: mutateResultats,
+  } = useSWR<ResultatEtudiant[]>(
+    isOpen ? ["resultats-session", sessionId] : null,
     () => sessionService.getResultatsSession(sessionId),
     {
       revalidateOnFocus: false,
-    }
-  )
+    },
+  );
 
   const handleRefresh = async () => {
-    await Promise.all([mutateStats(), mutateResultats()])
-  }
+    await Promise.all([mutateStats(), mutateResultats()]);
+  };
 
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return '—'
+    if (!dateString) return "—";
     try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+      const date = new Date(dateString);
+
+      return date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } catch {
-      return dateString
+      return dateString;
     }
-  }
+  };
 
   const formatDuree = (secondes: number | null | undefined) => {
-    if (!secondes) return '—'
-    const minutes = Math.floor(secondes / 60)
-    const secs = Math.floor(secondes % 60)
-    return `${minutes}min ${secs}s`
-  }
+    if (!secondes) return "—";
+    const minutes = Math.floor(secondes / 60);
+    const secs = Math.floor(secondes % 60);
 
-  const isLoading = isLoadingStats || isLoadingResultats
-  const error = errorStats || errorResultats
+    return `${minutes}min ${secs}s`;
+  };
+
+  const isLoading = isLoadingStats || isLoadingResultats;
+  const error = errorStats || errorResultats;
 
   if (isLoading) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size="5xl"
+        onClose={onClose}
+      >
         <ModalContent>
           <ModalHeader>Statistiques de la session</ModalHeader>
           <ModalBody>
@@ -97,27 +115,39 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
           </ModalBody>
         </ModalContent>
       </Modal>
-    )
+    );
   }
 
   if (error || !stats) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size="5xl"
+        onClose={onClose}
+      >
         <ModalContent>
           <ModalHeader>Statistiques de la session</ModalHeader>
           <ModalBody>
             <div className="flex items-center justify-center py-12">
-              <p className="text-danger">Erreur lors du chargement des statistiques</p>
+              <p className="text-danger">
+                Erreur lors du chargement des statistiques
+              </p>
             </div>
           </ModalBody>
         </ModalContent>
       </Modal>
-    )
+    );
   }
 
   if (stats.nombre_participants === 0) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size="5xl"
+        onClose={onClose}
+      >
         <ModalContent>
           <ModalHeader>Statistiques de la session</ModalHeader>
           <ModalBody>
@@ -127,19 +157,20 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
                 Aucun participant pour le moment
               </p>
               <p className="text-sm text-default-400">
-                Les statistiques apparaîtront une fois que les étudiants auront participé à cette session.
+                Les statistiques apparaîtront une fois que les étudiants auront
+                participé à cette session.
               </p>
             </div>
           </ModalBody>
         </ModalContent>
       </Modal>
-    )
+    );
   }
 
-  const resultatsList = resultats || []
+  const resultatsList = resultats || [];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} scrollBehavior="inside" size="5xl" onClose={onClose}>
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center justify-between w-full">
@@ -149,13 +180,15 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
             </div>
             <Button
               isIconOnly
-              variant="light"
-              size="sm"
-              onPress={handleRefresh}
-              isLoading={isValidatingStats}
               aria-label="Rafraîchir les statistiques"
+              isLoading={isValidatingStats}
+              size="sm"
+              variant="light"
+              onPress={handleRefresh}
             >
-              <RefreshCw className={`w-4 h-4 ${isValidatingStats ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isValidatingStats ? "animate-spin" : ""}`}
+              />
             </Button>
           </div>
         </ModalHeader>
@@ -169,7 +202,9 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
                     <Users className="w-4 h-4 text-primary" />
                     <p className="text-xs text-default-500">Participants</p>
                   </div>
-                  <p className="text-2xl font-bold">{stats.nombre_participants}</p>
+                  <p className="text-2xl font-bold">
+                    {stats.nombre_participants}
+                  </p>
                 </CardBody>
               </Card>
 
@@ -179,7 +214,9 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
                     <TrendingUp className="w-4 h-4 text-success" />
                     <p className="text-xs text-default-500">Moyenne</p>
                   </div>
-                  <p className="text-2xl font-bold">{stats.moyenne.toFixed(1)}</p>
+                  <p className="text-2xl font-bold">
+                    {stats.moyenne.toFixed(1)}
+                  </p>
                   <p className="text-xs text-default-400 mt-1">sur 20</p>
                 </CardBody>
               </Card>
@@ -190,7 +227,9 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
                     <Award className="w-4 h-4 text-warning" />
                     <p className="text-xs text-default-500">Taux de réussite</p>
                   </div>
-                  <p className="text-2xl font-bold">{stats.taux_reussite.toFixed(0)}%</p>
+                  <p className="text-2xl font-bold">
+                    {stats.taux_reussite.toFixed(0)}%
+                  </p>
                   <p className="text-xs text-default-400 mt-1">Note ≥ 10/20</p>
                 </CardBody>
               </Card>
@@ -212,20 +251,24 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
             {/* Distribution des notes */}
             <Card className="w-full">
               <CardHeader>
-                <h3 className="text-lg font-semibold">Distribution des notes</h3>
+                <h3 className="text-lg font-semibold">
+                  Distribution des notes
+                </h3>
               </CardHeader>
               <CardBody>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-default-500 mb-1">Note minimale</p>
+                    <p className="text-sm text-default-500 mb-1">
+                      Note minimale
+                    </p>
                     <p
                       className={
                         `text-xl font-bold ` +
                         (stats.note_min < 10
-                          ? 'text-danger'
+                          ? "text-danger"
                           : stats.note_min > 14
-                            ? 'text-success'
-                            : '')
+                            ? "text-success"
+                            : "")
                       }
                     >
                       {stats.note_min.toFixed(1)}/20
@@ -237,25 +280,27 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
                       className={
                         `text-xl font-bold ` +
                         (stats.moyenne < 10
-                          ? 'text-danger'
+                          ? "text-danger"
                           : stats.moyenne > 14
-                            ? 'text-success'
-                            : '')
+                            ? "text-success"
+                            : "")
                       }
                     >
                       {stats.moyenne.toFixed(1)}/20
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-default-500 mb-1">Note maximale</p>
+                    <p className="text-sm text-default-500 mb-1">
+                      Note maximale
+                    </p>
                     <p
                       className={
                         `text-xl font-bold ` +
                         (stats.note_max < 10
-                          ? 'text-danger'
+                          ? "text-danger"
                           : stats.note_max > 14
-                            ? 'text-success'
-                            : '')
+                            ? "text-success"
+                            : "")
                       }
                     >
                       {stats.note_max.toFixed(1)}/20
@@ -268,17 +313,21 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
             {/* Liste des résultats */}
             <Card className="w-full">
               <CardHeader>
-                <h3 className="text-lg font-semibold">Résultats des étudiants</h3>
+                <h3 className="text-lg font-semibold">
+                  Résultats des étudiants
+                </h3>
               </CardHeader>
               <CardBody>
                 {resultatsList.length === 0 ? (
-                  <p className="text-center text-default-500 py-8">Aucun résultat disponible</p>
+                  <p className="text-center text-default-500 py-8">
+                    Aucun résultat disponible
+                  </p>
                 ) : (
                   <div className="space-y-3">
                     {resultatsList.map((resultat) => {
-                      const pourcentage = resultat.pourcentage || 0
-                      const noteSur20 = resultat.note || 0
-                      const estReussi = pourcentage >= 50
+                      const pourcentage = resultat.pourcentage || 0;
+                      const noteSur20 = resultat.note || 0;
+                      const estReussi = pourcentage >= 50;
 
                       return (
                         <Card key={resultat.id}>
@@ -287,20 +336,26 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                   <p className="font-medium">
-                                    {resultat.etudiant?.nom || resultat.etudiant?.prenom || 'Étudiant'}
+                                    {resultat.etudiant?.name || "Étudiant"}
                                   </p>
                                   <Chip
-                                    size="sm"
-                                    color={estReussi ? 'success' : 'danger'}
-                                    variant="flat"
                                     className="flex items-center"
-                                    startContent={estReussi ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
+                                    color={estReussi ? "success" : "danger"}
+                                    size="sm"
+                                    startContent={
+                                      estReussi ? (
+                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                      ) : (
+                                        <XCircle className="w-3 h-3 mr-1" />
+                                      )
+                                    }
+                                    variant="flat"
                                   >
-                                    {estReussi ? 'Réussi' : 'Échoué'}
+                                    {estReussi ? "Réussi" : "Échoué"}
                                   </Chip>
                                 </div>
                                 <p className="text-xs text-default-500 mb-2">
-                                  {resultat.etudiant?.email || '—'}
+                                  {resultat.etudiant?.email || "—"}
                                 </p>
                                 <div className="flex items-center gap-4 text-sm">
                                   <div className="flex items-center gap-1">
@@ -322,7 +377,7 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
                             </div>
                           </CardBody>
                         </Card>
-                      )
+                      );
                     })}
                   </div>
                 )}
@@ -332,10 +387,5 @@ export function SessionStatisticsModal({ isOpen, onClose, sessionId }: SessionSt
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
+  );
 }
-
-
-
-
-

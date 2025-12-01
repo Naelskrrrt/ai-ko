@@ -257,6 +257,37 @@ class SessionExamenService:
             raise ValueError(
                 "La description ne peut pas dépasser 5000 caractères")
 
+        # Validation niveau_id, mention_id, parcours_id (optionnels)
+        niveau_id = data.get('niveau_id') or data.get('niveauId')
+        mention_id = data.get('mention_id') or data.get('mentionId')
+        parcours_id = data.get('parcours_id') or data.get('parcoursId')
+        
+        if niveau_id:
+            from app.repositories.niveau_repository import NiveauRepository
+            niveau_repo = NiveauRepository()
+            # Accepter soit un ID (UUID) soit un code (L1, L2, etc.)
+            niveau_obj = niveau_repo.get_by_id(niveau_id)
+            if not niveau_obj:
+                # Si ce n'est pas un ID, essayer comme code
+                niveau_obj = niveau_repo.get_by_code(niveau_id)
+            if not niveau_obj:
+                raise ValueError(f"Niveau avec l'ID ou code {niveau_id} non trouvé")
+            niveau_id = niveau_obj.id  # Utiliser l'ID réel
+        
+        if mention_id:
+            from app.repositories.mention_repository import MentionRepository
+            mention_repo = MentionRepository()
+            mention_obj = mention_repo.get_by_id(mention_id)
+            if not mention_obj:
+                raise ValueError(f"Mention avec l'ID {mention_id} non trouvée")
+        
+        if parcours_id:
+            from app.repositories.parcours_repository import ParcoursRepository
+            parcours_repo = ParcoursRepository()
+            parcours_obj = parcours_repo.get_by_id(parcours_id)
+            if not parcours_obj:
+                raise ValueError(f"Parcours avec l'ID {parcours_id} non trouvé")
+
         # Créer la session
         session = SessionExamen(
             titre=titre,
@@ -272,6 +303,9 @@ class SessionExamenService:
             status=data.get('status', 'programmee'),
             qcm_id=qcm_id,
             classe_id=classe_id,
+            niveau_id=niveau_id,
+            mention_id=mention_id,
+            parcours_id=parcours_id,
             createur_id=createur_id
         )
 
@@ -375,7 +409,7 @@ class SessionExamenService:
             session.afficher_correction = bool(data['afficher_correction'])
 
         if 'status' in data:
-            if data['status'] not in ['programmee', 'en_cours', 'terminee', 'annulee']:
+            if data['status'] not in ['programmee', 'en_cours', 'en_pause', 'terminee', 'annulee']:
                 raise ValueError("Status invalide")
             session.status = data['status']
 
@@ -403,9 +437,9 @@ class SessionExamenService:
         if not session:
             raise ValueError("Session non trouvée")
 
-        if session.status != 'programmee':
+        if session.status not in ['programmee', 'en_pause']:
             raise ValueError(
-                "Seules les sessions programmées peuvent être démarrées")
+                "Seules les sessions programmées ou en pause peuvent être démarrées")
 
         session.status = 'en_cours'
         session = self.session_repo.update(session)
@@ -417,10 +451,38 @@ class SessionExamenService:
         if not session:
             raise ValueError("Session non trouvée")
 
-        if session.status not in ['programmee', 'en_cours']:
+        if session.status not in ['programmee', 'en_cours', 'en_pause']:
             raise ValueError(
-                "Seules les sessions programmées ou en cours peuvent être terminées")
+                "Seules les sessions programmées, en cours ou en pause peuvent être terminées")
 
         session.status = 'terminee'
+        session = self.session_repo.update(session)
+        return session.to_dict()
+
+    def mettre_en_pause(self, session_id: str) -> Dict[str, Any]:
+        """Met une session en pause (change le statut en 'en_pause')"""
+        session = self.session_repo.get_by_id(session_id)
+        if not session:
+            raise ValueError("Session non trouvée")
+
+        if session.status != 'en_cours':
+            raise ValueError(
+                "Seules les sessions en cours peuvent être mises en pause")
+
+        session.status = 'en_pause'
+        session = self.session_repo.update(session)
+        return session.to_dict()
+
+    def reprendre_session(self, session_id: str) -> Dict[str, Any]:
+        """Reprend une session en pause (change le statut en 'en_cours')"""
+        session = self.session_repo.get_by_id(session_id)
+        if not session:
+            raise ValueError("Session non trouvée")
+
+        if session.status != 'en_pause':
+            raise ValueError(
+                "Seules les sessions en pause peuvent être reprises")
+
+        session.status = 'en_cours'
         session = self.session_repo.update(session)
         return session.to_dict()

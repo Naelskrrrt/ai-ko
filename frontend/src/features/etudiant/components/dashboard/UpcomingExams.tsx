@@ -1,29 +1,29 @@
-'use client'
+"use client";
 
-import useSWR from 'swr'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Button } from '@heroui/button'
-import { Chip } from '@heroui/chip'
-import { Calendar, Clock, BookOpen, Play } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { etudiantService } from '../../services/etudiant.service'
+import useSWR from "swr";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Calendar, Clock, BookOpen, Play } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import { etudiantService } from "../../services/etudiant.service";
 
 interface UpcomingExamsProps {
-  userId: string
+  userId: string;
 }
 
 export function UpcomingExams({ userId }: UpcomingExamsProps) {
-  const router = useRouter()
+  const router = useRouter();
   const { data: examens, isLoading } = useSWR(
-    userId ? ['upcoming-exams', userId] : null,
+    userId ? ["upcoming-exams", userId] : null,
     () => etudiantService.getUpcomingExams(userId),
     {
       revalidateOnFocus: false,
       refreshInterval: 30000, // Rafraîchir toutes les 30 secondes
       errorRetryCount: 0,
       shouldRetryOnError: false,
-    }
-  )
+    },
+  );
 
   if (isLoading) {
     return (
@@ -31,9 +31,7 @@ export function UpcomingExams({ userId }: UpcomingExamsProps) {
         <CardHeader className="flex gap-3">
           <div className="flex flex-col">
             <p className="text-md font-semibold">Examens à venir</p>
-            <p className="text-small text-default-500">
-              Chargement...
-            </p>
+            <p className="text-small text-default-500">Chargement...</p>
           </div>
         </CardHeader>
         <CardBody>
@@ -47,10 +45,10 @@ export function UpcomingExams({ userId }: UpcomingExamsProps) {
           </div>
         </CardBody>
       </Card>
-    )
+    );
   }
 
-  const examensDisponibles = examens?.filter((e) => !e.est_commence) || []
+  const examensDisponibles = examens?.filter((e) => !e.est_commence) || [];
 
   return (
     <Card className="h-full">
@@ -59,15 +57,15 @@ export function UpcomingExams({ userId }: UpcomingExamsProps) {
           <p className="text-md font-semibold">Examens à venir</p>
           <p className="text-small text-default-500">
             {examensDisponibles.length} examen
-            {examensDisponibles.length > 1 ? 's' : ''} disponible
-            {examensDisponibles.length > 1 ? 's' : ''}
+            {examensDisponibles.length > 1 ? "s" : ""} disponible
+            {examensDisponibles.length > 1 ? "s" : ""}
           </p>
         </div>
         {examensDisponibles.length > 0 && (
           <Button
             size="sm"
             variant="flat"
-            onPress={() => router.push('/etudiant/examens')}
+            onPress={() => router.push("/etudiant/examens")}
           >
             Voir tous
           </Button>
@@ -100,10 +98,13 @@ export function UpcomingExams({ userId }: UpcomingExamsProps) {
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         <span>
-                          {new Date(examen.date_debut).toLocaleDateString('fr-FR', {
-                            day: '2-digit',
-                            month: 'short',
-                          })}
+                          {new Date(examen.date_debut).toLocaleDateString(
+                            "fr-FR",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                            },
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -113,11 +114,13 @@ export function UpcomingExams({ userId }: UpcomingExamsProps) {
                     </div>
                   </div>
                   <Button
-                    size="sm"
-                    variant="flat"
                     className="bg-theme-primary/10 text-theme-primary hover:bg-theme-primary/20"
-                    onPress={() => router.push(`/etudiant/examens/${examen.id}`)}
+                    size="sm"
                     startContent={<Play className="h-3 w-3" />}
+                    variant="flat"
+                    onPress={() =>
+                      router.push(`/etudiant/examens/${examen.id}`)
+                    }
                   >
                     Commencer
                   </Button>
@@ -128,5 +131,5 @@ export function UpcomingExams({ userId }: UpcomingExamsProps) {
         )}
       </CardBody>
     </Card>
-  )
+  );
 }

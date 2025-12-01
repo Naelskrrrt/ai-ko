@@ -1,18 +1,14 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  useDisclosure,
-} from '@heroui/modal'
-import { Tabs, Tab } from '@heroui/tabs'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Chip } from '@heroui/chip'
-import { Progress } from '@heroui/progress'
-import { Button } from '@heroui/button'
+import type { QCMStatistics } from "../../types/enseignant.types";
+
+import * as React from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
+import { Tabs, Tab } from "@heroui/tabs";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Chip } from "@heroui/chip";
+import { Progress } from "@heroui/progress";
+import { Button } from "@heroui/button";
 import {
   BarChart3,
   Users,
@@ -23,55 +19,72 @@ import {
   XCircle,
   FileText,
   RefreshCw,
-} from 'lucide-react'
-import useSWR from 'swr'
-import { qcmService } from '../../services/qcm.service'
-import type { QCMStatistics } from '../../types/enseignant.types'
+} from "lucide-react";
+import useSWR from "swr";
+
+import { qcmService } from "../../services/qcm.service";
 
 interface QCMStatisticsModalProps {
-  isOpen: boolean
-  onClose: () => void
-  qcmId: string
+  isOpen: boolean;
+  onClose: () => void;
+  qcmId: string;
 }
 
-export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModalProps) {
-  const { data: stats, isLoading, error, mutate, isValidating } = useSWR<QCMStatistics>(
-    isOpen ? ['qcm-statistics', qcmId] : null,
+export function QCMStatisticsModal({
+  isOpen,
+  onClose,
+  qcmId,
+}: QCMStatisticsModalProps) {
+  const {
+    data: stats,
+    isLoading,
+    error,
+    mutate,
+    isValidating,
+  } = useSWR<QCMStatistics>(
+    isOpen ? ["qcm-statistics", qcmId] : null,
     () => qcmService.getQCMStatistics(qcmId),
     {
       revalidateOnFocus: false,
-    }
-  )
+    },
+  );
 
   const handleRefresh = async () => {
-    await mutate()
-  }
+    await mutate();
+  };
 
   const formatDuree = (secondes: number) => {
-    const minutes = Math.floor(secondes / 60)
-    const secs = Math.floor(secondes % 60)
-    return `${minutes}min ${secs}s`
-  }
+    const minutes = Math.floor(secondes / 60);
+    const secs = Math.floor(secondes % 60);
+
+    return `${minutes}min ${secs}s`;
+  };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '—'
+    if (!dateString) return "—";
     try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+      const date = new Date(dateString);
+
+      return date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } catch {
-      return dateString
+      return dateString;
     }
-  }
+  };
 
   if (isLoading) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size="5xl"
+        onClose={onClose}
+      >
         <ModalContent>
           <ModalHeader>Statistiques du QCM</ModalHeader>
           <ModalBody>
@@ -81,27 +94,39 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
           </ModalBody>
         </ModalContent>
       </Modal>
-    )
+    );
   }
 
   if (error || !stats) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size="5xl"
+        onClose={onClose}
+      >
         <ModalContent>
           <ModalHeader>Statistiques du QCM</ModalHeader>
           <ModalBody>
             <div className="flex items-center justify-center py-12">
-              <p className="text-danger">Erreur lors du chargement des statistiques</p>
+              <p className="text-danger">
+                Erreur lors du chargement des statistiques
+              </p>
             </div>
           </ModalBody>
         </ModalContent>
       </Modal>
-    )
+    );
   }
 
   if (stats.nombre_soumissions === 0) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size="5xl"
+        onClose={onClose}
+      >
         <ModalContent>
           <ModalHeader>Statistiques du QCM</ModalHeader>
           <ModalBody>
@@ -111,17 +136,18 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                 Aucune soumission pour le moment
               </p>
               <p className="text-sm text-default-400">
-                Les statistiques apparaîtront une fois que les étudiants auront soumis ce QCM.
+                Les statistiques apparaîtront une fois que les étudiants auront
+                soumis ce QCM.
               </p>
             </div>
           </ModalBody>
         </ModalContent>
       </Modal>
-    )
+    );
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
+    <Modal isOpen={isOpen} scrollBehavior="inside" size="5xl" onClose={onClose}>
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center justify-between w-full">
@@ -131,16 +157,20 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
             </div>
             <Button
               isIconOnly
-              variant="light"
-              size="sm"
-              onPress={handleRefresh}
-              isLoading={isValidating}
               aria-label="Rafraîchir les statistiques"
+              isLoading={isValidating}
+              size="sm"
+              variant="light"
+              onPress={handleRefresh}
             >
-              <RefreshCw className={`w-4 h-4 ${isValidating ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isValidating ? "animate-spin" : ""}`}
+              />
             </Button>
           </div>
-          <p className="text-sm font-normal text-default-500">{stats.qcm.titre}</p>
+          <p className="text-sm font-normal text-default-500">
+            {stats.qcm.titre}
+          </p>
         </ModalHeader>
         <ModalBody>
           <Tabs aria-label="Statistiques" className="w-full">
@@ -154,9 +184,13 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                         <Users className="w-4 h-4 text-primary" />
                         <p className="text-xs text-default-500">Soumissions</p>
                       </div>
-                      <p className="text-2xl font-bold">{stats.nombre_soumissions}</p>
+                      <p className="text-2xl font-bold">
+                        {stats.nombre_soumissions}
+                      </p>
                       <p className="text-xs text-default-400 mt-1">
-                        {stats.nombre_etudiants_uniques} étudiant{stats.nombre_etudiants_uniques > 1 ? 's' : ''} unique{stats.nombre_etudiants_uniques > 1 ? 's' : ''}
+                        {stats.nombre_etudiants_uniques} étudiant
+                        {stats.nombre_etudiants_uniques > 1 ? "s" : ""} unique
+                        {stats.nombre_etudiants_uniques > 1 ? "s" : ""}
                       </p>
                     </CardBody>
                   </Card>
@@ -167,7 +201,9 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                         <TrendingUp className="w-4 h-4 text-success" />
                         <p className="text-xs text-default-500">Moyenne</p>
                       </div>
-                      <p className="text-2xl font-bold">{stats.moyenne_note_sur_20.toFixed(1)}</p>
+                      <p className="text-2xl font-bold">
+                        {stats.moyenne_note_sur_20.toFixed(1)}
+                      </p>
                       <p className="text-xs text-default-400 mt-1">
                         {stats.moyenne_pourcentage.toFixed(1)}%
                       </p>
@@ -178,10 +214,16 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                     <CardBody className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Award className="w-4 h-4 text-warning" />
-                        <p className="text-xs text-default-500">Taux de réussite</p>
+                        <p className="text-xs text-default-500">
+                          Taux de réussite
+                        </p>
                       </div>
-                      <p className="text-2xl font-bold">{stats.taux_reussite.toFixed(0)}%</p>
-                      <p className="text-xs text-default-400 mt-1">Note ≥ 10/20</p>
+                      <p className="text-2xl font-bold">
+                        {stats.taux_reussite.toFixed(0)}%
+                      </p>
+                      <p className="text-xs text-default-400 mt-1">
+                        Note ≥ 10/20
+                      </p>
                     </CardBody>
                   </Card>
 
@@ -189,10 +231,16 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                     <CardBody className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Clock className="w-4 h-4 text-primary" />
-                        <p className="text-xs text-default-500">Durée moyenne</p>
+                        <p className="text-xs text-default-500">
+                          Durée moyenne
+                        </p>
                       </div>
-                      <p className="text-2xl font-bold">{formatDuree(stats.duree_moyenne_secondes)}</p>
-                      <p className="text-xs text-default-400 mt-1">Par soumission</p>
+                      <p className="text-2xl font-bold">
+                        {formatDuree(stats.duree_moyenne_secondes)}
+                      </p>
+                      <p className="text-xs text-default-400 mt-1">
+                        Par soumission
+                      </p>
                     </CardBody>
                   </Card>
                 </div>
@@ -200,50 +248,58 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                 {/* Notes min/max/médiane */}
                 <Card className="w-full p-3">
                   <CardHeader>
-                    <h3 className="text-lg font-semibold">Distribution des notes</h3>
+                    <h3 className="text-lg font-semibold">
+                      Distribution des notes
+                    </h3>
                   </CardHeader>
                   <CardBody>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <p className="text-sm text-default-500 mb-1">Note minimale</p>
+                        <p className="text-sm text-default-500 mb-1">
+                          Note minimale
+                        </p>
                         <p
                           className={
                             `text-xl font-bold ` +
                             (stats.note_min < 10
-                              ? 'text-danger'
+                              ? "text-danger"
                               : stats.note_min > 14
-                                ? 'text-success'
-                                : '')
+                                ? "text-success"
+                                : "")
                           }
                         >
                           {stats.note_min.toFixed(1)}/20
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-default-500 mb-1">Note médiane</p>
+                        <p className="text-sm text-default-500 mb-1">
+                          Note médiane
+                        </p>
                         <p
                           className={
                             `text-xl font-bold ` +
                             (stats.note_mediane < 10
-                              ? 'text-danger'
+                              ? "text-danger"
                               : stats.note_mediane > 14
-                                ? 'text-success'
-                                : '')
+                                ? "text-success"
+                                : "")
                           }
                         >
                           {stats.note_mediane.toFixed(1)}/20
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-default-500 mb-1">Note maximale</p>
+                        <p className="text-sm text-default-500 mb-1">
+                          Note maximale
+                        </p>
                         <p
                           className={
                             `text-xl font-bold ` +
                             (stats.note_max < 10
-                              ? 'text-danger'
+                              ? "text-danger"
                               : stats.note_max > 14
-                                ? 'text-success'
-                                : '')
+                                ? "text-success"
+                                : "")
                           }
                         >
                           {stats.note_max.toFixed(1)}/20
@@ -282,7 +338,9 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
             <Tab key="questions" title="Par question">
               <div className="space-y-4 py-4">
                 {stats.statistiques_par_question.length === 0 ? (
-                  <p className="text-center text-default-500 py-8">Aucune statistique par question disponible</p>
+                  <p className="text-center text-default-500 py-8">
+                    Aucune statistique par question disponible
+                  </p>
                 ) : (
                   stats.statistiques_par_question.map((qStat, index) => (
                     <Card key={qStat.question_id} className="w-full px-2">
@@ -294,40 +352,62 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                                 Question {qStat.question_numero}
                               </span>
                               <Chip
+                                color={
+                                  qStat.taux_reussite >= 70
+                                    ? "success"
+                                    : qStat.taux_reussite >= 50
+                                      ? "warning"
+                                      : "danger"
+                                }
                                 size="sm"
-                                color={qStat.taux_reussite >= 70 ? 'success' : qStat.taux_reussite >= 50 ? 'warning' : 'danger'}
                                 variant="flat"
                               >
                                 {qStat.taux_reussite.toFixed(0)}% réussite
                               </Chip>
                             </div>
-                            <p className="text-sm text-default-700">{qStat.question_enonce}</p>
+                            <p className="text-sm text-default-700">
+                              {qStat.question_enonce}
+                            </p>
                           </div>
                         </div>
                       </CardHeader>
                       <CardBody>
                         <div className="grid grid-cols-3 gap-4 mb-4">
                           <div>
-                            <p className="text-xs text-default-500 mb-1">Réponses</p>
-                            <p className="text-lg font-semibold">{qStat.nombre_reponses}</p>
+                            <p className="text-xs text-default-500 mb-1">
+                              Réponses
+                            </p>
+                            <p className="text-lg font-semibold">
+                              {qStat.nombre_reponses}
+                            </p>
                           </div>
                           <div>
-                            <p className="text-xs text-default-500 mb-1">Correctes</p>
+                            <p className="text-xs text-default-500 mb-1">
+                              Correctes
+                            </p>
                             <p className="text-lg font-semibold text-success">
                               {qStat.nombre_correctes}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-default-500 mb-1">Incorrectes</p>
+                            <p className="text-xs text-default-500 mb-1">
+                              Incorrectes
+                            </p>
                             <p className="text-lg font-semibold text-danger">
                               {qStat.nombre_reponses - qStat.nombre_correctes}
                             </p>
                           </div>
                         </div>
                         <Progress
-                          value={qStat.taux_reussite}
-                          color={qStat.taux_reussite >= 70 ? 'success' : qStat.taux_reussite >= 50 ? 'warning' : 'danger'}
                           className="mb-4"
+                          color={
+                            qStat.taux_reussite >= 70
+                              ? "success"
+                              : qStat.taux_reussite >= 50
+                                ? "warning"
+                                : "danger"
+                          }
+                          value={qStat.taux_reussite}
                         />
                         {qStat.reponses_frequentes.length > 0 && (
                           <div>
@@ -353,7 +433,9 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
             <Tab key="resultats" title="Résultats étudiants">
               <div className="space-y-4 py-4">
                 {stats.resultats.length === 0 ? (
-                  <p className="text-center text-default-500 py-8">Aucun résultat disponible</p>
+                  <p className="text-center text-default-500 py-8">
+                    Aucun résultat disponible
+                  </p>
                 ) : (
                   <div className="space-y-3">
                     {stats.resultats.map((resultat) => (
@@ -362,41 +444,59 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
-                                <p className="font-medium">{resultat.etudiant_nom}</p>
+                                <p className="font-medium">
+                                  {resultat.etudiant_nom}
+                                </p>
                                 <div className="flex items-center">
                                   <Chip
-                                    size="sm"
-                                    color={resultat.est_reussi ? 'success' : 'danger'}
-                                    variant="flat"
                                     className="flex items-center no-wrap"
-                                    startContent={resultat.est_reussi ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
+                                    color={
+                                      resultat.est_reussi ? "success" : "danger"
+                                    }
+                                    size="sm"
+                                    startContent={
+                                      resultat.est_reussi ? (
+                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                      ) : (
+                                        <XCircle className="w-3 h-3 mr-1" />
+                                      )
+                                    }
+                                    variant="flat"
                                   >
-                                    
-                                    <span className="whitespace-nowrap">{resultat.est_reussi ? 'Réussi' : 'Échoué'}</span>
+                                    <span className="whitespace-nowrap">
+                                      {resultat.est_reussi
+                                        ? "Réussi"
+                                        : "Échoué"}
+                                    </span>
                                   </Chip>
                                 </div>
                               </div>
-                              <p className="text-xs text-default-500 mb-2">{resultat.etudiant_email}</p>
+                              <p className="text-xs text-default-500 mb-2">
+                                {resultat.etudiant_email}
+                              </p>
                               <div className="flex items-center gap-4 text-sm">
                                 <div className="flex items-center gap-1">
                                   <Award className="w-4 h-4 text-default-400" />
                                   <span className="font-medium">
-                                    {resultat.note_sur_20?.toFixed(1) || '—'}/20
+                                    {resultat.note_sur_20?.toFixed(1) || "—"}/20
                                   </span>
                                   <span className="text-default-500">
-                                    ({resultat.pourcentage?.toFixed(1) || '—'}%)
+                                    ({resultat.pourcentage?.toFixed(1) || "—"}%)
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <FileText className="w-4 h-4 text-default-400" />
                                   <span>
-                                    {resultat.questions_correctes}/{resultat.questions_total} questions
+                                    {resultat.questions_correctes}/
+                                    {resultat.questions_total} questions
                                   </span>
                                 </div>
                                 {resultat.duree_secondes && (
                                   <div className="flex items-center gap-1">
                                     <Clock className="w-4 h-4 text-default-400" />
-                                    <span>{formatDuree(resultat.duree_secondes)}</span>
+                                    <span>
+                                      {formatDuree(resultat.duree_secondes)}
+                                    </span>
                                   </div>
                                 )}
                                 {resultat.date_fin && (
@@ -412,7 +512,8 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
                     ))}
                     {stats.nombre_soumissions > stats.resultats.length && (
                       <p className="text-center text-xs text-default-400 py-2">
-                        Affichage des 50 premiers résultats sur {stats.nombre_soumissions} soumissions
+                        Affichage des 50 premiers résultats sur{" "}
+                        {stats.nombre_soumissions} soumissions
                       </p>
                     )}
                   </div>
@@ -423,6 +524,5 @@ export function QCMStatisticsModal({ isOpen, onClose, qcmId }: QCMStatisticsModa
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
+  );
 }
-

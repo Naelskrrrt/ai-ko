@@ -119,6 +119,37 @@ class QCMService:
         if status not in ['draft', 'published', 'archived']:
             raise ValueError("Status invalide. Status autorisés: draft, published, archived")
 
+        # Validation niveau_id, mention_id, parcours_id (optionnels)
+        niveau_id = data.get('niveauId') or data.get('niveau_id')
+        mention_id = data.get('mentionId') or data.get('mention_id')
+        parcours_id = data.get('parcoursId') or data.get('parcours_id')
+        
+        if niveau_id:
+            from app.repositories.niveau_repository import NiveauRepository
+            niveau_repo = NiveauRepository()
+            # Accepter soit un ID (UUID) soit un code (L1, L2, etc.)
+            niveau_obj = niveau_repo.get_by_id(niveau_id)
+            if not niveau_obj:
+                # Si ce n'est pas un ID, essayer comme code
+                niveau_obj = niveau_repo.get_by_code(niveau_id)
+            if not niveau_obj:
+                raise ValueError(f"Niveau avec l'ID ou code {niveau_id} non trouvé")
+            niveau_id = niveau_obj.id  # Utiliser l'ID réel
+        
+        if mention_id:
+            from app.repositories.mention_repository import MentionRepository
+            mention_repo = MentionRepository()
+            mention_obj = mention_repo.get_by_id(mention_id)
+            if not mention_obj:
+                raise ValueError(f"Mention avec l'ID {mention_id} non trouvée")
+        
+        if parcours_id:
+            from app.repositories.parcours_repository import ParcoursRepository
+            parcours_repo = ParcoursRepository()
+            parcours_obj = parcours_repo.get_by_id(parcours_id)
+            if not parcours_obj:
+                raise ValueError(f"Parcours avec l'ID {parcours_id} non trouvé")
+
         # Créer le QCM
         qcm = QCM(
             titre=titre,
@@ -126,6 +157,9 @@ class QCMService:
             duree=duree,
             matiere=matiere,
             matiere_id=matiere_id,
+            niveau_id=niveau_id,
+            mention_id=mention_id,
+            parcours_id=parcours_id,
             status=status,
             createur_id=createur_id
         )

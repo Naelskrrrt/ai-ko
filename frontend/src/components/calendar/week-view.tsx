@@ -1,6 +1,10 @@
 "use client";
 
 import React from "react";
+import clsx from "clsx";
+
+import { ResizeHandle } from "./resize-handle";
+
 import { CalendarEvent, WeekViewProps } from "@/core/types/calendar";
 import {
   getWeekDays,
@@ -11,12 +15,9 @@ import {
   calculateEventPosition,
   calculateEventPositionsWithOverlap,
   yToHour,
-  roundToQuarterHour,
   snapToNearestSlot,
 } from "@/core/lib/calendar-utils";
-import { ResizeHandle } from "./resize-handle";
 import { useCurrentTime } from "@/core/hooks/useCurrentTime";
-import clsx from "clsx";
 
 export function WeekView({
   currentDate,
@@ -54,15 +55,17 @@ export function WeekView({
       const centerOffset = containerHeight / 2;
       const optimalScrollTop = Math.max(
         0,
-        Math.min(targetPosition - centerOffset, maxScrollTop)
+        Math.min(targetPosition - centerOffset, maxScrollTop),
       );
 
       container.scrollTop = optimalScrollTop;
+      // eslint-disable-next-line no-console
       console.log("WeekView auto-scroll to 7h on mount:", { optimalScrollTop });
     };
 
     // Délai pour s'assurer que le DOM est rendu
     const timeoutId = setTimeout(scrollTo7h, 200);
+
     return () => clearTimeout(timeoutId);
   }, []); // Se déclenche seulement au montage
 
@@ -79,10 +82,11 @@ export function WeekView({
       const centerOffset = containerHeight / 2;
       const optimalScrollTop = Math.max(
         0,
-        Math.min(targetPosition - centerOffset, maxScrollTop)
+        Math.min(targetPosition - centerOffset, maxScrollTop),
       );
 
       container.scrollTop = optimalScrollTop;
+      // eslint-disable-next-line no-console
       console.log("WeekView auto-scroll to 7h on date change:", {
         optimalScrollTop,
         currentDate: currentDate.toISOString(),
@@ -91,6 +95,7 @@ export function WeekView({
 
     // Délai pour s'assurer que le DOM est rendu
     const timeoutId = setTimeout(scrollTo7h, 200);
+
     return () => clearTimeout(timeoutId);
   }, [currentDate, selectedDate]); // Se déclenche quand on change de date
 
@@ -107,7 +112,7 @@ export function WeekView({
   } | null>(null);
   const [resizeCooldown, setResizeCooldown] = React.useState(false);
   const [previewEvent, setPreviewEvent] = React.useState<CalendarEvent | null>(
-    null
+    null,
   );
   const [isDragging, setIsDragging] = React.useState(false);
   const [placeholderPosition, setPlaceholderPosition] = React.useState<{
@@ -138,7 +143,7 @@ export function WeekView({
   const handleTimeSlotClick = (
     date: Date,
     hour: number,
-    e: React.MouseEvent
+    e: React.MouseEvent,
   ) => {
     // Vérifier si un popover vient d'être fermé pour éviter l'ouverture immédiate
     if (typeof window !== "undefined" && (window as any).__popoverJustClosed) {
@@ -146,9 +151,11 @@ export function WeekView({
     }
 
     const startDate = new Date(date);
+
     startDate.setHours(hour, 0, 0, 0);
 
     const endDate = new Date(date);
+
     endDate.setHours(hour + 1, 0, 0, 0); // +1 heure par défaut
 
     const startTime = `${hour.toString().padStart(2, "0")}:00`;
@@ -158,7 +165,7 @@ export function WeekView({
       startDate,
       startTime,
       endTime,
-      e.currentTarget as HTMLElement
+      e.currentTarget as HTMLElement,
     );
   };
 
@@ -170,7 +177,7 @@ export function WeekView({
   const handleResizeStart = (
     event: CalendarEvent,
     type: "top" | "bottom",
-    e: React.MouseEvent
+    e: React.MouseEvent,
   ) => {
     e.preventDefault();
     setIsResizing(true);
@@ -200,13 +207,13 @@ export function WeekView({
   const handleDragStart = (
     event: CalendarEvent,
     startX: number,
-    startY: number
+    startY: number,
   ) => {
     setIsDragging(true);
 
     // Obtenir le conteneur de la grille
     const eventElement = document.querySelector(
-      `[data-event-id="${event.id}"]`
+      `[data-event-id="${event.id}"]`,
     ) as HTMLElement;
     const gridContainer = eventElement?.closest(".grid") as HTMLElement;
     const containerRect = gridContainer?.getBoundingClientRect() || null;
@@ -223,7 +230,7 @@ export function WeekView({
       originalDay: new Date(
         event.start.getFullYear(),
         event.start.getMonth(),
-        event.start.getDate()
+        event.start.getDate(),
       ),
       originalTop: currentPosition.top,
       containerRect,
@@ -243,7 +250,7 @@ export function WeekView({
           handleDragStart(
             mouseDownData.event,
             mouseDownData.startX,
-            mouseDownData.startY
+            mouseDownData.startY,
           );
           setMouseDownData(null);
         }
@@ -262,6 +269,7 @@ export function WeekView({
         const newTime = new Date(resizeData.startTime);
         const hours = Math.floor(newHour);
         const minutes = (newHour - hours) * 60;
+
         newTime.setHours(hours, minutes, 0, 0);
 
         // Créer un événement de prévisualisation avec les nouvelles heures
@@ -294,7 +302,7 @@ export function WeekView({
         // Déterminer la colonne (0-6)
         const dayIndex = Math.max(
           0,
-          Math.min(6, Math.floor(relativeX / dayWidth))
+          Math.min(6, Math.floor(relativeX / dayWidth)),
         );
 
         // Obtenir la date du jour correspondant
@@ -310,6 +318,7 @@ export function WeekView({
         const newTime = new Date(newDay);
         const hours = Math.floor(snappedHour);
         const minutes = (snappedHour - hours) * 60;
+
         newTime.setHours(hours, minutes, 0, 0);
 
         // Calculer la durée de l'événement
@@ -328,18 +337,19 @@ export function WeekView({
         // Calculer la position du placeholder en utilisant la même logique que les événements
         // Remplacer temporairement l'événement original par l'événement temporaire
         const dayEvents = getEventsForDate(events, newDay).map((event) =>
-          event.id === dragData.event.id ? tempEvent : event
+          event.id === dragData.event.id ? tempEvent : event,
         );
         const eventPositions = calculateEventPositionsWithOverlap(dayEvents);
 
         // Trouver la position de notre événement temporaire
         let placeholderPos = eventPositions.find(
-          (pos) => pos.event.id === tempEvent.id
+          (pos) => pos.event.id === tempEvent.id,
         );
 
         // Si pas trouvé, utiliser la position par défaut
         if (!placeholderPos) {
           const { top, height } = calculateEventPosition(tempEvent);
+
           placeholderPos = {
             event: tempEvent,
             top,
@@ -366,7 +376,7 @@ export function WeekView({
         });
       }
     },
-    [isResizing, resizeData, isDragging, dragData, mouseDownData]
+    [isResizing, resizeData, isDragging, dragData, mouseDownData],
   );
 
   const handleMouseUp = React.useCallback(
@@ -381,6 +391,7 @@ export function WeekView({
         // Clic sur événement désactivé - seul le drag and drop est autorisé
 
         setMouseDownData(null);
+
         return;
       }
 
@@ -397,6 +408,7 @@ export function WeekView({
         const newTime = new Date(resizeData.startTime);
         const hours = Math.floor(newHour);
         const minutes = (newHour - hours) * 60;
+
         newTime.setHours(hours, minutes, 0, 0);
 
         // Calculer les nouvelles heures de début et fin
@@ -435,7 +447,7 @@ export function WeekView({
         // Déterminer la colonne (0-6)
         const dayIndex = Math.max(
           0,
-          Math.min(6, Math.floor(relativeX / dayWidth))
+          Math.min(6, Math.floor(relativeX / dayWidth)),
         );
 
         // Obtenir la date du jour correspondant
@@ -451,6 +463,7 @@ export function WeekView({
         const newTime = new Date(newDay);
         const hours = Math.floor(snappedHour);
         const minutes = (snappedHour - hours) * 60;
+
         newTime.setHours(hours, minutes, 0, 0);
 
         // Calculer la durée de l'événement
@@ -473,7 +486,14 @@ export function WeekView({
         }, 300); // 300ms de délai de grâce
       }
     },
-    [isResizing, resizeData, isDragging, dragData, onEventResize, mouseDownData]
+    [
+      isResizing,
+      resizeData,
+      isDragging,
+      dragData,
+      onEventResize,
+      mouseDownData,
+    ],
   );
 
   // Ajouter les écouteurs d'événements globaux
@@ -481,6 +501,7 @@ export function WeekView({
     if (isResizing || isDragging || mouseDownData) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
+
       return () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
@@ -490,6 +511,7 @@ export function WeekView({
 
   // Algorithme de scroll optimisé et unifié pour 7h
   React.useEffect(() => {
+    // eslint-disable-next-line no-console
     console.log("WeekView useEffect triggered:", {
       hasContainer: !!scrollContainerRef.current,
       shouldScrollToDefault,
@@ -518,12 +540,13 @@ export function WeekView({
       const centerOffset = containerHeight / 2;
       const optimalScrollTop = Math.max(
         0,
-        Math.min(targetPosition - centerOffset, maxScrollTop)
+        Math.min(targetPosition - centerOffset, maxScrollTop),
       );
 
       // Scroll immédiat pour éviter les glitches visuels
       container.scrollTop = optimalScrollTop;
 
+      // eslint-disable-next-line no-console
       console.log("WeekView Scroll to 7h:", {
         targetPosition,
         containerHeight,
@@ -555,7 +578,7 @@ export function WeekView({
     isSelected: boolean;
   }) => {
     const allDayEvents = getEventsForDay(day.date).filter(
-      (event) => event.allDay
+      (event) => event.allDay,
     );
 
     if (allDayEvents.length === 0) return null;
@@ -567,15 +590,15 @@ export function WeekView({
             key={event.id}
             className={clsx(
               "rounded px-2 py-1 text-xs font-medium transition-all cursor-pointer hover:opacity-80 select-none",
-              COLOR_CLASSES[event.color]
+              COLOR_CLASSES[event.color],
             )}
+            title={`${event.title} - Toute la journée`}
             onClick={(e) => {
               e.stopPropagation();
               if (onEventClick) {
                 onEventClick(event, e.currentTarget as HTMLElement);
               }
             }}
-            title={`${event.title} - Toute la journée`}
           >
             {event.title}
           </div>
@@ -593,12 +616,13 @@ export function WeekView({
     const dayEvents = getEventsForDay(weekDays[dayIndex].date);
     const eventPositions = calculateEventPositionsWithOverlap(dayEvents);
     const eventPosition = eventPositions.find(
-      (pos) => pos.event.id === displayEvent.id
+      (pos) => pos.event.id === displayEvent.id,
     );
 
     if (!eventPosition) {
       // Fallback si l'événement n'est pas trouvé
       const { top, height } = calculateEventPosition(displayEvent);
+
       return renderEventWithPosition(
         displayEvent,
         top,
@@ -607,12 +631,13 @@ export function WeekView({
         100,
         0,
         1,
-        1
+        1,
       );
     }
 
     const { top, height, left, width, column, totalColumns, overlapLevel } =
       eventPosition;
+
     return renderEventWithPosition(
       displayEvent,
       top,
@@ -621,7 +646,7 @@ export function WeekView({
       width,
       column,
       totalColumns,
-      overlapLevel
+      overlapLevel,
     );
   };
 
@@ -633,7 +658,7 @@ export function WeekView({
     width: number,
     column: number,
     totalColumns: number,
-    overlapLevel: number
+    overlapLevel: number,
   ) => {
     // Ne pas afficher les événements "toute la journée" dans la grille
     if (displayEvent.allDay) return null;
@@ -647,7 +672,6 @@ export function WeekView({
     return (
       <div
         key={displayEvent.id}
-        data-event-id={displayEvent.id}
         className={clsx(
           "absolute rounded transition-all z-10 overflow-hidden select-none",
           COLOR_CLASSES[displayEvent.color],
@@ -668,16 +692,17 @@ export function WeekView({
           column === totalColumns - 1 && "mr-0.5",
           // Indicateur de niveau de chevauchement
           overlapLevel > 1 &&
-            "before:absolute before:top-0 before:left-0 before:w-1 before:h-full before:bg-white/40 before:rounded-l"
+            "before:absolute before:top-0 before:left-0 before:w-1 before:h-full before:bg-white/40 before:rounded-l",
         )}
+        data-event-id={displayEvent.id}
         style={{
           top: `${top}px`,
           height: `${height}px`,
           left: `${left}%`,
           width: `${width}%`,
         }}
-        onMouseDown={(e) => handleMouseDown(displayEvent, e)}
         title={`${displayEvent.title} - ${formatTime(displayEvent.start)} - ${formatTime(displayEvent.end)}${totalColumns > 1 ? `\n📅 ${totalColumns} événements se chevauchent (position ${column + 1}/${totalColumns})` : ""}${canResize ? "\n🔄 Glissez les bords pour redimensionner\n↔️ Glissez l'événement pour le déplacer" : "\n↔️ Glissez l'événement pour le déplacer"}`}
+        onMouseDown={(e) => handleMouseDown(displayEvent, e)}
       >
         {/* Contenu adaptatif selon la taille */}
         {isVerySmall ? (
@@ -726,6 +751,7 @@ export function WeekView({
           className={`absolute top-1 bg-white/95 dark:bg-black/95 text-xs p-1 rounded-full text-gray-700 dark:text-gray-300 shadow-md border border-white/20 cursor-pointer hover:bg-white dark:hover:bg-black transition-colors opacity-0 group-hover:opacity-100 ${
             totalColumns > 1 ? "left-1" : "right-1"
           }`}
+          title="Modifier l'événement"
           onClick={(e) => {
             e.stopPropagation();
             // Appeler directement onEventClick si elle existe, sinon créer un événement de modification
@@ -733,7 +759,6 @@ export function WeekView({
               onEventClick(displayEvent, e.currentTarget as HTMLElement);
             }
           }}
-          title="Modifier l'événement"
         >
           ✏️
         </div>
@@ -776,7 +801,7 @@ export function WeekView({
                 key={index}
                 className={clsx(
                   "p-3 text-center border-r border-divider last:border-r-0",
-                  "bg-default-50 dark:bg-default-900"
+                  "bg-default-50 dark:bg-default-900",
                 )}
               >
                 <div className="text-sm font-medium text-default-700 dark:text-default-200">
@@ -789,7 +814,7 @@ export function WeekView({
                     day.isSelected && "text-blue-600 dark:text-blue-400",
                     !day.isToday &&
                       !day.isSelected &&
-                      "text-default-800 dark:text-default-100"
+                      "text-default-800 dark:text-default-100",
                   )}
                 >
                   {day.date.getDate()}
@@ -857,7 +882,7 @@ export function WeekView({
                         "absolute pointer-events-none z-20 border-2 border-dashed rounded-md opacity-50",
                         COLOR_CLASSES[
                           placeholderPosition.color as keyof typeof COLOR_CLASSES
-                        ]
+                        ],
                       )}
                       style={{
                         top: `${placeholderPosition.top}px`,
@@ -879,7 +904,7 @@ export function WeekView({
                       key={hour}
                       className={clsx(
                         "absolute w-full border-b border-divider cursor-pointer transition-colors",
-                        "hover:bg-default-100 dark:hover:bg-default-800 opacity-0 hover:opacity-100"
+                        "hover:bg-default-100 dark:hover:bg-default-800 opacity-0 hover:opacity-100",
                       )}
                       style={{
                         top: `${hour * 60}px`,

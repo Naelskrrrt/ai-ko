@@ -1,24 +1,25 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { use } from 'react'
-import { ArrowLeft, FileText } from 'lucide-react'
-import { Button } from '@heroui/button'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/core/providers/AuthProvider'
-import { ResultatView } from '@/features/etudiant/components/resultats/ResultatView'
+import * as React from "react";
+import { use } from "react";
+import { ArrowLeft, FileText } from "lucide-react";
+import { Button } from "@heroui/button";
+import { useRouter } from "next/navigation";
+
+import { useAuth } from "@/core/providers/AuthProvider";
+import { ResultatView } from "@/features/etudiant/components/resultats/ResultatView";
 
 interface NoteDetailPageProps {
   params: Promise<{
-    id: string
-  }>
+    id: string;
+  }>;
 }
 
 export default function NoteDetailPage({ params }: NoteDetailPageProps) {
-  const { id } = use(params)
-  const router = useRouter()
-  const { user } = useAuth()
-  const userId = user?.id || ''
+  const { id } = use(params);
+  const router = useRouter();
+  const { user } = useAuth();
+  const userId = user?.id || "";
 
   return (
     <div className="space-y-6">
@@ -36,9 +37,9 @@ export default function NoteDetailPage({ params }: NoteDetailPageProps) {
           </div>
         </div>
         <Button
-          variant="flat"
           startContent={<ArrowLeft className="h-4 w-4" />}
-          onPress={() => router.push('/etudiant/notes')}
+          variant="flat"
+          onPress={() => router.push("/etudiant/notes")}
         >
           Retour aux notes
         </Button>
@@ -47,6 +48,5 @@ export default function NoteDetailPage({ params }: NoteDetailPageProps) {
       {/* Résultat */}
       <ResultatView examId={id} userId={userId} />
     </div>
-  )
+  );
 }
-

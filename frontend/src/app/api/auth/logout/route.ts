@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Logout error:", error);
 
     // Même en cas d'erreur, on nettoie les cookies

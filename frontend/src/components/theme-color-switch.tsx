@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC } from "react";
 import {
   Dropdown,
   DropdownTrigger,
@@ -9,6 +9,7 @@ import {
 } from "@heroui/dropdown";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
+
 import { useColorTheme } from "@/core/hooks/useColorTheme";
 
 export interface ThemeColorSwitchProps {

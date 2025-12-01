@@ -4,12 +4,8 @@ import React from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 import { Textarea } from "@heroui/input";
-import { CalendarEvent, EventColor } from "@/core/types/calendar";
-import { useEventForm } from "@/core/hooks/useCalendar";
-import { EVENT_COLORS, COLOR_CLASSES } from "@/core/lib/calendar-utils";
 import {
   Calendar,
   Clock,
@@ -21,6 +17,10 @@ import {
   X,
 } from "lucide-react";
 import clsx from "clsx";
+
+import { CalendarEvent } from "@/core/types/calendar";
+import { useEventForm } from "@/core/hooks/useCalendar";
+import { EVENT_COLORS, COLOR_CLASSES } from "@/core/lib/calendar-utils";
 
 interface EventPopoverProps {
   isOpen: boolean;
@@ -72,6 +72,8 @@ export function EventPopover({
   const handleSave = () => {
     if (validateForm()) {
       const eventData = getEventFromForm();
+
+      // eslint-disable-next-line no-console
       console.log("Saving event data:", eventData);
       // Créer un objet CalendarEvent complet avec des valeurs par défaut
       const fullEvent: CalendarEvent = {
@@ -80,11 +82,14 @@ export function EventPopover({
         createdAt: event?.createdAt || new Date(),
         updatedAt: new Date(),
       };
+
+      // eslint-disable-next-line no-console
       console.log("Full event object:", fullEvent);
       onSave(fullEvent);
       resetForm();
       onClose();
     } else {
+      // eslint-disable-next-line no-console
       console.log("Form validation failed:", errors);
     }
   };
@@ -153,15 +158,15 @@ export function EventPopover({
 
   return (
     <Popover
-      isOpen={isOpen}
-      onClose={handleClose}
-      placement="bottom-start"
-      offset={10}
       showArrow
       classNames={{
         content: "p-0 w-fit",
         arrow: "bg-background border-divider",
       }}
+      isOpen={isOpen}
+      offset={10}
+      placement="bottom-start"
+      onClose={handleClose}
     >
       <PopoverTrigger>
         <div
@@ -169,6 +174,7 @@ export function EventPopover({
             if (el && triggerElement) {
               // Copier la position de l'élément trigger
               const rect = triggerElement.getBoundingClientRect();
+
               el.style.position = "fixed";
               el.style.left = `${rect.left}px`;
               el.style.top = `${rect.top}px`;
@@ -195,10 +201,10 @@ export function EventPopover({
             </div>
             <Button
               isIconOnly
+              className="text-default-500 dark:text-default-400 hover:text-default-700 dark:hover:text-default-200 transition-colors duration-150 hover:bg-default-100 dark:hover:bg-default-800"
               size="sm"
               variant="light"
               onPress={handleClose}
-              className="text-default-500 dark:text-default-400 hover:text-default-700 dark:hover:text-default-200 transition-colors duration-150 hover:bg-default-100 dark:hover:bg-default-800"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -208,82 +214,82 @@ export function EventPopover({
           <div className="space-y-3">
             {/* Titre */}
             <Input
-              label="Titre"
-              placeholder="Nom de l'événement"
-              value={formData.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              isInvalid={!!errors.title}
-              errorMessage={errors.title}
-              startContent={
-                <Tag className="w-4 h-4 text-default-500 dark:text-default-300" />
-              }
-              size="sm"
               classNames={{
                 input: "bg-default-50 dark:bg-default-100 text-foreground",
                 inputWrapper:
                   "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
                 label: "text-default-700 dark:text-default-300",
               }}
+              errorMessage={errors.title}
+              isInvalid={!!errors.title}
+              label="Titre"
+              placeholder="Nom de l'événement"
+              size="sm"
+              startContent={
+                <Tag className="w-4 h-4 text-default-500 dark:text-default-300" />
+              }
+              value={formData.title}
+              onChange={(e) => updateField("title", e.target.value)}
             />
 
             {/* Date et heures */}
             <div className="grid grid-cols-2 gap-2">
               <Input
-                label="Date"
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => updateField("startDate", e.target.value)}
-                isInvalid={!!errors.startDate}
-                errorMessage={errors.startDate}
-                startContent={
-                  <Calendar className="w-4 h-4 text-default-500 dark:text-default-300" />
-                }
-                size="sm"
                 classNames={{
                   input: "bg-default-50 dark:bg-default-800 text-foreground",
                   inputWrapper:
                     "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
                   label: "text-default-700 dark:text-default-300",
                 }}
+                errorMessage={errors.startDate}
+                isInvalid={!!errors.startDate}
+                label="Date"
+                size="sm"
+                startContent={
+                  <Calendar className="w-4 h-4 text-default-500 dark:text-default-300" />
+                }
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => updateField("startDate", e.target.value)}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <Input
+                classNames={{
+                  input: "bg-default-50 dark:bg-default-800 text-foreground",
+                  inputWrapper:
+                    "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
+                  label: "text-default-700 dark:text-default-300",
+                }}
+                errorMessage={errors.startTime}
+                isInvalid={!!errors.startTime}
                 label="Début"
+                size="sm"
+                startContent={
+                  <Clock className="w-4 h-4 text-default-500 dark:text-default-300" />
+                }
                 type="time"
                 value={formData.startTime}
                 onChange={(e) => updateField("startTime", e.target.value)}
-                isInvalid={!!errors.startTime}
-                errorMessage={errors.startTime}
-                startContent={
-                  <Clock className="w-4 h-4 text-default-500 dark:text-default-300" />
-                }
-                size="sm"
+              />
+              <Input
                 classNames={{
                   input: "bg-default-50 dark:bg-default-800 text-foreground",
                   inputWrapper:
                     "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
                   label: "text-default-700 dark:text-default-300",
                 }}
-              />
-              <Input
+                errorMessage={errors.endTime}
+                isInvalid={!!errors.endTime}
                 label="Fin"
+                size="sm"
+                startContent={
+                  <Clock className="w-4 h-4 text-default-500 dark:text-default-300" />
+                }
                 type="time"
                 value={formData.endTime}
                 onChange={(e) => updateField("endTime", e.target.value)}
-                isInvalid={!!errors.endTime}
-                errorMessage={errors.endTime}
-                startContent={
-                  <Clock className="w-4 h-4 text-default-500 dark:text-default-300" />
-                }
-                size="sm"
-                classNames={{
-                  input: "bg-default-50 dark:bg-default-800 text-foreground",
-                  inputWrapper:
-                    "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
-                  label: "text-default-700 dark:text-default-300",
-                }}
               />
             </div>
 
@@ -293,7 +299,7 @@ export function EventPopover({
                 "flex items-center justify-between p-3 rounded-lg bg-default-50 dark:bg-default-800 border border-default-200 dark:border-default-300",
                 formData.allDay
                   ? "border-theme-primary"
-                  : "bg-default-50 dark:bg-default-800"
+                  : "bg-default-50 dark:bg-default-800",
               )}
             >
               <span
@@ -307,49 +313,49 @@ export function EventPopover({
                 Toute la journée
               </span>
               <Switch
-                isSelected={formData.allDay}
-                onValueChange={(value) => updateField("allDay", value)}
-                size="sm"
                 classNames={{
                   wrapper: `${formData.allDay ? "bg-theme-primary" : ""} group-data-[selected=true]:${formData.allDay ? "bg-theme-primary" : ""}`,
                   thumb: "bg-white shadow-md",
                 }}
+                isSelected={formData.allDay}
+                size="sm"
+                onValueChange={(value) => updateField("allDay", value)}
               />
             </div>
 
             {/* Localisation */}
             <Input
-              label="Localisation"
-              placeholder="Lieu de l'événement"
-              value={formData.location || ""}
-              onChange={(e) => updateField("location", e.target.value)}
-              startContent={
-                <MapPin className="w-4 h-4 text-default-500 dark:text-default-300" />
-              }
-              size="sm"
               classNames={{
                 input: "bg-default-50 dark:bg-default-800 text-foreground",
                 inputWrapper:
                   "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
                 label: "text-default-700 dark:text-default-300",
               }}
+              label="Localisation"
+              placeholder="Lieu de l'événement"
+              size="sm"
+              startContent={
+                <MapPin className="w-4 h-4 text-default-500 dark:text-default-300" />
+              }
+              value={formData.location || ""}
+              onChange={(e) => updateField("location", e.target.value)}
             />
 
             {/* Description */}
             <Textarea
-              label="Description"
-              placeholder="Description de l'événement"
-              value={formData.description || ""}
-              onChange={(e) => updateField("description", e.target.value)}
-              minRows={2}
-              maxRows={3}
-              size="sm"
               classNames={{
                 input: "bg-default-50 dark:bg-default-100 text-foreground",
                 inputWrapper:
                   "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
                 label: "text-default-700 dark:text-default-300",
               }}
+              label="Description"
+              maxRows={3}
+              minRows={2}
+              placeholder="Description de l'événement"
+              size="sm"
+              value={formData.description || ""}
+              onChange={(e) => updateField("description", e.target.value)}
             />
 
             {/* Couleur */}
@@ -369,10 +375,10 @@ export function EventPopover({
                       COLOR_CLASSES[color],
                       formData.color === color
                         ? "border-foreground scale-110"
-                        : "border-transparent hover:scale-105"
+                        : "border-transparent hover:scale-105",
                     )}
-                    onClick={() => updateField("color", color)}
                     title={color}
+                    onClick={() => updateField("color", color)}
                   />
                 ))}
               </div>
@@ -384,12 +390,12 @@ export function EventPopover({
             <div className="flex gap-2">
               {isEditing && onDelete && (
                 <Button
+                  className="hover:bg-danger-50 dark:hover:bg-danger-900/20 text-danger-600 dark:text-danger-400"
                   color="danger"
-                  variant="light"
                   size="sm"
                   startContent={<Trash2 className="w-4 h-4" />}
+                  variant="light"
                   onPress={handleDelete}
-                  className="hover:bg-danger-50 dark:hover:bg-danger-900/20 text-danger-600 dark:text-danger-400"
                 >
                   Supprimer
                 </Button>
@@ -397,18 +403,18 @@ export function EventPopover({
             </div>
             <div className="flex gap-2">
               <Button
-                variant="light"
-                size="sm"
-                onPress={handleClose}
                 className="transition-all duration-150 hover:bg-default-100 dark:hover:bg-default-800 text-default-700 dark:text-default-300"
+                size="sm"
+                variant="light"
+                onPress={handleClose}
               >
                 Annuler
               </Button>
               <Button
+                className="transition-all duration-150 hover:scale-105 bg-theme-primary text-white hover:bg-theme-primary/90"
                 size="sm"
                 startContent={<Save className="w-4 h-4" />}
                 onPress={handleSave}
-                className="transition-all duration-150 hover:scale-105 bg-theme-primary text-white hover:bg-theme-primary/90"
               >
                 {isEditing ? "Modifier" : "Créer"}
               </Button>

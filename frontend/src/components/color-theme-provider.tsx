@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+
 import {
   COLOR_THEMES,
   generateColorPalette,
@@ -113,9 +114,7 @@ export function ColorThemeProvider({
   };
 
   return (
-    <ColorThemeContext.Provider
-      value={{ colorTheme, setColorTheme, isLoaded }}
-    >
+    <ColorThemeContext.Provider value={{ colorTheme, setColorTheme, isLoaded }}>
       {children}
     </ColorThemeContext.Provider>
   );

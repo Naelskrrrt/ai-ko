@@ -1,14 +1,15 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { useAuth } from '@/core/providers/AuthProvider'
-import { StatsCards } from '@/features/etudiant/components/dashboard/StatsCards'
-import { UpcomingExams } from '@/features/etudiant/components/dashboard/UpcomingExams'
-import { RecentResults } from '@/features/etudiant/components/dashboard/RecentResults'
+import * as React from "react";
+
+import { useAuth } from "@/core/providers/AuthProvider";
+import { StatsCards } from "@/features/etudiant/components/dashboard/StatsCards";
+import { UpcomingExams } from "@/features/etudiant/components/dashboard/UpcomingExams";
+import { RecentResults } from "@/features/etudiant/components/dashboard/RecentResults";
 
 export default function EtudiantDashboardPage() {
-  const { user } = useAuth()
-  const userId = user?.id || ''
+  const { user } = useAuth();
+  const userId = user?.id || "";
 
   return (
     <div className="space-y-6">
@@ -21,5 +22,5 @@ export default function EtudiantDashboardPage() {
         <RecentResults userId={userId} />
       </div>
     </div>
-  )
+  );
 }

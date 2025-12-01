@@ -1,60 +1,76 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { Card, CardBody, CardHeader } from '@heroui/card'
-import { Button } from '@heroui/button'
-import { Chip } from '@heroui/chip'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/modal'
-import { Calendar, Clock, FileText, Play, AlertCircle, ArrowLeft } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import useSWR from 'swr'
-import { examensService } from '../../services/examens.service'
-import type { Examen } from '../../types/examens.types'
+import * as React from "react";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@heroui/modal";
+import {
+  Calendar,
+  Clock,
+  FileText,
+  Play,
+  AlertCircle,
+  ArrowLeft,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import useSWR from "swr";
+
+import { examensService } from "../../services/examens.service";
 
 interface ExamenDetailsProps {
-  examId: string
-  userId: string
+  examId: string;
+  userId: string;
 }
 
 export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
-  const router = useRouter()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Charger les détails de l'examen
   const { data: examen, isLoading } = useSWR(
-    ['examen-details', examId],
+    ["examen-details", examId],
     () => examensService.getById(examId),
     {
       revalidateOnFocus: false,
-    }
-  )
+    },
+  );
 
   const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return 'Non spécifié'
+    if (!dateString) return "Non spécifié";
     try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return 'Date invalide'
-      return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+      const date = new Date(dateString);
+
+      if (isNaN(date.getTime())) return "Date invalide";
+
+      return date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } catch (error) {
-      return 'Date invalide'
+      return "Date invalide";
     }
-  }
+  };
 
   const handleStartExam = () => {
-    onOpen()
-  }
+    onOpen();
+  };
 
   const confirmStartExam = () => {
-    onClose()
+    onClose();
     // Rediriger vers la page qui va démarrer l'examen
-    router.push(`/etudiant/examens/${examId}/start`)
-  }
+    router.push(`/etudiant/examens/${examId}/start`);
+  };
 
   if (isLoading) {
     return (
@@ -65,7 +81,7 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
           </CardBody>
         </Card>
       </div>
-    )
+    );
   }
 
   if (!examen) {
@@ -77,40 +93,44 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
             <p className="text-lg font-semibold">Examen non trouvé</p>
             <Button
               className="mt-4"
-              onPress={() => router.push('/etudiant/examens')}
+              onPress={() => router.push("/etudiant/examens")}
             >
               Retour aux examens
             </Button>
           </CardBody>
         </Card>
       </div>
-    )
+    );
   }
 
   const getStatusBadge = () => {
     switch (examen.statut) {
-      case 'disponible':
+      case "disponible":
         return (
-          <Chip size="sm" variant="flat" className="bg-success/10 text-success border-success/20">
+          <Chip
+            className="bg-success/10 text-success border-success/20"
+            size="sm"
+            variant="flat"
+          >
             Disponible
           </Chip>
-        )
-      case 'en_cours':
+        );
+      case "en_cours":
         return (
-          <Chip size="sm" color="warning" variant="flat">
+          <Chip color="warning" size="sm" variant="flat">
             En cours
           </Chip>
-        )
-      case 'termine':
+        );
+      case "termine":
         return (
-          <Chip size="sm" color="success" variant="flat">
+          <Chip color="success" size="sm" variant="flat">
             Terminé
           </Chip>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="container mx-auto max-w-4xl py-6">
@@ -145,7 +165,9 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
               <Clock className="h-5 w-5 text-default-400 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm text-default-500 mb-1">Durée</p>
-                <p className="font-semibold">{examen.duree_minutes || 0} minutes</p>
+                <p className="font-semibold">
+                  {examen.duree_minutes || 0} minutes
+                </p>
               </div>
             </div>
 
@@ -154,7 +176,10 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
               <div>
                 <p className="text-sm text-default-500 mb-1">Questions</p>
                 <p className="font-semibold">
-                  {examen.nombre_questions || 0} question{(examen.nombre_questions || 0) > 1 ? 's' : ''} ({examen.total_points || 0} point{(examen.total_points || 0) > 1 ? 's' : ''})
+                  {examen.nombre_questions || 0} question
+                  {(examen.nombre_questions || 0) > 1 ? "s" : ""} (
+                  {examen.total_points || 0} point
+                  {(examen.total_points || 0) > 1 ? "s" : ""})
                 </p>
               </div>
             </div>
@@ -170,66 +195,72 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
             )}
           </div>
 
-          {examen.tentatives_restantes !== undefined && examen.tentatives_restantes > 0 && (
-            <div className="flex items-center gap-2 p-3 bg-warning-50 border border-warning-200 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-warning flex-shrink-0" />
-              <span className="text-sm text-warning-700">
-                {examen.tentatives_restantes} tentative{examen.tentatives_restantes > 1 ? 's' : ''} restante{examen.tentatives_restantes > 1 ? 's' : ''}
-              </span>
-            </div>
-          )}
+          {examen.tentatives_restantes !== undefined &&
+            examen.tentatives_restantes > 0 && (
+              <div className="flex items-center gap-2 p-3 bg-warning-50 border border-warning-200 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-warning flex-shrink-0" />
+                <span className="text-sm text-warning-700">
+                  {examen.tentatives_restantes} tentative
+                  {examen.tentatives_restantes > 1 ? "s" : ""} restante
+                  {examen.tentatives_restantes > 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
 
-          {examen.tentatives_restantes !== undefined && examen.tentatives_restantes === 0 && (
-            <div className="flex items-center gap-2 p-3 bg-danger-50 border border-danger-200 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-danger flex-shrink-0" />
-              <span className="text-sm text-danger-700">
-                Aucune tentative restante
-              </span>
-            </div>
-          )}
+          {examen.tentatives_restantes !== undefined &&
+            examen.tentatives_restantes === 0 && (
+              <div className="flex items-center gap-2 p-3 bg-danger-50 border border-danger-200 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-danger flex-shrink-0" />
+                <span className="text-sm text-danger-700">
+                  Aucune tentative restante
+                </span>
+              </div>
+            )}
         </CardBody>
 
         <div className="p-6 pt-0">
           <div className="flex items-center gap-4">
             <Button
-              variant="flat"
-              onPress={() => router.push('/etudiant/examens')}
               startContent={<ArrowLeft className="h-4 w-4" />}
+              variant="flat"
+              onPress={() => router.push("/etudiant/examens")}
             >
               Retour
             </Button>
-            {examen.statut === 'disponible' && (
+            {examen.statut === "disponible" && (
               <Button
                 className="flex-1 bg-theme-primary text-white hover:bg-theme-primary/90"
-                size="lg"
-                onPress={handleStartExam}
                 isDisabled={
                   examen.tentatives_restantes !== undefined &&
                   examen.tentatives_restantes === 0
                 }
+                size="lg"
                 startContent={<Play className="h-5 w-5" />}
+                onPress={handleStartExam}
               >
                 Commencer l'examen
               </Button>
             )}
-            {examen.statut === 'en_cours' && (
+            {examen.statut === "en_cours" && (
               <Button
                 className="flex-1"
                 color="warning"
                 size="lg"
-                onPress={() => router.push(`/etudiant/examens/${examId}/start`)}
                 startContent={<Play className="h-5 w-5" />}
+                onPress={() => router.push(`/etudiant/examens/${examId}/start`)}
               >
                 Reprendre l'examen
               </Button>
             )}
-            {examen.statut === 'termine' && (
+            {examen.statut === "termine" && (
               <Button
                 className="flex-1"
                 color="default"
-                variant="flat"
                 size="lg"
-                onPress={() => router.push(`/etudiant/examens/${examId}/resultat`)}
+                variant="flat"
+                onPress={() =>
+                  router.push(`/etudiant/examens/${examId}/resultat`)
+                }
               >
                 Voir le résultat
               </Button>
@@ -239,7 +270,7 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
       </Card>
 
       {/* Modal de confirmation */}
-      <Modal isOpen={isOpen} onClose={onClose} size="md">
+      <Modal isOpen={isOpen} size="md" onClose={onClose}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -258,9 +289,16 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
                         <p className="font-semibold">Important :</p>
                         <ul className="list-disc list-inside space-y-1">
                           <li>Le chronomètre démarrera immédiatement</li>
-                          <li>Vous ne pourrez pas quitter la page pendant l'examen</li>
-                          <li>L'examen durera {examen.duree_minutes || 0} minutes</li>
-                          <li>Vous avez {examen.nombre_questions || 0} questions à répondre</li>
+                          <li>
+                            Vous ne pourrez pas quitter la page pendant l'examen
+                          </li>
+                          <li>
+                            L'examen durera {examen.duree_minutes || 0} minutes
+                          </li>
+                          <li>
+                            Vous avez {examen.nombre_questions || 0} questions à
+                            répondre
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -273,8 +311,8 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
                 </Button>
                 <Button
                   className="bg-theme-primary text-white hover:bg-theme-primary/90"
-                  onPress={confirmStartExam}
                   startContent={<Play className="h-4 w-4" />}
+                  onPress={confirmStartExam}
                 >
                   Commencer l'examen
                 </Button>
@@ -284,6 +322,5 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
         </ModalContent>
       </Modal>
     </div>
-  )
+  );
 }
-

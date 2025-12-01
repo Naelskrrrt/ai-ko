@@ -43,6 +43,7 @@ async function attemptTokenRefresh(
 
     return data.accessToken || null;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("[API Proxy] Token refresh failed:", error);
 
     return null;
@@ -112,11 +113,13 @@ async function proxyRequestWithCookies(
 
     // Si 401 (token expiré), tenter un refresh
     if (response.status === 401 && token && request) {
+      // eslint-disable-next-line no-console
       console.log("[API Proxy] 401 detected, attempting token refresh...");
 
       const newToken = await attemptTokenRefresh(request);
 
       if (newToken) {
+        // eslint-disable-next-line no-console
         console.log("[API Proxy] Token refreshed, retrying request...");
 
         // Retry avec le nouveau token
@@ -135,6 +138,7 @@ async function proxyRequestWithCookies(
       responseData = responseText;
     }
 
+    // eslint-disable-next-line no-console
     console.log(
       `[API Proxy] Response ${response.status} for ${method} ${path}`,
     );
@@ -151,6 +155,7 @@ async function proxyRequestWithCookies(
       },
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(`[API Proxy] Error for ${method} ${path}:`, error);
 
     return NextResponse.json(

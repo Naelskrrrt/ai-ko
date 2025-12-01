@@ -168,6 +168,60 @@ def get_me():
         return jsonify({'message': f'Erreur: {str(e)}'}), 500
 
 
+@bp.route('/me', methods=['PUT'])
+@jwt_required()
+def update_me():
+    """Mettre à jour le profil de l'utilisateur connecté"""
+    try:
+        user_id = get_jwt_identity()
+        
+        if not user_id:
+            return jsonify({'message': 'Non authentifié'}), 401
+        
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({'message': 'Utilisateur non trouvé'}), 404
+        
+        data = request.get_json()
+        
+        # Champs modifiables uniquement
+        if 'name' in data:
+            user.name = data['name'].strip() if data['name'] else None
+        
+        if 'telephone' in data:
+            telephone = data['telephone'].strip() if data['telephone'] else None
+            # Validation basique du téléphone
+            if telephone and len(telephone) > 20:
+                return jsonify({'message': 'Le numéro de téléphone est trop long'}), 400
+            user.telephone = telephone
+        
+        if 'adresse' in data:
+            user.adresse = data['adresse'].strip() if data['adresse'] else None
+        
+        if 'dateNaissance' in data or 'date_naissance' in data:
+            date_naissance = data.get('dateNaissance') or data.get('date_naissance')
+            if date_naissance:
+                try:
+                    from datetime import datetime
+                    if isinstance(date_naissance, str):
+                        user.date_naissance = datetime.fromisoformat(date_naissance.replace('Z', '+00:00')).date()
+                    else:
+                        user.date_naissance = date_naissance
+                except (ValueError, TypeError) as e:
+                    return jsonify({'message': f'Format de date invalide: {str(e)}'}), 400
+            else:
+                user.date_naissance = None
+        
+        db.session.commit()
+        
+        return jsonify(user_response_schema.dump(user.to_dict())), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erreur lors de la mise à jour: {str(e)}'}), 500
+
+
 @bp.route('/oauth/google', methods=['GET'])
 def google_oauth():
     """Redirection vers Google OAuth"""

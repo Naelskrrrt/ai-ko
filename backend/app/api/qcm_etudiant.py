@@ -8,6 +8,7 @@ from app.services.qcm_etudiant_service import QCMEtudiantService
 from app.repositories.user_repository import UserRepository
 from app.services.matiere_service import MatiereService
 from app.models.user import UserRole
+from app.models.matiere import Matiere
 from app import db
 from datetime import datetime
 import logging
@@ -388,7 +389,13 @@ class MesMatieres(Resource):
             if not user or user.role != UserRole.ETUDIANT:
                 api.abort(403, "Accès réservé aux étudiants")
             
-            matieres = [m.to_dict() for m in user.matieres_etudiees.filter_by(actif=True).all()]
+            # Récupérer le profil étudiant
+            if not user.etudiant_profil:
+                return [], 200  # Pas de profil étudiant, retourner liste vide
+            
+            etudiant = user.etudiant_profil
+            # Récupérer les matières via la relation many-to-many (etudiant_matieres_v2)
+            matieres = [m.to_dict() for m in etudiant.matieres.filter(Matiere.actif == True).all()]
             return matieres, 200
         except Exception as e:
             logger.error(f"Erreur récupération matières étudiant: {e}", exc_info=True)
@@ -406,6 +413,11 @@ class MesMatieres(Resource):
             if not user or user.role != UserRole.ETUDIANT:
                 api.abort(403, "Accès réservé aux étudiants")
             
+            # Récupérer le profil étudiant
+            if not user.etudiant_profil:
+                api.abort(404, "Profil étudiant non trouvé")
+            
+            etudiant = user.etudiant_profil
             data = request.get_json()
             matieres_ids = data.get('matieres_ids', [])
             annee_scolaire = data.get('annee_scolaire', '2024-2025')
@@ -420,31 +432,29 @@ class MesMatieres(Resource):
                 if matiere and matiere.actif:
                     matieres_valides.append(matiere)
             
-            # Supprimer toutes les associations existantes pour cet étudiant
-            from app.models.associations import etudiant_matieres
+            # Supprimer toutes les associations existantes pour cet étudiant (table etudiant_matieres_v2)
             db.session.execute(
-                db.delete(etudiant_matieres).where(
-                    etudiant_matieres.c.etudiant_id == user_id
-                )
+                db.text("DELETE FROM etudiant_matieres_v2 WHERE etudiant_id = :etudiant_id"),
+                {"etudiant_id": etudiant.id}
             )
+            db.session.flush()
             
             # Ajouter les nouvelles associations
             for matiere in matieres_valides:
                 db.session.execute(
-                    db.insert(etudiant_matieres).values(
-                        etudiant_id=user_id,
-                        matiere_id=matiere.id,
-                        annee_scolaire=annee_scolaire,
-                        est_actuelle=True,
-                        created_at=datetime.utcnow()
-                    )
+                    db.text("INSERT INTO etudiant_matieres_v2 (etudiant_id, matiere_id, annee_scolaire) VALUES (:etudiant_id, :matiere_id, :annee_scolaire)"),
+                    {"etudiant_id": etudiant.id, "matiere_id": matiere.id, "annee_scolaire": annee_scolaire}
                 )
+            db.session.flush()
             
             db.session.commit()
             
             # Retourner les matières mises à jour
-            user = user_repo.get_by_id(user_id)  # Recharger pour avoir les nouvelles relations
-            matieres = [m.to_dict() for m in user.matieres_etudiees.filter_by(actif=True).all()]
+            # Recharger l'étudiant pour avoir les nouvelles relations
+            from app.repositories.etudiant_repository import EtudiantRepository
+            etudiant_repo = EtudiantRepository()
+            etudiant_updated = etudiant_repo.get_by_id(etudiant.id)
+            matieres = [m.to_dict() for m in etudiant_updated.matieres.filter(Matiere.actif == True).all()]
             return matieres, 200
             
         except Exception as e:

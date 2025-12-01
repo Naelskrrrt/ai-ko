@@ -9,8 +9,8 @@ export function getApiUrl(): string {
   }
 
   // Côté serveur (SSR), utiliser localhost
-  if (typeof window === 'undefined') {
-    return 'http://localhost:5000';
+  if (typeof window === "undefined") {
+    return "http://localhost:5000";
   }
 
   // Côté client : utiliser l'URL actuelle du navigateur
@@ -23,14 +23,16 @@ export function getApiUrl(): string {
  */
 export function getApiEndpoint(path: string): string {
   const baseUrl = getApiUrl();
+
   // Si l'URL de base est déjà le frontend, utiliser le proxy Next.js
-  if (baseUrl.includes('localhost:3000') || baseUrl.includes('ngrok-free.dev') || baseUrl.includes('ngrok.io')) {
+  if (
+    baseUrl.includes("localhost:3000") ||
+    baseUrl.includes("ngrok-free.dev") ||
+    baseUrl.includes("ngrok.io")
+  ) {
     return `/api${path}`;
   }
+
   // Sinon, utiliser l'URL complète
   return `${baseUrl}/api${path}`;
 }
-
-
-
-

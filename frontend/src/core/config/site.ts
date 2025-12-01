@@ -26,9 +26,7 @@ export const siteConfig = {
   ],
 
   // Pages qui utilisent le layout avec sidebar
-  sidebarPages: [
-    "/admin",
-  ],
+  sidebarPages: ["/admin"],
 
   // Navigation dans la sidebar (pour utilisateurs non-admin - vide pour l'instant)
   sidebarNavItems: [
@@ -55,6 +53,30 @@ export const siteConfig = {
       icon: "team",
       primary: false,
     },
+    {
+      label: "Étudiants",
+      href: "/admin/etudiants",
+      icon: "team",
+      primary: false,
+    },
+    {
+      label: "Professeurs",
+      href: "/admin/professeurs",
+      icon: "team",
+      primary: false,
+    },
+    {
+      label: "Configs IA",
+      href: "/admin/ai-configs",
+      icon: "settings",
+      primary: false,
+    },
+    // {
+    //   label: "Profil",
+    //   href: "/admin/profile",
+    //   icon: "profile",
+    //   primary: false,
+    // },
   ],
 
   // Navigation spécifique étudiant dans la sidebar
@@ -83,6 +105,12 @@ export const siteConfig = {
       icon: "file",
       primary: false,
     },
+    // {
+    //   label: "Profil",
+    //   href: "/etudiant/profile",
+    //   icon: "profile",
+    //   primary: false,
+    // },
   ],
 
   // Navigation spécifique enseignant dans la sidebar
@@ -106,11 +134,17 @@ export const siteConfig = {
       primary: false,
     },
     {
-      label: "Profil",
-      href: "/profile",
-      icon: "profile",
+      label: "Mes Élèves",
+      href: "/enseignant/eleves",
+      icon: "team",
       primary: false,
     },
+    // {
+    //   label: "Profil",
+    //   href: "/enseignant/profile",
+    //   icon: "profile",
+    //   primary: false,
+    // },
   ],
 
   // Configuration du thème (optionnel - peut être géré par Tailwind/HeroUI)

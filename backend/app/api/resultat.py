@@ -9,6 +9,7 @@ from app.services.resultat_service import ResultatService
 from app.models.user import UserRole
 from app.repositories.user_repository import UserRepository
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -159,24 +160,19 @@ class ResultatDetail(Resource):
     @api.marshal_with(resultat_model)
     @jwt_required()
     def get(self, resultat_id):
-        """Récupère un résultat par son ID"""
+        """Récupère un résultat par son ID avec filtrage selon le rôle"""
         try:
-            include_details = request.args.get(
-                'include_details', 'false').lower() == 'true'
             user_id = get_jwt_identity()
             user = user_repo.get_by_id(user_id)
 
             if not user:
                 api.abort(401, "Utilisateur non trouvé")
 
-            resultat = resultat_service.get_resultat_by_id(
-                resultat_id, include_details=include_details)
+            # Utiliser la méthode qui filtre selon le rôle et la publication
+            resultat = resultat_service.get_resultat_etudiant_filtre(
+                resultat_id, user_id, user.role.value)
             if not resultat:
                 api.abort(404, f"Résultat {resultat_id} non trouvé")
-
-            # Vérifier les permissions (étudiant ne peut voir que ses résultats)
-            if user.role == UserRole.ETUDIANT and resultat.get('etudiantId') != user_id:
-                api.abort(403, "Vous ne pouvez pas voir ce résultat")
 
             return resultat, 200
         except HTTPException:
@@ -201,7 +197,7 @@ class ResultatBySession(Resource):
     @api.marshal_with(resultat_model)
     @jwt_required()
     def get(self, session_id):
-        """Récupère le résultat d'un étudiant pour une session donnée"""
+        """Récupère le résultat d'un étudiant pour une session donnée (avec filtrage selon publication)"""
         try:
             include_details = request.args.get(
                 'include_details', 'false').lower() == 'true'
@@ -215,6 +211,20 @@ class ResultatBySession(Resource):
                 session_id, user_id, include_details=include_details)
             if not resultat:
                 api.abort(404, f"Aucun résultat trouvé pour cette session")
+            
+            # Si étudiant et résultat non publié, filtrer les données
+            if user.role == UserRole.ETUDIANT and not resultat.get('estPublie', False):
+                # Retourner seulement les infos partielles
+                return {
+                    'id': resultat.get('id'),
+                    'sessionId': resultat.get('sessionId'),
+                    'status': resultat.get('status'),
+                    'estPublie': False,
+                    'dateDebut': resultat.get('dateDebut'),
+                    'dateFin': resultat.get('dateFin'),
+                    'dureeReelleSecondes': resultat.get('dureeReelleSecondes'),
+                    'message': 'En attente de validation par l\'enseignant'
+                }, 200
 
             return resultat, 200
         except HTTPException:
@@ -396,6 +406,28 @@ class AjouterCommentaire(Resource):
             api.abort(400, str(e))
         except Exception as e:
             logger.error(f"Erreur ajout commentaire: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+@api.route('/<string:resultat_id>/regenerer-commentaire')
+@api.param('resultat_id', 'ID du résultat')
+class RegenererCommentaire(Resource):
+    @api.doc('regenerer_commentaire', security='Bearer')
+    @api.marshal_with(resultat_model)
+    @jwt_required()
+    def post(self, resultat_id):
+        """Régénère le commentaire IA pour un résultat (admin/enseignant)"""
+        try:
+            user = require_admin_or_teacher()
+            resultat = resultat_service.regenerer_commentaire_ia(
+                resultat_id, user.id
+            )
+            return resultat, 200
+        except ValueError as e:
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur régénération commentaire: {e}", exc_info=True)
+            logger.error(traceback.format_exc())
             api.abort(500, f"Erreur interne: {str(e)}")
 
 
@@ -586,4 +618,190 @@ class HistoriqueComplet(Resource):
         except Exception as e:
             logger.error(
                 f"Erreur récupération historique complet: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+# Endpoints de publication
+@api.route('/<string:resultat_id>/publier')
+@api.param('resultat_id', 'ID du résultat')
+class PublierResultat(Resource):
+    @api.doc('publier_resultat', security='Bearer')
+    @api.marshal_with(resultat_model)
+    @jwt_required()
+    def post(self, resultat_id):
+        """Publie un résultat individuel (enseignant uniquement)"""
+        try:
+            require_admin_or_teacher()
+            resultat = resultat_service.publier_resultat(resultat_id)
+            return resultat, 200
+        except ValueError as e:
+            logger.warning(f"Erreur validation publication: {e}")
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur publication résultat: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+@api.route('/<string:resultat_id>/depublier')
+@api.param('resultat_id', 'ID du résultat')
+class DepublierResultat(Resource):
+    @api.doc('depublier_resultat', security='Bearer')
+    @api.marshal_with(resultat_model)
+    @jwt_required()
+    def post(self, resultat_id):
+        """Dépublie un résultat individuel (enseignant uniquement)"""
+        try:
+            require_admin_or_teacher()
+            resultat = resultat_service.depublier_resultat(resultat_id)
+            return resultat, 200
+        except ValueError as e:
+            logger.warning(f"Erreur validation dépublication: {e}")
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur dépublication résultat: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+publication_session_response = api.model('PublicationSessionResponse', {
+    'session_id': fields.String(description='ID de la session'),
+    'total_resultats': fields.Integer(description='Nombre total de résultats'),
+    'resultats_termines': fields.Integer(description='Nombre de résultats terminés'),
+    'resultats_publies': fields.Integer(description='Nombre de résultats publiés'),
+    'message': fields.String(description='Message de confirmation')
+})
+
+
+@api.route('/session/<string:session_id>/publier-tous')
+@api.param('session_id', 'ID de la session')
+class PublierResultatsSession(Resource):
+    @api.doc('publier_resultats_session', security='Bearer')
+    @api.marshal_with(publication_session_response)
+    @jwt_required()
+    def post(self, session_id):
+        """Publie tous les résultats terminés d'une session (enseignant uniquement)"""
+        try:
+            require_admin_or_teacher()
+            result = resultat_service.publier_resultats_session(session_id)
+            return result, 200
+        except ValueError as e:
+            logger.warning(f"Erreur validation publication session: {e}")
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur publication résultats session: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+# Endpoints d'export PDF
+@api.route('/<string:resultat_id>/export-pdf')
+@api.param('resultat_id', 'ID du résultat')
+class ExportPDFResultat(Resource):
+    @api.doc('export_pdf_resultat', security='Bearer')
+    @jwt_required()
+    def get(self, resultat_id):
+        """Exporte un résultat individuel en PDF (enseignant uniquement)"""
+        try:
+            from flask import send_file
+            from app.services.pdf_service import PDFService
+            
+            require_admin_or_teacher()
+            
+            pdf_service = PDFService()
+            pdf_buffer = pdf_service.generer_pdf_resultat_individuel(resultat_id)
+            
+            # Récupérer des infos pour le nom du fichier
+            resultat = resultat_service.get_resultat_by_id(resultat_id)
+            etudiant_name = resultat.get('etudiant', {}).get('name', 'etudiant').replace(' ', '_')
+            session_titre = resultat.get('session', {}).get('titre', 'examen').replace(' ', '_')
+            filename = f"resultat_{etudiant_name}_{session_titre}.pdf"
+            
+            return send_file(
+                pdf_buffer,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name=filename
+            )
+        except ValueError as e:
+            logger.warning(f"Erreur validation export PDF: {e}")
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur export PDF résultat: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+@api.route('/session/<string:session_id>/export-pdf')
+@api.param('session_id', 'ID de la session')
+class ExportPDFSession(Resource):
+    @api.doc('export_pdf_session', security='Bearer')
+    @jwt_required()
+    def get(self, session_id):
+        """Exporte le récapitulatif d'une session en PDF (enseignant uniquement)"""
+        try:
+            from flask import send_file
+            from app.services.pdf_service import PDFService
+            from app.repositories.session_examen_repository import SessionExamenRepository
+            
+            require_admin_or_teacher()
+            
+            logger.info(f"Début export PDF pour session {session_id}")
+            
+            pdf_service = PDFService()
+            pdf_buffer = pdf_service.generer_pdf_recapitulatif_session(session_id)
+            
+            logger.info(f"PDF généré avec succès pour session {session_id}")
+            
+            # Récupérer le titre de la session pour le nom du fichier
+            session_repo = SessionExamenRepository()
+            session = session_repo.get_by_id(session_id)
+            session_titre = session.titre.replace(' ', '_') if session else 'session'
+            filename = f"recapitulatif_{session_titre}.pdf"
+            
+            return send_file(
+                pdf_buffer,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name=filename
+            )
+        except ValueError as e:
+            logger.warning(f"Erreur validation export PDF session: {e}")
+            logger.warning(traceback.format_exc())
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur export PDF session: {e}", exc_info=True)
+            logger.error(traceback.format_exc())
+            api.abort(500, f"Erreur interne: {str(e)}")
+
+
+@api.route('/<string:resultat_id>/details-etudiant')
+@api.param('resultat_id', 'ID du résultat')
+class DetailsEtudiant(Resource):
+    @api.doc('get_details_etudiant', security='Bearer')
+    @jwt_required()
+    def get(self, resultat_id):
+        """Récupère les détails complets d'un étudiant pour un résultat (enseignant uniquement)"""
+        try:
+            require_admin_or_teacher()
+            
+            # Récupérer le résultat avec tous les détails
+            resultat = resultat_service.get_resultat_by_id(resultat_id, include_details=True)
+            if not resultat:
+                api.abort(404, "Résultat non trouvé")
+            
+            # Récupérer les infos complètes de l'étudiant
+            etudiant_id = resultat.get('etudiantId')
+            etudiant = user_repo.get_by_id(etudiant_id)
+            if not etudiant:
+                api.abort(404, "Étudiant non trouvé")
+            
+            # Construire la réponse avec toutes les infos
+            response = {
+                'resultat': resultat,
+                'etudiant': etudiant.to_dict(include_profil=True)
+            }
+            
+            return response, 200
+        except ValueError as e:
+            logger.warning(f"Erreur validation détails étudiant: {e}")
+            api.abort(400, str(e))
+        except Exception as e:
+            logger.error(f"Erreur récupération détails étudiant: {e}", exc_info=True)
             api.abort(500, f"Erreur interne: {str(e)}")

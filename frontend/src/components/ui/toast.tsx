@@ -2,13 +2,20 @@
 
 import * as React from "react";
 import { Card, CardBody } from "@heroui/card";
+import {
+  X,
+  CheckCircle2,
+  AlertCircle,
+  Info,
+  AlertTriangle,
+} from "lucide-react";
+
 import { useToast, type Toast as ToastType } from "@/hooks/use-toast";
-import { X, CheckCircle2, AlertCircle, Info, AlertTriangle } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 const ToastIcon = ({ variant }: { variant: ToastType["variant"] }) => {
   const iconClass = "w-5 h-5";
-  
+
   switch (variant) {
     case "success":
       return <CheckCircle2 className={cn(iconClass, "text-success")} />;
@@ -24,7 +31,7 @@ const ToastIcon = ({ variant }: { variant: ToastType["variant"] }) => {
 
 const Toast = ({ toast }: { toast: ToastType }) => {
   const { dismiss } = useToast();
-  
+
   const handleDismiss = () => {
     dismiss(toast.id);
   };
@@ -49,7 +56,7 @@ const Toast = ({ toast }: { toast: ToastType }) => {
         "min-w-[320px] max-w-[420px] shadow-2xl border",
         "bg-background/95 backdrop-blur-xl backdrop-saturate-150",
         "dark:bg-background/90",
-        getVariantStyles(toast.variant)
+        getVariantStyles(toast.variant),
       )}
       style={{
         animation: "slideIn 0.3s ease-out",
@@ -61,13 +68,15 @@ const Toast = ({ toast }: { toast: ToastType }) => {
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm">{toast.title}</p>
             {toast.description && (
-              <p className="text-sm text-default-600 mt-1">{toast.description}</p>
+              <p className="text-sm text-default-600 mt-1">
+                {toast.description}
+              </p>
             )}
           </div>
           <button
-            onClick={handleDismiss}
-            className="flex-shrink-0 p-1 rounded-md hover:bg-default-100 transition-colors"
             aria-label="Fermer"
+            className="flex-shrink-0 p-1 rounded-md hover:bg-default-100 transition-colors"
+            onClick={handleDismiss}
           >
             <X className="w-4 h-4" />
           </button>
@@ -92,4 +101,3 @@ export function Toaster() {
     </div>
   );
 }
-

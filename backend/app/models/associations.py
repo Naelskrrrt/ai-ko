@@ -67,3 +67,60 @@ qcm_niveaux = db.Table(
     db.Column('niveau_id', db.String(36), db.ForeignKey('niveaux.id'), primary_key=True),
     db.Column('created_at', db.DateTime, server_default=db.func.now())
 )
+
+# ========================================
+# NOUVELLES TABLES D'ASSOCIATION (v2)
+# Pour les modèles Enseignant et Etudiant
+# ========================================
+
+# Association Enseignant <-> Matières
+enseignant_matieres = db.Table(
+    'enseignant_matieres',
+    db.Column('enseignant_id', db.String(36), db.ForeignKey('enseignants.id'), primary_key=True),
+    db.Column('matiere_id', db.String(36), db.ForeignKey('matieres.id'), primary_key=True),
+    db.Column('annee_scolaire', db.String(20), nullable=True),
+    db.Column('created_at', db.DateTime, server_default=db.func.now())
+)
+
+# Association Enseignant <-> Niveaux
+enseignant_niveaux = db.Table(
+    'enseignant_niveaux',
+    db.Column('enseignant_id', db.String(36), db.ForeignKey('enseignants.id'), primary_key=True),
+    db.Column('niveau_id', db.String(36), db.ForeignKey('niveaux.id'), primary_key=True),
+    db.Column('created_at', db.DateTime, server_default=db.func.now())
+)
+
+# Association Enseignant <-> Parcours
+enseignant_parcours = db.Table(
+    'enseignant_parcours',
+    db.Column('enseignant_id', db.String(36), db.ForeignKey('enseignants.id'), primary_key=True),
+    db.Column('parcours_id', db.String(36), db.ForeignKey('parcours.id'), primary_key=True),
+    db.Column('created_at', db.DateTime, server_default=db.func.now())
+)
+
+# Association Enseignant <-> Mentions
+enseignant_mentions = db.Table(
+    'enseignant_mentions',
+    db.Column('enseignant_id', db.String(36), db.ForeignKey('enseignants.id'), primary_key=True),
+    db.Column('mention_id', db.String(36), db.ForeignKey('mentions.id'), primary_key=True),
+    db.Column('created_at', db.DateTime, server_default=db.func.now())
+)
+
+# Association Etudiant <-> Matières (nouvelle version)
+etudiant_matieres_v2 = db.Table(
+    'etudiant_matieres_v2',
+    db.Column('etudiant_id', db.String(36), db.ForeignKey('etudiants.id'), primary_key=True),
+    db.Column('matiere_id', db.String(36), db.ForeignKey('matieres.id'), primary_key=True),
+    db.Column('annee_scolaire', db.String(20), nullable=False),
+    db.Column('semestre', db.Integer, nullable=True),
+    db.Column('created_at', db.DateTime, server_default=db.func.now())
+)
+
+# Association Etudiant <-> Classes (nouvelle version)
+etudiant_classes_v2 = db.Table(
+    'etudiant_classes_v2',
+    db.Column('etudiant_id', db.String(36), db.ForeignKey('etudiants.id'), primary_key=True),
+    db.Column('classe_id', db.String(36), db.ForeignKey('classes.id'), primary_key=True),
+    db.Column('annee_scolaire', db.String(20), nullable=False),
+    db.Column('created_at', db.DateTime, server_default=db.func.now())
+)

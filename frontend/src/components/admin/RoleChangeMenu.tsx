@@ -1,8 +1,8 @@
 "use client";
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
-import { Shield, GraduationCap, User as UserIcon } from "lucide-react";
 import type { User } from "@/shared/types/admin.types";
+
+import { Shield, GraduationCap, User as UserIcon } from "lucide-react";
 
 interface RoleChangeMenuProps {
   user: User;
@@ -11,14 +11,36 @@ interface RoleChangeMenuProps {
   onRoleChange: (role: string) => void;
 }
 
-export function RoleChangeMenu({ user, isOpen, onClose, onRoleChange }: RoleChangeMenuProps) {
+export function RoleChangeMenu({
+  user,
+  isOpen,
+  onClose,
+  onRoleChange,
+}: RoleChangeMenuProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50"
+      role="button"
+      tabIndex={0}
+      onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          onClose();
+        }
+      }}
+    >
       <div
         className="absolute right-20 top-1/2 -translate-y-1/2 bg-white dark:bg-content1 rounded-lg shadow-lg border border-divider p-2 min-w-[180px]"
+        role="button"
+        tabIndex={0}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            onClose();
+          }
+        }}
       >
         <div className="text-sm font-semibold text-default-500 px-2 py-1 mb-1">
           Changer le rôle
@@ -63,5 +85,3 @@ export function RoleChangeMenu({ user, isOpen, onClose, onRoleChange }: RoleChan
     </div>
   );
 }
-
-

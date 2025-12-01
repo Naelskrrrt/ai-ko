@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { CalendarEvent } from "@/core/types/calendar";
 import clsx from "clsx";
+
+import { CalendarEvent } from "@/core/types/calendar";
 
 interface ResizeHandleProps {
   event: CalendarEvent;
@@ -10,7 +11,7 @@ interface ResizeHandleProps {
   onResizeStart: (
     event: CalendarEvent,
     type: "top" | "bottom",
-    e: React.MouseEvent
+    e: React.MouseEvent,
   ) => void;
   className?: string;
 }
@@ -34,7 +35,7 @@ export function ResizeHandle({
         "hover:bg-white/40 transition-all duration-200",
         "opacity-0 group-hover:opacity-100",
         type === "top" ? "top-0 -mt-2" : "bottom-0 -mb-2",
-        className
+        className,
       )}
       onMouseDown={handleMouseDown}
       onMouseEnter={(e) => {
@@ -51,7 +52,7 @@ export function ResizeHandle({
         className={clsx(
           "absolute left-1/2 transform -translate-x-1/2 w-3 h-1 rounded-full",
           "bg-white/90 hover:bg-white transition-colors shadow-sm",
-          type === "top" ? "top-1.5" : "bottom-1.5"
+          type === "top" ? "top-1.5" : "bottom-1.5",
         )}
       />
     </div>

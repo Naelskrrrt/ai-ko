@@ -1,39 +1,44 @@
-'use client'
+"use client";
 
-import { Clock, AlertTriangle } from 'lucide-react'
-import { Chip } from '@heroui/chip'
+import { Clock, AlertTriangle } from "lucide-react";
+import { Chip } from "@heroui/chip";
 
 interface ExamTimerProps {
-  timeRemaining: number // en secondes
+  timeRemaining: number; // en secondes
 }
 
 export function ExamTimer({ timeRemaining }: ExamTimerProps) {
-  const minutes = Math.floor(timeRemaining / 60)
-  const seconds = timeRemaining % 60
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining % 60;
 
-  const isCritical = timeRemaining < 60 // Moins d'une minute
-  const isWarning = timeRemaining < 300 && !isCritical // Moins de 5 minutes
+  const isCritical = timeRemaining < 60; // Moins d'une minute
+  const isWarning = timeRemaining < 300 && !isCritical; // Moins de 5 minutes
 
   const formatTime = (value: number) => {
-    return value.toString().padStart(2, '0')
-  }
+    return value.toString().padStart(2, "0");
+  };
 
   const getColor = () => {
-    if (isCritical) return 'danger'
-    if (isWarning) return 'warning'
-    return 'primary'
-  }
+    if (isCritical) return "danger";
+    if (isWarning) return "warning";
+
+    return "primary";
+  };
 
   const getVariant = () => {
-    if (isCritical) return 'solid'
-    return 'flat'
-  }
+    if (isCritical) return "solid";
+
+    return "flat";
+  };
 
   return (
     <Chip
-      size="lg"
+      classNames={{
+        base: isCritical ? "animate-pulse" : "",
+        content: "font-mono font-bold text-lg",
+      }}
       color={getColor()}
-      variant={getVariant()}
+      size="lg"
       startContent={
         isCritical ? (
           <AlertTriangle className="h-5 w-5 animate-pulse" />
@@ -41,12 +46,9 @@ export function ExamTimer({ timeRemaining }: ExamTimerProps) {
           <Clock className="h-5 w-5" />
         )
       }
-      classNames={{
-        base: isCritical ? 'animate-pulse' : '',
-        content: 'font-mono font-bold text-lg',
-      }}
+      variant={getVariant()}
     >
       {formatTime(minutes)}:{formatTime(seconds)}
     </Chip>
-  )
+  );
 }

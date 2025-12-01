@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Refresh token error:", error);
 
     const response = NextResponse.json(

@@ -3,8 +3,6 @@
 import React from "react";
 import { Button } from "@heroui/button";
 import { Tabs, Tab } from "@heroui/tabs";
-import { CalendarView, CalendarToolbarProps } from "@/core/types/calendar";
-import { getPeriodTitle } from "@/core/lib/calendar-utils";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,6 +10,9 @@ import {
   Calendar as CalendarIcon,
   Clock,
 } from "lucide-react";
+
+import { CalendarView, CalendarToolbarProps } from "@/core/types/calendar";
+import { getPeriodTitle } from "@/core/lib/calendar-utils";
 
 export function CalendarToolbar({
   currentDate,
@@ -73,29 +74,29 @@ export function CalendarToolbar({
             <div className="flex items-center justify-center gap-1 sm:gap-2">
               <Button
                 isIconOnly
-                variant="light"
-                size="sm"
-                onPress={onNavigatePrevious}
                 className="hover:bg-default-100 dark:hover:bg-default-50 min-w-8 h-8"
+                size="sm"
+                variant="light"
+                onPress={onNavigatePrevious}
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
 
               <Button
-                variant="light"
-                size="sm"
-                onPress={onNavigateToday}
                 className="hover:bg-default-100 dark:hover:bg-default-50 min-w-16 sm:min-w-20 text-xs sm:text-sm"
+                size="sm"
+                variant="light"
+                onPress={onNavigateToday}
               >
                 Aujourd'hui
               </Button>
 
               <Button
                 isIconOnly
-                variant="light"
-                size="sm"
-                onPress={onNavigateNext}
                 className="hover:bg-default-100 dark:hover:bg-default-50 min-w-8 h-8"
+                size="sm"
+                variant="light"
+                onPress={onNavigateNext}
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
@@ -104,9 +105,6 @@ export function CalendarToolbar({
             {/* Sélecteur de vue - Desktop */}
             <div className="hidden md:block">
               <Tabs
-                selectedKey={view}
-                onSelectionChange={(key) => onViewChange(key as CalendarView)}
-                variant="underlined"
                 classNames={{
                   tabList:
                     "gap-4 lg:gap-6 w-full relative rounded-none p-0 border-b border-divider",
@@ -115,6 +113,9 @@ export function CalendarToolbar({
                   tabContent:
                     "group-data-[selected=true]:text-theme-primary text-sm lg:text-base",
                 }}
+                selectedKey={view}
+                variant="underlined"
+                onSelectionChange={(key) => onViewChange(key as CalendarView)}
               >
                 {viewOptions.map((option) => (
                   <Tab key={option.key} title={option.label} />
@@ -125,12 +126,12 @@ export function CalendarToolbar({
             {/* Bouton Vue Business - visible seulement pour les vues semaine et jour */}
             {(view === "week" || view === "day") && onBusinessView && (
               <Button
-                startContent={<Clock className="w-4 h-4" />}
-                onPress={onBusinessView}
-                size="sm"
-                variant="bordered"
                 className="font-medium w-full sm:w-auto hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 isIconOnly={isMobile}
+                size="sm"
+                startContent={<Clock className="w-4 h-4" />}
+                variant="bordered"
+                onPress={onBusinessView}
               >
                 <span className="xs:hidden">Vue Business</span>
               </Button>
@@ -138,11 +139,11 @@ export function CalendarToolbar({
 
             {/* Bouton créer événement */}
             <Button
-              startContent={<Plus className="w-4 h-4" />}
-              onPress={onCreateEvent}
-              size="sm"
               className="font-medium w-full sm:w-auto bg-theme-primary text-white"
               isIconOnly={isMobile}
+              size="sm"
+              startContent={<Plus className="w-4 h-4" />}
+              onPress={onCreateEvent}
             >
               <span className="xs:hidden">Créer</span>
               {/* <span className="xs:hidden">+</span> */}
@@ -153,9 +154,6 @@ export function CalendarToolbar({
         {/* Sélecteur de vue mobile/tablet */}
         <div className="md:hidden mt-3">
           <Tabs
-            selectedKey={view}
-            onSelectionChange={(key) => onViewChange(key as CalendarView)}
-            variant="bordered"
             classNames={{
               tabList:
                 "gap-1 sm:gap-2 w-full relative rounded-lg p-1 bg-default-100 dark:bg-default-50",
@@ -164,6 +162,9 @@ export function CalendarToolbar({
               tabContent:
                 "group-data-[selected=true]:text-theme-primary text-xs sm:text-sm",
             }}
+            selectedKey={view}
+            variant="bordered"
+            onSelectionChange={(key) => onViewChange(key as CalendarView)}
           >
             {viewOptions.map((option) => (
               <Tab key={option.key} title={option.label} />

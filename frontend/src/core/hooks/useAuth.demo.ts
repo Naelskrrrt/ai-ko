@@ -49,6 +49,7 @@ export function useAuthDemo(): UseAuthReturn {
 
     // Actions (simulées)
     login: async (credentials: LoginCredentials) => {
+      // eslint-disable-next-line no-console
       console.log("🎭 [DEMO MODE] Login simulé avec:", credentials.username);
       await new Promise((resolve) => setTimeout(resolve, 500));
       router.push("/admin");
@@ -57,6 +58,7 @@ export function useAuthDemo(): UseAuthReturn {
     },
 
     register: async (credentials: RegisterCredentials) => {
+      // eslint-disable-next-line no-console
       console.log("🎭 [DEMO MODE] Inscription simulée:", credentials.username);
       await new Promise((resolve) => setTimeout(resolve, 500));
       router.push("/login");
@@ -65,12 +67,14 @@ export function useAuthDemo(): UseAuthReturn {
     },
 
     logout: async () => {
+      // eslint-disable-next-line no-console
       console.log("🎭 [DEMO MODE] Logout simulé");
       await new Promise((resolve) => setTimeout(resolve, 300));
       router.push("/");
     },
 
     refreshSession: async () => {
+      // eslint-disable-next-line no-console
       console.log("🎭 [DEMO MODE] Refresh session simulé");
 
       return true;

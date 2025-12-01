@@ -13,10 +13,11 @@ import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 import { Textarea } from "@heroui/input";
-import { CalendarEvent, EventColor } from "@/core/types/calendar";
+import { Calendar, Clock, MapPin, Tag, Palette } from "lucide-react";
+
+import { CalendarEvent } from "@/core/types/calendar";
 import { useEventForm } from "@/core/hooks/useCalendar";
 import { EVENT_COLORS, COLOR_CLASSES } from "@/core/lib/calendar-utils";
-import { Calendar, Clock, MapPin, Tag, Palette } from "lucide-react";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -53,6 +54,7 @@ export function EventModal({
   React.useEffect(() => {
     if (defaultDate && !isEditing) {
       const dateStr = defaultDate.toISOString().split("T")[0];
+
       updateField("startDate", dateStr);
       updateField("endDate", dateStr);
 
@@ -81,6 +83,7 @@ export function EventModal({
           ...eventData,
           updatedAt: new Date(),
         };
+
         onSave(updatedEvent);
       } else {
         // Création d'un nouvel événement - on passe seulement les données sans id, createdAt, updatedAt
@@ -90,6 +93,7 @@ export function EventModal({
       resetForm();
       onClose();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Erreur lors de la sauvegarde:", error);
     }
   };
@@ -119,16 +123,16 @@ export function EventModal({
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      size="2xl"
-      scrollBehavior="inside"
       classNames={{
         base: "bg-background",
         header: "border-b border-divider",
         body: "py-6",
         footer: "border-t border-divider",
       }}
+      isOpen={isOpen}
+      scrollBehavior="inside"
+      size="2xl"
+      onClose={handleClose}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
@@ -141,32 +145,32 @@ export function EventModal({
           <div className="space-y-6">
             {/* Titre */}
             <Input
+              errorMessage={errors.title}
+              isInvalid={!!errors.title}
               label="Titre"
               placeholder="Nom de l'événement"
-              value={formData.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              isInvalid={!!errors.title}
-              errorMessage={errors.title}
               startContent={<Calendar className="w-4 h-4 text-default-400" />}
+              value={formData.title}
               variant="bordered"
+              onChange={(e) => updateField("title", e.target.value)}
             />
 
             {/* Description */}
             <Textarea
               label="Description"
+              minRows={3}
               placeholder="Description de l'événement (optionnel)"
               value={formData.description}
-              onChange={(e) => updateField("description", e.target.value)}
-              minRows={3}
               variant="bordered"
+              onChange={(e) => updateField("description", e.target.value)}
             />
 
             {/* Toute la journée */}
             <div className="flex items-center gap-3">
               <Switch
                 isSelected={formData.allDay}
-                onValueChange={(value) => updateField("allDay", value)}
                 size="sm"
+                onValueChange={(value) => updateField("allDay", value)}
               />
               <span className="text-sm text-default-600">Toute la journée</span>
             </div>
@@ -175,24 +179,24 @@ export function EventModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Date de début */}
               <Input
+                errorMessage={errors.startDate}
+                isInvalid={!!errors.startDate}
                 label="Date de début"
                 type="date"
                 value={formData.startDate}
-                onChange={(e) => updateField("startDate", e.target.value)}
-                isInvalid={!!errors.startDate}
-                errorMessage={errors.startDate}
                 variant="bordered"
+                onChange={(e) => updateField("startDate", e.target.value)}
               />
 
               {/* Heure de début */}
               {!formData.allDay && (
                 <Input
                   label="Heure de début"
+                  startContent={<Clock className="w-4 h-4 text-default-400" />}
                   type="time"
                   value={formData.startTime}
-                  onChange={(e) => updateField("startTime", e.target.value)}
-                  startContent={<Clock className="w-4 h-4 text-default-400" />}
                   variant="bordered"
+                  onChange={(e) => updateField("startTime", e.target.value)}
                 />
               )}
             </div>
@@ -200,26 +204,26 @@ export function EventModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Date de fin */}
               <Input
+                errorMessage={errors.endDate}
+                isInvalid={!!errors.endDate}
                 label="Date de fin"
                 type="date"
                 value={formData.endDate}
-                onChange={(e) => updateField("endDate", e.target.value)}
-                isInvalid={!!errors.endDate}
-                errorMessage={errors.endDate}
                 variant="bordered"
+                onChange={(e) => updateField("endDate", e.target.value)}
               />
 
               {/* Heure de fin */}
               {!formData.allDay && (
                 <Input
+                  errorMessage={errors.endTime}
+                  isInvalid={!!errors.endTime}
                   label="Heure de fin"
+                  startContent={<Clock className="w-4 h-4 text-default-400" />}
                   type="time"
                   value={formData.endTime}
-                  onChange={(e) => updateField("endTime", e.target.value)}
-                  isInvalid={!!errors.endTime}
-                  errorMessage={errors.endTime}
-                  startContent={<Clock className="w-4 h-4 text-default-400" />}
                   variant="bordered"
+                  onChange={(e) => updateField("endTime", e.target.value)}
                 />
               )}
             </div>
@@ -228,10 +232,10 @@ export function EventModal({
             <Input
               label="Localisation"
               placeholder="Lieu de l'événement (optionnel)"
-              value={formData.location}
-              onChange={(e) => updateField("location", e.target.value)}
               startContent={<MapPin className="w-4 h-4 text-default-400" />}
+              value={formData.location}
               variant="bordered"
+              onChange={(e) => updateField("location", e.target.value)}
             />
 
             {/* Catégorie */}
@@ -239,12 +243,13 @@ export function EventModal({
               label="Catégorie"
               placeholder="Sélectionner une catégorie"
               selectedKeys={formData.category ? [formData.category] : []}
-              onSelectionChange={(keys) => {
-                const selectedKey = Array.from(keys)[0] as string;
-                updateField("category", selectedKey);
-              }}
               startContent={<Tag className="w-4 h-4 text-default-400" />}
               variant="bordered"
+              onSelectionChange={(keys) => {
+                const selectedKey = Array.from(keys)[0] as string;
+
+                updateField("category", selectedKey);
+              }}
             >
               {categoryOptions.map((option) => (
                 <SelectItem key={option.key}>{option.label}</SelectItem>
@@ -261,7 +266,6 @@ export function EventModal({
                 {EVENT_COLORS.map((color) => (
                   <button
                     key={color}
-                    onClick={() => updateField("color", color)}
                     className={`
                       w-8 h-8 rounded-full border-2 transition-all
                       ${
@@ -272,6 +276,7 @@ export function EventModal({
                       ${COLOR_CLASSES[color]}
                     `}
                     title={color}
+                    onClick={() => updateField("color", color)}
                   />
                 ))}
               </div>
@@ -285,9 +290,9 @@ export function EventModal({
               {isEditing && onDelete && (
                 <Button
                   color="danger"
+                  size="sm"
                   variant="light"
                   onPress={handleDelete}
-                  size="sm"
                 >
                   Supprimer
                 </Button>
@@ -300,8 +305,8 @@ export function EventModal({
               </Button>
               <Button
                 className="bg-theme-primary text-white"
-                onPress={handleSave}
                 isDisabled={!formData.title.trim()}
+                onPress={handleSave}
               >
                 {isEditing ? "Modifier" : "Créer"}
               </Button>

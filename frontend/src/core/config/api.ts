@@ -45,6 +45,7 @@ function validateApiUrl(url: string): boolean {
 
     return true;
   } catch {
+    // eslint-disable-next-line no-console
     console.warn(`Invalid API URL: ${url}`);
 
     return false;
@@ -55,6 +56,7 @@ const BASE_URL = getBaseURL();
 
 // Validation au chargement
 if (!validateApiUrl(BASE_URL)) {
+  // eslint-disable-next-line no-console
   console.error(`Invalid API configuration. Base URL: ${BASE_URL}`);
 }
 

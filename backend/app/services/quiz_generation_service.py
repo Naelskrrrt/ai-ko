@@ -40,7 +40,8 @@ def estimate_generation_time(num_questions: int, is_document: bool = False) -> i
 
 def generate_quiz_from_text_async(task_id: str, qcm_id: str, text: str, 
                                   num_questions: int = 10, matiere: str = None, 
-                                  niveau: str = None):
+                                  niveau: str = None, mention: str = None,
+                                  parcours: str = None):
     """
     Génère un QCM à partir de texte brut (version asynchrone)
     
@@ -51,6 +52,8 @@ def generate_quiz_from_text_async(task_id: str, qcm_id: str, text: str,
         num_questions: Nombre de questions à générer
         matiere: Matière (optionnel)
         niveau: Niveau académique (optionnel)
+        mention: Mention académique (optionnel)
+        parcours: Parcours académique (optionnel)
     
     Returns:
         Dictionnaire avec les informations du QCM généré
@@ -160,7 +163,8 @@ def generate_quiz_from_text_async(task_id: str, qcm_id: str, text: str,
 
 def generate_quiz_from_document_async(task_id: str, qcm_id: str, file_bytes: bytes, 
                                       file_type: str, num_questions: int = 10, 
-                                      matiere: str = None, niveau: str = None):
+                                      matiere: str = None, niveau: str = None,
+                                      mention: str = None, parcours: str = None):
     """
     Génère un QCM à partir d'un document (PDF ou DOCX) - version asynchrone
     
@@ -172,6 +176,8 @@ def generate_quiz_from_document_async(task_id: str, qcm_id: str, file_bytes: byt
         num_questions: Nombre de questions à générer
         matiere: Matière (optionnel)
         niveau: Niveau académique (optionnel)
+        mention: Mention académique (optionnel)
+        parcours: Parcours académique (optionnel)
     
     Returns:
         Dictionnaire avec les informations du QCM généré
@@ -208,7 +214,9 @@ def generate_quiz_from_document_async(task_id: str, qcm_id: str, file_bytes: byt
                 text=clean_text,
                 num_questions=num_questions,
                 matiere=matiere,
-                niveau=niveau
+                niveau=niveau,
+                mention=mention,
+                parcours=parcours
             )
         except Exception as e:
             error_msg = str(e)

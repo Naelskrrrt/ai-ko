@@ -1,64 +1,70 @@
-import axios from 'axios'
-import type { QCMDisponible, AccesQCMResponse } from '../types/qcms.types'
+import type { QCMDisponible, AccesQCMResponse } from "../types/qcms.types";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+import axios from "axios";
+
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const qcmsApi = axios.create({
   baseURL: `${API_URL}/api`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
-})
+});
 
 // Intercepteur pour ajouter le token JWT
 qcmsApi.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     let token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('auth_token='))
-      ?.split('=')[1]
+      .split("; ")
+      .find((row) => row.startsWith("auth_token="))
+      ?.split("=")[1];
 
     if (!token) {
-      token = localStorage.getItem('auth_token')
+      token = localStorage.getItem("auth_token") || undefined;
     }
 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
   }
-  return config
-})
+
+  return config;
+});
 
 // Intercepteur pour logger les erreurs
 qcmsApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 404 || error.response?.status === 400) {
-      console.warn('⚠️ API Warning:', {
+      // eslint-disable-next-line no-console
+      console.warn("⚠️ API Warning:", {
         url: error.config?.url,
         status: error.response?.status,
-        message: error.response?.data?.message || 'Ressource non trouvée',
-      })
+        message: error.response?.data?.message || "Ressource non trouvée",
+      });
     } else {
-      console.error('❌ API Error:', {
+      // eslint-disable-next-line no-console
+      console.error("❌ API Error:", {
         url: error.config?.url,
         status: error.response?.status,
         data: error.response?.data,
         message: error.message,
-      })
+      });
     }
-    return Promise.reject(error)
-  }
-)
+
+    return Promise.reject(error);
+  },
+);
 
 export interface Matiere {
-  id: string
-  code: string
-  nom: string
-  description?: string
-  couleur?: string
-  icone?: string
+  id: string;
+  code: string;
+  nom: string;
+  description?: string;
+  couleur?: string;
+  icone?: string;
 }
 
 export const qcmsService = {
@@ -66,64 +72,83 @@ export const qcmsService = {
    * Récupère tous les QCMs disponibles pour l'étudiant
    */
   async getDisponibles(): Promise<QCMDisponible[]> {
-    const response = await qcmsApi.get<QCMDisponible[]>('/qcm-etudiant/disponibles')
-    return response.data
+    const response = await qcmsApi.get<QCMDisponible[]>(
+      "/qcm-etudiant/disponibles",
+    );
+
+    return response.data;
   },
 
   /**
    * Vérifie si l'étudiant peut accéder à un QCM
    */
   async verifierAcces(qcmId: string): Promise<boolean> {
-    const response = await qcmsApi.get<AccesQCMResponse>(`/qcm-etudiant/${qcmId}/acces`)
-    return response.data.canAccess
+    const response = await qcmsApi.get<AccesQCMResponse>(
+      `/qcm-etudiant/${qcmId}/acces`,
+    );
+
+    return response.data.canAccess;
   },
 
   /**
    * Récupère toutes les matières disponibles
    */
   async getMatieresDisponibles(): Promise<Matiere[]> {
-    const response = await qcmsApi.get<Matiere[]>('/qcm-etudiant/matieres')
-    return response.data
+    const response = await qcmsApi.get<Matiere[]>("/qcm-etudiant/matieres");
+
+    return response.data;
   },
 
   /**
    * Récupère les matières suivies par l'étudiant
    */
   async getMesMatieres(): Promise<Matiere[]> {
-    const response = await qcmsApi.get<Matiere[]>('/qcm-etudiant/matieres/mes-matieres')
-    return response.data
+    const response = await qcmsApi.get<Matiere[]>(
+      "/qcm-etudiant/matieres/mes-matieres",
+    );
+
+    return response.data;
   },
 
   /**
    * Met à jour les matières suivies par l'étudiant
    */
-  async updateMesMatieres(matieresIds: string[], anneeScolaire?: string): Promise<Matiere[]> {
-    const response = await qcmsApi.put<Matiere[]>('/qcm-etudiant/matieres/mes-matieres', {
-      matieres_ids: matieresIds,
-      annee_scolaire: anneeScolaire || '2024-2025',
-    })
-    return response.data
+  async updateMesMatieres(
+    matieresIds: string[],
+    anneeScolaire?: string,
+  ): Promise<Matiere[]> {
+    const response = await qcmsApi.put<Matiere[]>(
+      "/qcm-etudiant/matieres/mes-matieres",
+      {
+        matieres_ids: matieresIds,
+        annee_scolaire: anneeScolaire || "2024-2025",
+      },
+    );
+
+    return response.data;
   },
 
   /**
    * Récupère un QCM par son ID
    */
   async getQCMById(qcmId: string): Promise<any> {
-    const response = await qcmsApi.get(`/qcm-etudiant/${qcmId}`)
-    return response.data
+    const response = await qcmsApi.get(`/qcm-etudiant/${qcmId}`);
+
+    return response.data;
   },
 
   /**
    * Démarre un QCM libre
    */
   async startQCM(qcmId: string): Promise<{
-    questions: any[]
-    duree_restante_secondes: number
-    resultat_id: string
-    date_debut: string
+    questions: any[];
+    duree_restante_secondes: number;
+    resultat_id: string;
+    date_debut: string;
   }> {
-    const response = await qcmsApi.post(`/qcm-etudiant/${qcmId}/demarrer`)
-    return response.data
+    const response = await qcmsApi.post(`/qcm-etudiant/${qcmId}/demarrer`);
+
+    return response.data;
   },
 
   /**
@@ -132,28 +157,29 @@ export const qcmsService = {
   async submitQCM(
     qcmId: string,
     resultatId: string,
-    reponses: Record<string, any>
+    reponses: Record<string, any>,
   ): Promise<{
-    resultat_id: string
-    score_total: number
-    score_maximum: number
-    pourcentage: number
-    questions_correctes: number
-    questions_total: number
+    resultat_id: string;
+    score_total: number;
+    score_maximum: number;
+    pourcentage: number;
+    questions_correctes: number;
+    questions_total: number;
   }> {
     const response = await qcmsApi.post(`/qcm-etudiant/${qcmId}/soumettre`, {
       resultat_id: resultatId,
       reponses,
-    })
-    return response.data
+    });
+
+    return response.data;
   },
 
   /**
    * Récupère le résultat détaillé d'un QCM libre
    */
   async getResultat(resultatId: string): Promise<any> {
-    const response = await qcmsApi.get(`/qcm-etudiant/resultat/${resultatId}`)
-    return response.data
-  },
-}
+    const response = await qcmsApi.get(`/qcm-etudiant/resultat/${resultatId}`);
 
+    return response.data;
+  },
+};

@@ -1,84 +1,105 @@
-'use client'
+"use client";
 
-import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card'
-import { Button } from '@heroui/button'
-import { Chip } from '@heroui/chip'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/modal'
-import { Calendar, Clock, FileText, Play, Eye, AlertCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import type { Examen } from '../../types/examens.types'
+import type { Examen } from "../../types/examens.types";
+
+import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@heroui/modal";
+import {
+  Calendar,
+  Clock,
+  FileText,
+  Play,
+  Eye,
+  AlertCircle,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ExamenCardProps {
-  examen: Examen
-  onUpdate?: () => void
+  examen: Examen;
+  onUpdate?: () => void;
 }
 
 export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
-  const router = useRouter()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleStartExam = () => {
-    onOpen()
-  }
+    onOpen();
+  };
 
   const confirmStartExam = () => {
-    onClose()
-    router.push(`/etudiant/examens/${examen.id}`)
-  }
+    onClose();
+    router.push(`/etudiant/examens/${examen.id}`);
+  };
 
   const handleViewDetails = () => {
-    router.push(`/etudiant/examens/${examen.id}`)
-  }
+    router.push(`/etudiant/examens/${examen.id}`);
+  };
 
   const handleContinueExam = () => {
-    router.push(`/etudiant/examens/${examen.id}/start`)
-  }
+    router.push(`/etudiant/examens/${examen.id}/start`);
+  };
 
   const handleViewResult = () => {
-    router.push(`/etudiant/examens/${examen.id}/resultat`)
-  }
+    router.push(`/etudiant/examens/${examen.id}/resultat`);
+  };
 
   const getStatusBadge = () => {
     switch (examen.statut) {
-      case 'disponible':
+      case "disponible":
         return (
-          <Chip size="sm" variant="flat" className="bg-theme-primary/10 text-theme-primary border-theme-primary/20">
+          <Chip
+            className="bg-theme-primary/10 text-theme-primary border-theme-primary/20"
+            size="sm"
+            variant="flat"
+          >
             Disponible
           </Chip>
-        )
-      case 'en_cours':
+        );
+      case "en_cours":
         return (
-          <Chip size="sm" color="warning" variant="flat">
+          <Chip color="warning" size="sm" variant="flat">
             En cours
           </Chip>
-        )
-      case 'termine':
+        );
+      case "termine":
         return (
-          <Chip size="sm" color="success" variant="flat">
+          <Chip color="success" size="sm" variant="flat">
             Terminé
           </Chip>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return 'Non spécifié'
+    if (!dateString) return "Non spécifié";
     try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return 'Date invalide'
-      return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+      const date = new Date(dateString);
+
+      if (isNaN(date.getTime())) return "Date invalide";
+
+      return date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } catch (error) {
-      return 'Date invalide'
+      return "Date invalide";
     }
-  }
+  };
 
   return (
     <Card className="border-none shadow-md hover:shadow-lg transition-shadow">
@@ -115,7 +136,10 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
           <div className="flex items-center text-default-500">
             <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
             <span>
-              {examen.nombre_questions || 0} question{(examen.nombre_questions || 0) > 1 ? 's' : ''} ({examen.total_points || 0} point{(examen.total_points || 0) > 1 ? 's' : ''})
+              {examen.nombre_questions || 0} question
+              {(examen.nombre_questions || 0) > 1 ? "s" : ""} (
+              {examen.total_points || 0} point
+              {(examen.total_points || 0) > 1 ? "s" : ""})
             </span>
           </div>
         </div>
@@ -125,13 +149,13 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
             <AlertCircle className="h-4 w-4 text-warning" />
             <span className="text-sm text-warning-700">
               {examen.tentatives_restantes > 0
-                ? `${examen.tentatives_restantes} tentative${examen.tentatives_restantes > 1 ? 's' : ''} restante${examen.tentatives_restantes > 1 ? 's' : ''}`
-                : 'Aucune tentative restante'}
+                ? `${examen.tentatives_restantes} tentative${examen.tentatives_restantes > 1 ? "s" : ""} restante${examen.tentatives_restantes > 1 ? "s" : ""}`
+                : "Aucune tentative restante"}
             </span>
           </div>
         )}
 
-        {examen.statut === 'en_cours' && examen.progression !== undefined && (
+        {examen.statut === "en_cours" && examen.progression !== undefined && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs text-default-500">
               <span>Progression</span>
@@ -148,36 +172,36 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
       </CardBody>
 
       <CardFooter className="pt-0">
-        {examen.statut === 'disponible' && (
+        {examen.statut === "disponible" && (
           <Button
             className="w-full bg-theme-primary text-white hover:bg-theme-primary/90"
-            onPress={handleStartExam}
             isDisabled={
               examen.tentatives_restantes !== undefined &&
               examen.tentatives_restantes === 0
             }
             startContent={<Play className="h-4 w-4" />}
+            onPress={handleStartExam}
           >
             Commencer l'examen
           </Button>
         )}
-        {examen.statut === 'en_cours' && (
+        {examen.statut === "en_cours" && (
           <Button
             className="w-full"
             color="warning"
-            onPress={handleContinueExam}
             startContent={<Play className="h-4 w-4" />}
+            onPress={handleContinueExam}
           >
             Reprendre l'examen
           </Button>
         )}
-        {examen.statut === 'termine' && (
+        {examen.statut === "termine" && (
           <Button
             className="w-full"
             color="default"
+            startContent={<Eye className="h-4 w-4" />}
             variant="flat"
             onPress={handleViewResult}
-            startContent={<Eye className="h-4 w-4" />}
           >
             Voir le résultat
           </Button>
@@ -185,7 +209,7 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
       </CardFooter>
 
       {/* Modal de confirmation */}
-      <Modal isOpen={isOpen} onClose={onClose} size="md">
+      <Modal isOpen={isOpen} size="md" onClose={onClose}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -204,9 +228,16 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
                         <p className="font-semibold">Important :</p>
                         <ul className="list-disc list-inside space-y-1">
                           <li>Le chronomètre démarrera immédiatement</li>
-                          <li>Vous ne pourrez pas quitter la page pendant l'examen</li>
-                          <li>L'examen durera {examen.duree_minutes || 0} minutes</li>
-                          <li>Vous avez {examen.nombre_questions || 0} questions à répondre</li>
+                          <li>
+                            Vous ne pourrez pas quitter la page pendant l'examen
+                          </li>
+                          <li>
+                            L'examen durera {examen.duree_minutes || 0} minutes
+                          </li>
+                          <li>
+                            Vous avez {examen.nombre_questions || 0} questions à
+                            répondre
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -219,8 +250,8 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
                 </Button>
                 <Button
                   className="bg-theme-primary text-white hover:bg-theme-primary/90"
-                  onPress={confirmStartExam}
                   startContent={<Play className="h-4 w-4" />}
+                  onPress={confirmStartExam}
                 >
                   Commencer l'examen
                 </Button>
@@ -230,5 +261,5 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
         </ModalContent>
       </Modal>
     </Card>
-  )
+  );
 }

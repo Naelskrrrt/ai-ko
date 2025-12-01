@@ -1,9 +1,9 @@
 "use client";
 
+import { redirect } from "next/navigation";
+
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useAuth } from "@/core/providers/AuthProvider";
-import { redirect } from "next/navigation";
-import { useEffect } from "react";
 
 /**
  * Layout Admin - Version ULTRA SAFE
@@ -22,7 +22,7 @@ export default function AdminLayoutSafe({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
           <p className="text-default-500">Vérification des permissions...</p>
         </div>
       </div>
@@ -31,13 +31,17 @@ export default function AdminLayoutSafe({
 
   // Si pas d'utilisateur, rediriger vers login
   if (!user) {
+    // eslint-disable-next-line no-console
     console.log("[AdminLayout] Pas d'utilisateur, redirection vers /login");
     redirect("/login");
   }
 
   // Si utilisateur connecté mais pas admin, rediriger vers home
   if (!hasRole("admin")) {
-    console.log("[AdminLayout] Utilisateur n'est pas admin, redirection vers /");
+    // eslint-disable-next-line no-console
+    console.log(
+      "[AdminLayout] Utilisateur n'est pas admin, redirection vers /",
+    );
     redirect("/");
   }
 

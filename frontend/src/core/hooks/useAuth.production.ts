@@ -191,6 +191,7 @@ export function useAuthProduction(): UseAuthReturn {
 
       // Vérifier si le token est expiré
       if (isTokenExpired(token)) {
+        // eslint-disable-next-line no-console
         console.log("Token expired, attempting refresh...");
         const refreshed = await refreshSession();
 
@@ -208,6 +209,7 @@ export function useAuthProduction(): UseAuthReturn {
       setIsAuthenticated(true);
       setUser(storedUser);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Session check error:", error);
       setIsAuthenticated(false);
       setUser(null);
@@ -239,6 +241,7 @@ export function useAuthProduction(): UseAuthReturn {
     const refreshTime = Math.max(0, timeToExpiry - 120000);
 
     const refreshTimer = setTimeout(() => {
+      // eslint-disable-next-line no-console
       console.log("Auto-refreshing token...");
       refreshSession();
     }, refreshTime);
@@ -269,7 +272,7 @@ export function useAuthProduction(): UseAuthReturn {
         setUser(response.user);
 
         // Redirection selon le rôle
-        if (response.user.role === 'admin') {
+        if (response.user.role === "admin") {
           router.push("/admin");
         } else {
           // Pour l'instant, seuls les admins ont accès
@@ -282,6 +285,7 @@ export function useAuthProduction(): UseAuthReturn {
           err instanceof Error ? err.message : "Erreur de connexion";
 
         setError(errorMessage);
+        // eslint-disable-next-line no-console
         console.error("Login error:", err);
 
         return false;
@@ -357,6 +361,7 @@ export function useAuthProduction(): UseAuthReturn {
       // Redirection
       router.push("/login");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Logout error:", err);
       // Même en cas d'erreur, on nettoie localement
       clearTokens();
@@ -389,6 +394,7 @@ export function useAuthProduction(): UseAuthReturn {
 
       return true;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Token refresh failed:", error);
 
       return false;

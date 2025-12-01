@@ -1,25 +1,26 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { use } from 'react'
-import { ArrowLeft, FileText } from 'lucide-react'
-import { Button } from '@heroui/button'
-import { useRouter, useParams } from 'next/navigation'
-import { QCMResultatView } from '@/features/etudiant/components/qcms/QCMResultatView'
+import * as React from "react";
+import { use } from "react";
+import { ArrowLeft, FileText } from "lucide-react";
+import { Button } from "@heroui/button";
+import { useRouter, useParams } from "next/navigation";
+
+import { QCMResultatView } from "@/features/etudiant/components/qcms/QCMResultatView";
 
 interface QCMResultatPageProps {
   params: Promise<{
-    id: string
-  }>
+    id: string;
+  }>;
 }
 
 export default function QCMResultatPage({ params }: QCMResultatPageProps) {
-  const { id } = use(params)
-  const router = useRouter()
-  const urlParams = useParams()
+  const { id } = use(params);
+  const router = useRouter();
+  const urlParams = useParams();
   // Le resultat_id est dans l'URL, mais on peut aussi le passer en query param
   // Pour l'instant, on utilise l'ID de l'URL comme resultat_id
-  const resultatId = id
+  const resultatId = id;
 
   return (
     <div className="space-y-6">
@@ -37,9 +38,9 @@ export default function QCMResultatPage({ params }: QCMResultatPageProps) {
           </div>
         </div>
         <Button
-          variant="flat"
           startContent={<ArrowLeft className="h-4 w-4" />}
-          onPress={() => router.push('/etudiant/qcms')}
+          variant="flat"
+          onPress={() => router.push("/etudiant/qcms")}
         >
           Retour aux QCMs
         </Button>
@@ -48,6 +49,5 @@ export default function QCMResultatPage({ params }: QCMResultatPageProps) {
       {/* Résultat */}
       <QCMResultatView resultatId={resultatId} />
     </div>
-  )
+  );
 }
-

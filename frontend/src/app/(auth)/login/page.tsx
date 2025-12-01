@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,18 +9,21 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Link } from "@heroui/link";
+import { Eye, EyeOff } from "lucide-react";
+
 import { useAuth } from "@/core/providers/AuthProvider";
 import { Logo } from "@/components/icons";
-import { Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
-  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  password: z
+    .string()
+    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, user, loading } = useAuth();
@@ -36,6 +39,7 @@ export default function LoginPage() {
     // Si l'utilisateur est connecté, rediriger
     if (user) {
       let defaultRedirect = "/";
+
       if (user.role === "admin") {
         defaultRedirect = "/admin";
       } else if (user.role === "etudiant") {
@@ -44,7 +48,9 @@ export default function LoginPage() {
         defaultRedirect = "/enseignant";
       }
       const redirectUrl = searchParams.get("redirect") || defaultRedirect;
+
       router.replace(redirectUrl);
+
       return;
     }
 
@@ -82,31 +88,37 @@ export default function LoginPage() {
 
     try {
       await login(data.email, data.password);
-      
+
       // Attendre un court instant pour que l'AuthProvider récupère l'utilisateur
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       // Rediriger selon le rôle (on va chercher l'utilisateur via l'API)
-      const apiUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
-      const response = await fetch(
-        `${apiUrl}/api/auth/me`,
-        {
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]}`,
-          },
-        }
-      );
-      
+      const apiUrl =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${apiUrl}/api/auth/me`, {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${
+            document.cookie
+              .split("; ")
+              .find((row) => row.startsWith("auth_token="))
+              ?.split("=")[1]
+          }`,
+        },
+      });
+
       if (response.ok) {
         const userData = await response.json();
         let redirectPath = "/";
-        if (userData.role === 'admin') {
+
+        if (userData.role === "admin") {
           redirectPath = "/admin";
-        } else if (userData.role === 'etudiant') {
+        } else if (userData.role === "etudiant") {
           redirectPath = "/etudiant";
-        } else if (userData.role === 'enseignant') {
+        } else if (userData.role === "enseignant") {
           redirectPath = "/enseignant";
         }
         router.push(redirectPath);
@@ -123,18 +135,19 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const apiUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
-      const response = await fetch(
-        `${apiUrl}/api/auth/oauth/google`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const apiUrl =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await fetch(`${apiUrl}/api/auth/oauth/google`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
+
       if (data.auth_url) {
         window.location.href = data.auth_url;
       }
@@ -148,7 +161,7 @@ export default function LoginPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-default-50 to-default-100 dark:from-default-950 dark:to-default-900">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
           <p className="text-default-500">Vérification de la session...</p>
         </div>
       </div>
@@ -160,7 +173,7 @@ export default function LoginPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-default-50 to-default-100 dark:from-default-950 dark:to-default-900">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
           <p className="text-default-500">Redirection...</p>
         </div>
       </div>
@@ -191,31 +204,29 @@ export default function LoginPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <Input
                 {...register("email")}
-                type="email"
+                errorMessage={errors.email?.message}
+                isInvalid={!!errors.email}
                 label="Email"
                 placeholder="votre@email.com"
+                type="email"
                 variant="bordered"
-                isInvalid={!!errors.email}
-                errorMessage={errors.email?.message}
               />
 
               <Input
                 {...register("password")}
-                type={isPasswordVisible ? "text" : "password"}
-                label="Mot de passe"
-                placeholder="••••••••"
-                variant="bordered"
-                isInvalid={!!errors.password}
-                errorMessage={errors.password?.message}
                 endContent={
                   <button
+                    aria-label={
+                      isPasswordVisible
+                        ? "Masquer le mot de passe"
+                        : "Afficher le mot de passe"
+                    }
                     className="focus:outline-none"
                     type="button"
                     onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                    aria-label={isPasswordVisible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                   >
                     {isPasswordVisible ? (
                       <EyeOff className="w-4 h-4 text-default-400" />
@@ -224,13 +235,19 @@ export default function LoginPage() {
                     )}
                   </button>
                 }
+                errorMessage={errors.password?.message}
+                isInvalid={!!errors.password}
+                label="Mot de passe"
+                placeholder="••••••••"
+                type={isPasswordVisible ? "text" : "password"}
+                variant="bordered"
               />
 
               <Button
-                type="submit"
                 className="w-full bg-theme-primary text-white hover:bg-theme-primary/90"
                 isLoading={isLoading}
                 size="lg"
+                type="submit"
               >
                 {isLoading ? "Connexion..." : "Se connecter"}
               </Button>
@@ -248,10 +265,7 @@ export default function LoginPage() {
             </div>
 
             <Button
-              type="button"
-              variant="bordered"
               className="w-full"
-              onClick={handleGoogleLogin}
               disabled={isLoading}
               startContent={
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -273,6 +287,9 @@ export default function LoginPage() {
                   />
                 </svg>
               }
+              type="button"
+              variant="bordered"
+              onClick={handleGoogleLogin}
             >
               Continuer avec Google
             </Button>
@@ -281,7 +298,10 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-default-500">
           Pas encore de compte ?{" "}
-          <Link href="/register" className="text-theme-primary hover:text-theme-primary/80">
+          <Link
+            className="text-theme-primary hover:text-theme-primary/80"
+            href="/register"
+          >
             S&apos;inscrire
           </Link>
         </p>
@@ -290,3 +310,19 @@ export default function LoginPage() {
   );
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-default-50 to-default-100 dark:from-default-950 dark:to-default-900">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
+            <p className="text-default-500">Chargement...</p>
+          </div>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  );
+}
