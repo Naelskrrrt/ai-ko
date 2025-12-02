@@ -34,7 +34,10 @@ class SocketService {
     this.isConnecting = true;
 
     try {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:5000";
+      // Utiliser NEXT_PUBLIC_API_URL pour le WebSocket (même serveur que l'API)
+      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 
+                    process.env.NEXT_PUBLIC_API_URL || 
+                    "http://localhost:5000";
 
       this.socket = io(wsUrl, {
         transports: ["websocket", "polling"],
