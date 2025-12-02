@@ -1,17 +1,19 @@
 # Configuration Nixpacks pour Railway
 # Ce fichier indique à Railway comment construire et démarrer l'application
 
+# Utiliser le provider Python natif de Nixpacks
+providers = ["python"]
+
 [phases.setup]
-nixPkgs = ["python312", "gcc", "postgresql"]
+nixPkgs = ["gcc", "postgresql"]
 
 [phases.install]
-# Utiliser requirements-railway.txt optimisé (sans torch/transformers)
-# pour économiser la RAM sur le plan Hobby
-cmds = ["python3 -m pip install -r requirements-railway.txt"]
+# Nixpacks gère automatiquement pip pour Python
+cmds = ["pip install -r requirements-railway.txt"]
 
 [start]
 # 1 worker pour économiser la RAM sur le plan Hobby
-cmd = "python3 -m gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 180 run:app"
+cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 180 run:app"
 
 [variables]
 PYTHONUNBUFFERED = "1"
