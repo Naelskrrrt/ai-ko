@@ -123,17 +123,18 @@ export const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
                   const IconComponent = item.icon
                     ? iconMap[item.icon as keyof typeof iconMap]
                     : null;
-                  
+
                   // Pour les routes de base (dashboard), utiliser une égalité exacte
                   // Pour les autres routes, vérifier si le pathname commence par le href
-                  const isBaseDashboard = 
-                    item.href === "/admin" || 
-                    item.href === "/enseignant" || 
+                  const isBaseDashboard =
+                    item.href === "/admin" ||
+                    item.href === "/enseignant" ||
                     item.href === "/etudiant";
-                  
+
                   const isActive = isBaseDashboard
                     ? pathname === item.href
-                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                    : pathname === item.href ||
+                      pathname.startsWith(`${item.href}/`);
 
                   return (
                     <Button

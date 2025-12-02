@@ -288,7 +288,13 @@ function CalendarPageContent() {
 
 export default function CalendarPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center h-full">Chargement...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-full">
+          Chargement...
+        </div>
+      }
+    >
       <CalendarPageContent />
     </Suspense>
   );

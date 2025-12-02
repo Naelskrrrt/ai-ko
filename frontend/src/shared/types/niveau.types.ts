@@ -70,4 +70,3 @@ export const NIVEAUX_STATIQUES: Niveau[] = [
     actif: true,
   },
 ];
-

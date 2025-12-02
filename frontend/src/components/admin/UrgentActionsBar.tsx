@@ -1,12 +1,12 @@
 "use client";
 
+import type { UrgentAction } from "@/shared/types/admin.types";
+
 import * as React from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { AlertCircle, Clock, TrendingDown, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-import type { UrgentAction } from "@/shared/types/admin.types";
 
 interface UrgentActionsBarProps {
   actions: UrgentAction[];
@@ -92,11 +92,11 @@ export function UrgentActionsBar({ actions, role }: UrgentActionsBarProps) {
           return (
             <Card
               key={action.id}
+              isPressable
               className={`
                 ${colors.border} ${colors.bg}
                 border-l-4 shadow-sm hover:shadow-md transition-all cursor-pointer
               `}
-              isPressable
               onPress={() => handleActionClick(action)}
             >
               <CardBody className="flex flex-row items-center gap-3 p-3">
@@ -105,7 +105,9 @@ export function UrgentActionsBar({ actions, role }: UrgentActionsBarProps) {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${colors.text} line-clamp-2`}>
+                  <p
+                    className={`text-sm font-medium ${colors.text} line-clamp-2`}
+                  >
                     {action.message}
                   </p>
                   <p className="text-xs text-default-500 mt-0.5">
@@ -117,9 +119,9 @@ export function UrgentActionsBar({ actions, role }: UrgentActionsBarProps) {
                   <div className="flex-shrink-0">
                     <Button
                       isIconOnly
+                      color={action.type === "critical" ? "danger" : "primary"}
                       size="sm"
                       variant="light"
-                      color={action.type === "critical" ? "danger" : "primary"}
                     >
                       <ChevronRight className="w-4 h-4" />
                     </Button>
@@ -133,5 +135,3 @@ export function UrgentActionsBar({ actions, role }: UrgentActionsBarProps) {
     </div>
   );
 }
-
-

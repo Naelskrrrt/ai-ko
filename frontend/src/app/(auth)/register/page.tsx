@@ -58,11 +58,33 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      await registerUser(data.name, data.email, data.password);
-      // Après inscription, rediriger vers la page de connexion
-      router.push("/login");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Erreur lors de l'inscription");
+      const response = await registerUser(data.name, data.email, data.password);
+
+      // Stocker l'ID utilisateur temporairement pour le parcours d'onboarding
+      if (response?.user?.id) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("onboarding_userId", response.user.id);
+
+          // Vérifier si on a un token dans la réponse
+          if (response?.token) {
+            localStorage.setItem("onboarding_token", response.token);
+          }
+
+          // Le token devrait aussi être dans auth_token (stocké par AuthProvider)
+          const authToken = localStorage.getItem("auth_token");
+
+          if (authToken && !response?.token) {
+            localStorage.setItem("onboarding_token", authToken);
+          }
+        }
+
+        // Rediriger vers le parcours d'onboarding au lieu de /login
+        router.push("/onboarding/role-selection");
+      }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+
+      setError(error.response?.data?.message || "Erreur lors de l'inscription");
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +108,7 @@ export default function RegisterPage() {
       if (data.auth_url) {
         window.location.href = data.auth_url;
       }
-    } catch (err) {
+    } catch {
       setError("Erreur lors de l'inscription avec Google");
     }
   };

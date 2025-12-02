@@ -8,7 +8,7 @@ export interface Etablissement {
   nom: string;
   nomCourt?: string;
   description?: string;
-  typeEtablissement: 'université' | 'école' | 'institut';
+  typeEtablissement: "université" | "école" | "institut";
   adresse?: string;
   ville?: string;
   pays: string;
@@ -28,7 +28,7 @@ export interface EtablissementCreate {
   nom: string;
   nomCourt?: string;
   description?: string;
-  typeEtablissement: 'université' | 'école' | 'institut';
+  typeEtablissement: "université" | "école" | "institut";
   adresse?: string;
   ville?: string;
   pays?: string;
@@ -42,4 +42,3 @@ export interface EtablissementCreate {
 }
 
 export interface EtablissementUpdate extends Partial<EtablissementCreate> {}
-

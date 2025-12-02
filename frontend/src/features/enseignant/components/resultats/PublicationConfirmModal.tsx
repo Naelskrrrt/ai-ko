@@ -73,11 +73,7 @@ export function PublicationConfirmModal({
           <Button color="default" variant="flat" onPress={onClose}>
             Annuler
           </Button>
-          <Button
-            color="primary"
-            isLoading={isLoading}
-            onPress={onConfirm}
-          >
+          <Button color="primary" isLoading={isLoading} onPress={onConfirm}>
             Confirmer la publication
           </Button>
         </ModalFooter>
@@ -85,4 +81,3 @@ export function PublicationConfirmModal({
     </Modal>
   );
 }
-

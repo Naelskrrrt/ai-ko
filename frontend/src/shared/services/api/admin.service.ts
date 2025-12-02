@@ -44,58 +44,18 @@ adminApi.interceptors.request.use((config) => {
       token = localStorage.getItem("auth_token") || undefined;
     }
 
-    // eslint-disable-next-line no-console
-    console.log("🔑 Request interceptor:", {
-      url: config.url,
-      method: config.method,
-      hasToken: !!token,
-      tokenSource: token
-        ? document.cookie.includes("auth_token=")
-          ? "cookie"
-          : "localStorage"
-        : "none",
-      token: token ? `${token.substring(0, 20)}...` : "none",
-      allCookies: document.cookie,
-    });
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      // eslint-disable-next-line no-console
-      console.warn("⚠️ No auth token found in cookies OR localStorage");
-      // eslint-disable-next-line no-console
-      console.warn("Available cookies:", document.cookie);
-      // eslint-disable-next-line no-console
-      console.warn("LocalStorage keys:", Object.keys(localStorage));
     }
   }
 
   return config;
 });
 
-// Intercepteur pour logger les erreurs
+// Intercepteur pour gérer les erreurs
 adminApi.interceptors.response.use(
-  (response) => {
-    // eslint-disable-next-line no-console
-    console.log("✅ API Response:", {
-      url: response.config.url,
-      status: response.status,
-      data: response.data,
-    });
-
-    return response;
-  },
-  (error) => {
-    // eslint-disable-next-line no-console
-    console.error("❌ API Error:", {
-      url: error.config?.url,
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    });
-
-    return Promise.reject(error);
-  },
+  (response) => response,
+  (error) => Promise.reject(error),
 );
 
 export const adminService = {
@@ -153,9 +113,13 @@ export const adminService = {
   },
 
   async toggleUserStatus(id: string): Promise<User> {
-    const response = await adminApi.patch<User>(`/users/${id}/status`);
+    try {
+      const response = await adminApi.patch<User>(`/users/${id}/status`);
 
-    return response.data;
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
   },
 
   // Statistiques
@@ -168,11 +132,13 @@ export const adminService = {
   },
 
   // Étudiants
-  async getEtudiants(params: UsersFilters = {}): Promise<PaginatedResponse<Etudiant>> {
-    const response = await adminApi.get<{ etudiants: Etudiant[]; pagination: any }>(
-      "/etudiants",
-      { params },
-    );
+  async getEtudiants(
+    params: UsersFilters = {},
+  ): Promise<PaginatedResponse<Etudiant>> {
+    const response = await adminApi.get<{
+      etudiants: Etudiant[];
+      pagination: any;
+    }>("/etudiants", { params });
 
     return {
       data: response.data.etudiants,
@@ -202,23 +168,31 @@ export const adminService = {
     await adminApi.delete(`/etudiants/${id}`);
   },
 
-  async assignEtudiant(id: string, data: {
-    niveauIds?: string[];
-    classeIds?: string[];
-    matiereIds?: string[];
-    anneeScolaire: string;
-  }): Promise<Etudiant> {
-    const response = await adminApi.post<Etudiant>(`/etudiants/${id}/assign`, data);
+  async assignEtudiant(
+    id: string,
+    data: {
+      niveauIds?: string[];
+      classeIds?: string[];
+      matiereIds?: string[];
+      anneeScolaire: string;
+    },
+  ): Promise<Etudiant> {
+    const response = await adminApi.post<Etudiant>(
+      `/etudiants/${id}/assign`,
+      data,
+    );
 
     return response.data;
   },
 
   // Professeurs
-  async getProfesseurs(params: UsersFilters = {}): Promise<PaginatedResponse<Professeur>> {
-    const response = await adminApi.get<{ professeurs: Professeur[]; pagination: any }>(
-      "/professeurs",
-      { params },
-    );
+  async getProfesseurs(
+    params: UsersFilters = {},
+  ): Promise<PaginatedResponse<Professeur>> {
+    const response = await adminApi.get<{
+      professeurs: Professeur[];
+      pagination: any;
+    }>("/professeurs", { params });
 
     return {
       data: response.data.professeurs,
@@ -238,7 +212,10 @@ export const adminService = {
     return response.data;
   },
 
-  async updateProfesseur(id: string, data: ProfesseurUpdate): Promise<Professeur> {
+  async updateProfesseur(
+    id: string,
+    data: ProfesseurUpdate,
+  ): Promise<Professeur> {
     const response = await adminApi.put<Professeur>(`/professeurs/${id}`, data);
 
     return response.data;
@@ -248,20 +225,28 @@ export const adminService = {
     await adminApi.delete(`/professeurs/${id}`);
   },
 
-  async assignProfesseur(id: string, data: {
-    matiereIds?: string[];
-    niveauIds?: string[];
-    classeIds?: string[];
-    anneeScolaire: string;
-  }): Promise<Professeur> {
-    const response = await adminApi.post<Professeur>(`/professeurs/${id}/assign`, data);
+  async assignProfesseur(
+    id: string,
+    data: {
+      matiereIds?: string[];
+      niveauIds?: string[];
+      classeIds?: string[];
+      anneeScolaire: string;
+    },
+  ): Promise<Professeur> {
+    const response = await adminApi.post<Professeur>(
+      `/professeurs/${id}/assign`,
+      data,
+    );
 
     return response.data;
   },
 
   // Configurations IA
   async getAIConfigs(): Promise<AIModelConfig[]> {
-    const response = await adminApi.get<{ configs: AIModelConfig[] }>("/ai-configs");
+    const response = await adminApi.get<{ configs: AIModelConfig[] }>(
+      "/ai-configs",
+    );
 
     return response.data.configs;
   },
@@ -284,8 +269,14 @@ export const adminService = {
     return response.data;
   },
 
-  async updateAIConfig(id: string, data: AIModelConfigUpdate): Promise<AIModelConfig> {
-    const response = await adminApi.put<AIModelConfig>(`/ai-configs/${id}`, data);
+  async updateAIConfig(
+    id: string,
+    data: AIModelConfigUpdate,
+  ): Promise<AIModelConfig> {
+    const response = await adminApi.put<AIModelConfig>(
+      `/ai-configs/${id}`,
+      data,
+    );
 
     return response.data;
   },
@@ -295,19 +286,25 @@ export const adminService = {
   },
 
   async setDefaultAIConfig(id: string): Promise<AIModelConfig> {
-    const response = await adminApi.post<AIModelConfig>(`/ai-configs/${id}/set-default`);
+    const response = await adminApi.post<AIModelConfig>(
+      `/ai-configs/${id}/set-default`,
+    );
 
     return response.data;
   },
 
   async applyAIConfig(id: string): Promise<{ message: string }> {
-    const response = await adminApi.post<{ message: string }>(`/ai-configs/${id}/apply`);
+    const response = await adminApi.post<{ message: string }>(
+      `/ai-configs/${id}/apply`,
+    );
 
     return response.data;
   },
 
   async initDefaultAIConfigs(): Promise<{ configs: AIModelConfig[] }> {
-    const response = await adminApi.post<{ configs: AIModelConfig[] }>("/ai-configs/init-defaults");
+    const response = await adminApi.post<{ configs: AIModelConfig[] }>(
+      "/ai-configs/init-defaults",
+    );
 
     return response.data;
   },
@@ -332,10 +329,32 @@ export const adminService = {
       // Pour l'instant on retourne un tableau vide
 
       return actions;
-    } catch (error) {
-      console.error("Erreur lors de la récupération des actions urgentes:", error);
-
+    } catch {
       return [];
     }
+  },
+
+  // Gestion des utilisateurs en attente de validation
+  async getPendingUsers(
+    role?: string,
+  ): Promise<{ users: any[]; total: number }> {
+    const params = role && role !== "all" ? { role } : {};
+    const response = await adminApi.get("/pending-users", { params });
+
+    return response.data;
+  },
+
+  async activateUser(userId: string, reason?: string): Promise<any> {
+    const response = await adminApi.post(`/users/${userId}/activate`, {
+      reason,
+    });
+
+    return response.data;
+  },
+
+  async rejectUser(userId: string, reason: string): Promise<any> {
+    const response = await adminApi.post(`/users/${userId}/reject`, { reason });
+
+    return response.data;
   },
 };

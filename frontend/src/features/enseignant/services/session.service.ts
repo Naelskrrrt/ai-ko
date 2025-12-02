@@ -226,7 +226,13 @@ export const sessionService = {
     const resultatsTransformes = resultats.map((r: any) => {
       // Calculer le pourcentage si non fourni mais que note et scoreMax sont disponibles
       let pourcentage = r.pourcentage;
-      if (!pourcentage && r.noteSur20 != null && r.scoreMaximum != null && r.scoreMaximum > 0) {
+
+      if (
+        !pourcentage &&
+        r.noteSur20 != null &&
+        r.scoreMaximum != null &&
+        r.scoreMaximum > 0
+      ) {
         pourcentage = (r.noteSur20 / 20) * 100;
       }
 
@@ -260,19 +266,21 @@ export const sessionService = {
 
     // Trier par note décroissante (du plus haut au plus bas)
     // Les résultats avec note === null sont placés à la fin
-    return resultatsTransformes.sort((a: ResultatEtudiant, b: ResultatEtudiant) => {
-      const noteA = a.note ?? 0;
-      const noteB = b.note ?? 0;
-      const hasNoteA = a.note !== null;
-      const hasNoteB = b.note !== null;
+    return resultatsTransformes.sort(
+      (a: ResultatEtudiant, b: ResultatEtudiant) => {
+        const noteA = a.note ?? 0;
+        const noteB = b.note ?? 0;
+        const hasNoteA = a.note !== null;
+        const hasNoteB = b.note !== null;
 
-      // Si l'un a une note et l'autre non, celui avec note vient en premier
-      if (hasNoteA && !hasNoteB) return -1;
-      if (!hasNoteA && hasNoteB) return 1;
+        // Si l'un a une note et l'autre non, celui avec note vient en premier
+        if (hasNoteA && !hasNoteB) return -1;
+        if (!hasNoteA && hasNoteB) return 1;
 
-      // Sinon, trier par note décroissante
-      return noteB - noteA;
-    });
+        // Sinon, trier par note décroissante
+        return noteB - noteA;
+      },
+    );
   },
 
   /**
@@ -296,9 +304,7 @@ export const sessionService = {
    * Publie un résultat individuel
    */
   async publierResultat(resultatId: string): Promise<ResultatEtudiant> {
-    const response = await sessionApi.post(
-      `/resultats/${resultatId}/publier`,
-    );
+    const response = await sessionApi.post(`/resultats/${resultatId}/publier`);
 
     return response.data;
   },
@@ -399,6 +405,7 @@ export const sessionService = {
     const response = await sessionApi.post(
       `/resultats/${resultatId}/regenerer-commentaire`,
     );
+
     return response.data;
   },
 };

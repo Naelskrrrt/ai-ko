@@ -1,5 +1,7 @@
 "use client";
 
+import type { ResultatEtudiant } from "../../types/enseignant.types";
+
 import * as React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -9,7 +11,6 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 
 import { sessionService } from "../../services/session.service";
-import type { ResultatEtudiant } from "../../types/enseignant.types";
 
 interface SessionResultatsResumeProps {
   sessionId: string;
@@ -36,6 +37,7 @@ export function SessionResultatsResume({
   // Limiter aux 5 premiers résultats (déjà triés par le backend)
   const resultatsAffiches = React.useMemo(() => {
     if (!resultats) return [];
+
     return resultats.slice(0, 5);
   }, [resultats]);
 
@@ -43,9 +45,11 @@ export function SessionResultatsResume({
   const getInitiales = (name: string) => {
     if (!name) return "??";
     const parts = name.trim().split(" ");
+
     if (parts.length >= 2) {
       return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
     }
+
     return name.substring(0, 2).toUpperCase();
   };
 
@@ -115,9 +119,9 @@ export function SessionResultatsResume({
           <h3 className="text-lg font-semibold">Résultats de la session</h3>
           <Button
             color="primary"
+            endContent={<ChevronRight className="h-4 w-4" />}
             size="sm"
             variant="flat"
-            endContent={<ChevronRight className="h-4 w-4" />}
             onPress={() =>
               router.push(`/enseignant/sessions/${sessionId}/resultats`)
             }
@@ -157,7 +161,6 @@ export function SessionResultatsResume({
                       <Chip
                         color={estReussi ? "success" : "danger"}
                         size="sm"
-                        variant="flat"
                         startContent={
                           estReussi ? (
                             <CheckCircle className="h-3 w-3" />
@@ -165,6 +168,7 @@ export function SessionResultatsResume({
                             <XCircle className="h-3 w-3" />
                           )
                         }
+                        variant="flat"
                       >
                         {estReussi ? "Réussi" : "Échoué"}
                       </Chip>
@@ -204,4 +208,3 @@ export function SessionResultatsResume({
     </Card>
   );
 }
-

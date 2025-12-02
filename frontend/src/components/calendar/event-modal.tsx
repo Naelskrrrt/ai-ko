@@ -13,6 +13,8 @@ import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 import { Textarea } from "@heroui/input";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate } from "@internationalized/date";
 import { Calendar, Clock, MapPin, Tag, Palette } from "lucide-react";
 
 import { CalendarEvent } from "@/core/types/calendar";
@@ -178,14 +180,18 @@ export function EventModal({
             {/* Dates et heures */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Date de début */}
-              <Input
+              <DatePicker
+                showMonthAndYearPickers
                 errorMessage={errors.startDate}
                 isInvalid={!!errors.startDate}
                 label="Date de début"
-                type="date"
-                value={formData.startDate}
+                value={
+                  formData.startDate ? parseDate(formData.startDate) : null
+                }
                 variant="bordered"
-                onChange={(e) => updateField("startDate", e.target.value)}
+                onChange={(date) =>
+                  updateField("startDate", date ? date.toString() : "")
+                }
               />
 
               {/* Heure de début */}
@@ -203,14 +209,16 @@ export function EventModal({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Date de fin */}
-              <Input
+              <DatePicker
+                showMonthAndYearPickers
                 errorMessage={errors.endDate}
                 isInvalid={!!errors.endDate}
                 label="Date de fin"
-                type="date"
-                value={formData.endDate}
+                value={formData.endDate ? parseDate(formData.endDate) : null}
                 variant="bordered"
-                onChange={(e) => updateField("endDate", e.target.value)}
+                onChange={(date) =>
+                  updateField("endDate", date ? date.toString() : "")
+                }
               />
 
               {/* Heure de fin */}

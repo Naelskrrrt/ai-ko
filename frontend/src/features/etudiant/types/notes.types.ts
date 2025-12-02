@@ -36,7 +36,6 @@ export interface Resultat {
   feedback_general?: string;
   reponses: ReponseDetail[];
   message?: string; // Message si résultat non publié
-  afficherCorrection?: boolean; // Contrôle si la correction peut être affichée
 }
 
 /**

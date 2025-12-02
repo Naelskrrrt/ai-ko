@@ -1,42 +1,44 @@
 /**
  * Service API pour les Étudiants
  */
-import axios from 'axios';
 import type {
   Etudiant,
   EtudiantWithRelations,
   EtudiantCreate,
   EtudiantUpdate,
   EtudiantsListResponse,
-  EtudiantProgression,
-} from '../../types/etudiant.types';
+} from "../../types/etudiant.types";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import axios from "axios";
+
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const etudiantApi = axios.create({
   baseURL: `${API_URL}/api/etudiants`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
 });
 
 // Intercepteur pour ajouter le token JWT
 etudiantApi.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     let token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('auth_token='))
-      ?.split('=')[1];
-    
+      .split("; ")
+      .find((row) => row.startsWith("auth_token="))
+      ?.split("=")[1];
+
     if (!token) {
-      token = localStorage.getItem('auth_token') || undefined;
+      token = localStorage.getItem("auth_token") || undefined;
     }
-    
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
+
   return config;
 });
 
@@ -45,9 +47,10 @@ export const etudiantService = {
    * Récupère tous les étudiants (avec pagination)
    */
   async getEtudiants(page = 1, perPage = 50): Promise<EtudiantsListResponse> {
-    const response = await etudiantApi.get('', {
+    const response = await etudiantApi.get("", {
       params: { page, per_page: perPage },
     });
+
     return response.data;
   },
 
@@ -55,17 +58,22 @@ export const etudiantService = {
    * Récupère le profil de l'étudiant connecté
    */
   async getMe(): Promise<Etudiant> {
-    const response = await etudiantApi.get('/me');
+    const response = await etudiantApi.get("/me");
+
     return response.data;
   },
 
   /**
    * Récupère un étudiant par son ID
    */
-  async getEtudiantById(id: string, includeRelations = false): Promise<Etudiant | EtudiantWithRelations> {
+  async getEtudiantById(
+    id: string,
+    includeRelations = false,
+  ): Promise<Etudiant | EtudiantWithRelations> {
     const response = await etudiantApi.get(`/${id}`, {
       params: { include_relations: includeRelations },
     });
+
     return response.data;
   },
 
@@ -73,7 +81,8 @@ export const etudiantService = {
    * Crée un nouvel étudiant
    */
   async createEtudiant(data: EtudiantCreate): Promise<Etudiant> {
-    const response = await etudiantApi.post('', data);
+    const response = await etudiantApi.post("", data);
+
     return response.data;
   },
 
@@ -82,6 +91,7 @@ export const etudiantService = {
    */
   async updateEtudiant(id: string, data: EtudiantUpdate): Promise<Etudiant> {
     const response = await etudiantApi.put(`/${id}`, data);
+
     return response.data;
   },
 
@@ -97,6 +107,7 @@ export const etudiantService = {
    */
   async getMatieres(etudiantId: string): Promise<any[]> {
     const response = await etudiantApi.get(`/${etudiantId}/matieres`);
+
     return response.data;
   },
 
@@ -119,6 +130,7 @@ export const etudiantService = {
    */
   async getClasses(etudiantId: string): Promise<any[]> {
     const response = await etudiantApi.get(`/${etudiantId}/classes`);
+
     return response.data;
   },
 
@@ -134,6 +146,7 @@ export const etudiantService = {
    */
   async getByMention(mentionId: string): Promise<Etudiant[]> {
     const response = await etudiantApi.get(`/mention/${mentionId}`);
+
     return response.data;
   },
 
@@ -142,6 +155,7 @@ export const etudiantService = {
    */
   async getByParcours(parcoursId: string): Promise<Etudiant[]> {
     const response = await etudiantApi.get(`/parcours/${parcoursId}`);
+
     return response.data;
   },
 
@@ -150,7 +164,7 @@ export const etudiantService = {
    */
   async getByNiveau(niveauId: string): Promise<Etudiant[]> {
     const response = await etudiantApi.get(`/niveau/${niveauId}`);
+
     return response.data;
   },
 };
-

@@ -229,12 +229,7 @@ export default function UsersPage() {
   };
 
   const handleToggleStatus = async (user: User) => {
-    // eslint-disable-next-line no-console
-    console.log("🔄 Toggle status clicked for user:", user.name, user.id);
-
     if (isCurrentUser(user)) {
-      // eslint-disable-next-line no-console
-      console.log("❌ Cannot toggle own status");
       toast({
         title: "Erreur",
         description: "Vous ne pouvez pas modifier votre propre statut",
@@ -244,22 +239,15 @@ export default function UsersPage() {
       return;
     }
 
-    // Sauvegarder l'ancien statut pour le message (non utilisé actuellement)
     const userName = user.name;
 
     setTogglingStatus(user.id);
 
-    // eslint-disable-next-line no-console
-    console.log("⏳ Sending request to toggle status...");
-
     try {
       const result = await adminService.toggleUserStatus(user.id);
 
-      // eslint-disable-next-line no-console
-      console.log("✅ Toggle status response:", result);
-
       // Utiliser le nouveau statut depuis la réponse
-      const newStatus = result.emailVerified;
+      const newStatus = result.isActive;
       const statusText = newStatus ? "activé" : "désactivé";
 
       // Rafraîchir les données
@@ -272,15 +260,6 @@ export default function UsersPage() {
         variant: "success",
       });
     } catch (error: any) {
-      // eslint-disable-next-line no-console
-      console.error("❌ Toggle status error:", error);
-      // eslint-disable-next-line no-console
-      console.error("Error details:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-      });
-
       toast({
         title: "❌ Erreur",
         description:
@@ -552,7 +531,7 @@ export default function UsersPage() {
                                 isCurrentUser(user) ||
                                 togglingStatus === user.id
                               }
-                              isSelected={user.emailVerified}
+                              isSelected={user.isActive}
                               size="sm"
                               onValueChange={() => handleToggleStatus(user)}
                             />

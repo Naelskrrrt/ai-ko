@@ -74,6 +74,7 @@ export const notesService = {
       const response = await notesApi.get<any>(
         `/${examId}?include_details=true`,
       );
+
       return transformResultatToResultat(response.data);
     } catch (error: any) {
       // Si erreur 404, c'est probablement un ID de session, essayer par session
@@ -81,6 +82,7 @@ export const notesService = {
         const response = await notesApi.get<any>(
           `/session/${examId}/etudiant?include_details=true`,
         );
+
         return transformResultatToResultat(response.data);
       }
       throw error;

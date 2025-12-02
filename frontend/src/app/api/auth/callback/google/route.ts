@@ -39,15 +39,25 @@ export async function GET(request: NextRequest) {
 
     const { user, token } = response.data;
 
-    // Déterminer la redirection selon le rôle de l'utilisateur
-    let redirectPath = "/dashboard";
+    // Vérifier si l'utilisateur a un profil complet
+    const hasProfile = user?.etudiantProfil || user?.enseignantProfil;
 
-    if (user?.role === "admin") {
-      redirectPath = "/admin";
-    } else if (user?.role === "etudiant") {
-      redirectPath = "/etudiant";
-    } else if (user?.role === "enseignant") {
-      redirectPath = "/enseignant";
+    let redirectPath;
+
+    if (hasProfile) {
+      // Utilisateur avec profil complet -> redirection normale
+      if (user?.role === "admin") {
+        redirectPath = "/admin";
+      } else if (user?.role === "etudiant") {
+        redirectPath = "/etudiant";
+      } else if (user?.role === "enseignant") {
+        redirectPath = "/enseignant";
+      } else {
+        redirectPath = "/dashboard";
+      }
+    } else {
+      // Nouveau utilisateur OAuth sans profil -> Parcours d'onboarding
+      redirectPath = `/onboarding/role-selection?userId=${user.id}&oauth=true`;
     }
 
     // Stocker le token dans un cookie sécurisé

@@ -32,8 +32,8 @@ export default function AdminProfilePage() {
     <>
       <EditProfileModal
         isOpen={isOpen}
-        onClose={onClose}
         profileData={profileData}
+        onClose={onClose}
       />
 
       <div className="max-w-4xl mx-auto space-y-6">
@@ -103,7 +103,7 @@ export default function AdminProfilePage() {
                       </p>
                       <p className="font-medium">
                         {new Date(user.dateNaissance).toLocaleDateString(
-                          "fr-FR"
+                          "fr-FR",
                         )}
                       </p>
                     </div>

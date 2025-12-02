@@ -1,57 +1,69 @@
-/**
- * Types pour les Étudiants
- */
+import type { Etablissement } from "./etablissement.types";
+import type { Mention } from "./mention.types";
+import type { Parcours } from "./parcours.types";
+import type { Niveau } from "./niveau.types";
+import type { Classe } from "./admin.types";
+import type { Matiere } from "./matiere.types";
 
-import { Matiere } from './matiere.types';
-import { Classe } from './classe.types';
-import { Niveau } from './niveau.types';
-import { Parcours } from './parcours.types';
-import { Mention } from './mention.types';
-import { Etablissement } from './etablissement.types';
+/**
+ * Types pour les �tudiants
+ */
 
 export interface Etudiant {
   id: string;
   userId: string;
-  numeroEtudiant: string;
-  anneeAdmission?: string;
+  numeroEtudiant?: string;
+  telephone?: string;
+  dateNaissance?: string;
+  adresse?: string;
   etablissementId: string;
-  etablissement?: Etablissement;
   mentionId?: string;
-  mention?: Mention;
   parcoursId?: string;
-  parcours?: Parcours;
   niveauId?: string;
-  niveau?: Niveau;
-  actif: boolean;
-  createdAt?: string;
+  anneeAdmission?: string;
+  actif?: boolean;
+  createdAt: string;
   updatedAt?: string;
-  // Infos user
+
+  // Relations depuis User
   email?: string;
   name?: string;
-  avatar?: string;
-  telephone?: string;
-  adresse?: string;
-  dateNaissance?: string;
+  role?: "etudiant";
 }
 
 export interface EtudiantWithRelations extends Etudiant {
-  matieres?: Matiere[];
+  etablissement?: Etablissement;
+  mention?: Mention;
+  parcours?: Parcours;
+  niveau?: Niveau;
+  niveaux?: Niveau[];
   classes?: Classe[];
+  matieres?: Matiere[];
 }
 
 export interface EtudiantCreate {
   userId: string;
-  numeroEtudiant: string;
-  anneeAdmission?: string;
+  numeroEtudiant?: string;
+  telephone?: string;
+  dateNaissance?: string;
+  adresse?: string;
   etablissementId: string;
   mentionId?: string;
   parcoursId?: string;
-  niveauId?: string;
-  actif?: boolean;
+  niveauActuel?: string;
+  anneeScolaire?: string;
 }
 
-export interface EtudiantUpdate extends Partial<EtudiantCreate> {
-  matieres?: string[]; // IDs des matières
+export interface EtudiantUpdate {
+  numeroEtudiant?: string;
+  telephone?: string;
+  dateNaissance?: string;
+  adresse?: string;
+  etablissementId?: string;
+  mentionId?: string;
+  parcoursId?: string;
+  niveauActuel?: string;
+  anneeScolaire?: string;
 }
 
 export interface EtudiantsListResponse {
@@ -61,12 +73,3 @@ export interface EtudiantsListResponse {
   per_page: number;
   total_pages: number;
 }
-
-export interface EtudiantProgression {
-  etudiant: Etudiant;
-  nombre_matieres: number;
-  nombre_classes: number;
-  matieres: Matiere[];
-  classes: Classe[];
-}
-

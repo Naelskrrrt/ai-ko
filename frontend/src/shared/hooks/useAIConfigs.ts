@@ -1,6 +1,7 @@
+import type { AIModelConfig } from "../types/admin.types";
+
 import useSWR from "swr";
 
-import type { AIModelConfig } from "../types/admin.types";
 import { adminService } from "../services/api/admin.service";
 
 export function useAIConfigs() {
@@ -44,5 +45,3 @@ export function useDefaultAIConfig() {
     mutate,
   };
 }
-
-

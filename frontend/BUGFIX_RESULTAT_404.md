@@ -139,3 +139,4 @@ Aucune action requise :
 **Impact** : Critique (bloquait la consultation des résultats)  
 **Status** : ✅ Résolu
 
+

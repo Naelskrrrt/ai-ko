@@ -36,6 +36,26 @@ export function ResultatView({ examId, userId }: ResultatViewProps) {
     },
   );
 
+  // Fonctions utilitaires
+  const formatDuree = (secondes: number): string => {
+    const minutes = Math.floor(secondes / 60);
+    const secs = secondes % 60;
+
+    return `${minutes}min ${secs}s`;
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -69,28 +89,8 @@ export function ResultatView({ examId, userId }: ResultatViewProps) {
     );
   }
 
-  // Fonctions utilitaires
-  const formatDuree = (secondes: number): string => {
-    const minutes = Math.floor(secondes / 60);
-    const secs = secondes % 60;
-
-    return `${minutes}min ${secs}s`;
-  };
-
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-
-    return date.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   // Si le résultat n'est pas publié, afficher infos partielles
-  if (!resultat.estPublie || resultat.statut === "en_attente") {
+  if (!resultat.estPublie && resultat.message) {
     return (
       <Card className="border-warning-500">
         <CardBody className="text-center py-12">
@@ -99,7 +99,7 @@ export function ResultatView({ examId, userId }: ResultatViewProps) {
             Examen terminé avec succès ✓
           </p>
           <p className="text-sm text-default-500 mb-6">
-            Les notes ne sont pas encore disponibles. En attente de publication par l'enseignant.
+            {resultat.message || "En attente de validation par l'enseignant"}
           </p>
 
           {/* Informations disponibles */}
@@ -256,109 +256,94 @@ export function ResultatView({ examId, userId }: ResultatViewProps) {
       </Card>
 
       {/* Détails des réponses */}
-      {(resultat.afficherCorrection ?? true) ? (
-        <Card>
-          <CardHeader>
-            <h3 className="text-xl font-bold">Détails des réponses</h3>
-          </CardHeader>
-          <CardBody>
-            <Tabs
-              aria-label="Filtres réponses"
-              classNames={{
-                tabList: "gap-6",
-                cursor: "w-full bg-theme-primary",
-                tab: "max-w-fit px-0 h-12",
-              }}
-              variant="underlined"
+      <Card>
+        <CardHeader>
+          <h3 className="text-xl font-bold">Détails des réponses</h3>
+        </CardHeader>
+        <CardBody>
+          <Tabs
+            aria-label="Filtres réponses"
+            classNames={{
+              tabList: "gap-6",
+              cursor: "w-full bg-theme-primary",
+              tab: "max-w-fit px-0 h-12",
+            }}
+            variant="underlined"
+          >
+            <Tab
+              key="toutes"
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>Toutes</span>
+                  <span className="bg-default-100 px-2 py-0.5 rounded-full text-xs">
+                    {resultat.reponses.length}
+                  </span>
+                </div>
+              }
             >
-              <Tab
-                key="toutes"
-                title={
-                  <div className="flex items-center space-x-2">
-                    <span>Toutes</span>
-                    <span className="bg-default-100 px-2 py-0.5 rounded-full text-xs">
-                      {resultat.reponses.length}
-                    </span>
-                  </div>
-                }
-              >
-                <div className="mt-6 space-y-4">
-                  {resultat.reponses.map((reponse) => (
-                    <FeedbackPanel key={reponse.question_id} reponse={reponse} />
-                  ))}
-                </div>
-              </Tab>
+              <div className="mt-6 space-y-4">
+                {resultat.reponses.map((reponse) => (
+                  <FeedbackPanel key={reponse.question_id} reponse={reponse} />
+                ))}
+              </div>
+            </Tab>
 
-              <Tab
-                key="correctes"
-                title={
-                  <div className="flex items-center space-x-2">
-                    <span>Correctes</span>
-                    <span className="bg-success-100 text-success px-2 py-0.5 rounded-full text-xs">
-                      {reponsesCorrectes.length}
-                    </span>
-                  </div>
-                }
-              >
-                <div className="mt-6 space-y-4">
-                  {reponsesCorrectes.length === 0 ? (
-                    <p className="text-center py-8 text-default-500">
-                      Aucune réponse correcte
-                    </p>
-                  ) : (
-                    reponsesCorrectes.map((reponse) => (
-                      <FeedbackPanel
-                        key={reponse.question_id}
-                        reponse={reponse}
-                      />
-                    ))
-                  )}
+            <Tab
+              key="correctes"
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>Correctes</span>
+                  <span className="bg-success-100 text-success px-2 py-0.5 rounded-full text-xs">
+                    {reponsesCorrectes.length}
+                  </span>
                 </div>
-              </Tab>
+              }
+            >
+              <div className="mt-6 space-y-4">
+                {reponsesCorrectes.length === 0 ? (
+                  <p className="text-center py-8 text-default-500">
+                    Aucune réponse correcte
+                  </p>
+                ) : (
+                  reponsesCorrectes.map((reponse) => (
+                    <FeedbackPanel
+                      key={reponse.question_id}
+                      reponse={reponse}
+                    />
+                  ))
+                )}
+              </div>
+            </Tab>
 
-              <Tab
-                key="incorrectes"
-                title={
-                  <div className="flex items-center space-x-2">
-                    <span>Incorrectes</span>
-                    <span className="bg-danger-100 text-danger px-2 py-0.5 rounded-full text-xs">
-                      {reponsesIncorrectes.length}
-                    </span>
-                  </div>
-                }
-              >
-                <div className="mt-6 space-y-4">
-                  {reponsesIncorrectes.length === 0 ? (
-                    <p className="text-center py-8 text-default-500">
-                      Aucune réponse incorrecte - Parfait !
-                    </p>
-                  ) : (
-                    reponsesIncorrectes.map((reponse) => (
-                      <FeedbackPanel
-                        key={reponse.question_id}
-                        reponse={reponse}
-                      />
-                    ))
-                  )}
+            <Tab
+              key="incorrectes"
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>Incorrectes</span>
+                  <span className="bg-danger-100 text-danger px-2 py-0.5 rounded-full text-xs">
+                    {reponsesIncorrectes.length}
+                  </span>
                 </div>
-              </Tab>
-            </Tabs>
-          </CardBody>
-        </Card>
-      ) : (
-        <Card className="border-warning-500">
-          <CardBody className="text-center py-12">
-            <AlertCircle className="h-12 w-12 text-warning mx-auto mb-4" />
-            <p className="text-lg font-semibold text-warning mb-2">
-              Correction non disponible
-            </p>
-            <p className="text-sm text-default-500">
-              L'enseignant n'a pas encore autorisé l'affichage de la correction pour cet examen.
-              Vous pourrez consulter les détails des réponses une fois que l'enseignant publiera la correction.
-            </p>
-          </CardBody>
-        </Card>
-      )}
+              }
+            >
+              <div className="mt-6 space-y-4">
+                {reponsesIncorrectes.length === 0 ? (
+                  <p className="text-center py-8 text-default-500">
+                    Aucune réponse incorrecte - Parfait !
+                  </p>
+                ) : (
+                  reponsesIncorrectes.map((reponse) => (
+                    <FeedbackPanel
+                      key={reponse.question_id}
+                      reponse={reponse}
+                    />
+                  ))
+                )}
+              </div>
+            </Tab>
+          </Tabs>
+        </CardBody>
+      </Card>
     </div>
   );
 }

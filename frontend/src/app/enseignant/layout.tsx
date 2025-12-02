@@ -35,6 +35,21 @@ export default function EnseignantLayout({
       return;
     }
 
+    // Vérifier si l'onboarding est complet (admins exemptés)
+    if (user.role !== "admin") {
+      const hasProfile = user?.etudiantProfil || user?.enseignantProfil;
+
+      if (!hasProfile) {
+        // eslint-disable-next-line no-console
+        console.log(
+          "[EnseignantLayout] Onboarding incomplet, préparation redirection vers /onboarding/role-selection",
+        );
+        setShouldRedirect("/onboarding/role-selection");
+
+        return;
+      }
+    }
+
     // Si utilisateur connecté mais pas enseignant, marquer pour redirection
     if (!hasRole("enseignant") && !hasRole("admin")) {
       // eslint-disable-next-line no-console

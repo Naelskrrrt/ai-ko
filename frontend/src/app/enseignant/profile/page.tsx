@@ -250,25 +250,42 @@ export default function ProfilePage() {
                   <div className="flex-shrink-0">
                     <div className="relative">
                       <div className="rounded-full overflow-hidden border-4 border-theme-primary/30 shadow-lg">
-                        {displayUser?.avatar || user?.avatar ? (
+                        {(displayUser &&
+                          "avatar" in displayUser &&
+                          displayUser.avatar) ||
+                        (user && "avatar" in user && user.avatar) ? (
                           <Image
                             priority
                             alt={
-                              displayUser?.name ||
-                              user?.name ||
-                              displayUser?.email ||
-                              user?.email ||
+                              (displayUser && "name" in displayUser
+                                ? displayUser.name
+                                : null) ||
+                              (user && "name" in user ? user.name : null) ||
+                              (displayUser && "email" in displayUser
+                                ? displayUser.email
+                                : null) ||
+                              (user && "email" in user ? user.email : null) ||
                               "Photo de profil"
                             }
                             className="object-cover object-top"
                             height={112}
-                            src={displayUser?.avatar || user?.avatar || ""}
+                            src={
+                              (displayUser && "avatar" in displayUser
+                                ? displayUser.avatar
+                                : null) ||
+                              (user && "avatar" in user ? user.avatar : null) ||
+                              ""
+                            }
                             width={112}
                           />
                         ) : (
                           <div className="w-28 h-28 bg-theme-primary/20 flex items-center justify-center text-2xl font-semibold text-theme-primary">
                             {getInitials(
-                              displayUser?.name || user?.name || null,
+                              (displayUser && "name" in displayUser
+                                ? displayUser.name
+                                : null) ||
+                                (user && "name" in user ? user.name : null) ||
+                                null,
                             )}
                           </div>
                         )}
@@ -281,28 +298,37 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <div className="mb-2">
                       <h2 className="text-2xl font-bold text-foreground mb-1">
-                        {displayUser?.name ||
-                          displayUser?.email ||
-                          user?.name ||
-                          user?.email}
+                        {(displayUser && "name" in displayUser
+                          ? displayUser.name
+                          : null) ||
+                          (displayUser && "email" in displayUser
+                            ? displayUser.email
+                            : null) ||
+                          (user && "name" in user ? user.name : null) ||
+                          (user && "email" in user ? user.email : null)}
                       </h2>
                       <p className="text-base text-theme-primary font-semibold mb-1">
                         {formatRole(displayUser?.role || user?.role)}
                         {enseignantData?.grade && ` - ${enseignantData.grade}`}
                       </p>
                       <p className="text-xs text-default-500 dark:text-default-400">
-                        {displayUser?.email || user?.email}
+                        {(displayUser && "email" in displayUser
+                          ? displayUser.email
+                          : null) ||
+                          (user && "email" in user ? user.email : null)}
                       </p>
                       {enseignantData?.numeroEnseignant && (
                         <p className="text-xs text-default-400 mt-1">
                           N° {enseignantData.numeroEnseignant}
                         </p>
                       )}
-                      {etudiantData?.numeroEtudiant && (
+                      {etudiantData &&
+                      "numeroEtudiant" in etudiantData &&
+                      etudiantData.numeroEtudiant ? (
                         <p className="text-xs text-default-400 mt-1">
-                          N° {etudiantData.numeroEtudiant}
+                          N° {String(etudiantData.numeroEtudiant)}
                         </p>
-                      )}
+                      ) : null}
                     </div>
 
                     {/* Badges de statut */}
@@ -340,7 +366,10 @@ export default function ProfilePage() {
                       </span>
                     </div>
                     <p className="text-sm font-medium ml-6">
-                      {displayUser?.email || user?.email}
+                      {(displayUser && "email" in displayUser
+                        ? displayUser.email
+                        : null) ||
+                        (user && "email" in user ? user.email : null)}
                     </p>
                   </div>
 
@@ -383,7 +412,15 @@ export default function ProfilePage() {
                       </span>
                     </div>
                     <p className="text-sm font-medium ml-6">
-                      {formatDate(displayUser?.createdAt || user?.createdAt)}
+                      {formatDate(
+                        (displayUser && "createdAt" in displayUser
+                          ? displayUser.createdAt
+                          : null) ||
+                          (user && "createdAt" in user
+                            ? user.createdAt
+                            : null) ||
+                          "",
+                      )}
                     </p>
                   </div>
 

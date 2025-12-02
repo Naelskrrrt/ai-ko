@@ -19,7 +19,7 @@ const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 const BACKEND_URL =
   process.env.BACKEND_INTERNAL_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  `http://localhost:${process.env.BACKEND_PORT || "8000"}`;
+  `http://localhost:${process.env.BACKEND_PORT || "5000"}`;
 
 /**
  * Tente de refresh le token
@@ -42,10 +42,7 @@ async function attemptTokenRefresh(
     const data = await refreshResponse.json();
 
     return data.accessToken || null;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("[API Proxy] Token refresh failed:", error);
-
+  } catch {
     return null;
   }
 }
@@ -113,15 +110,9 @@ async function proxyRequestWithCookies(
 
     // Si 401 (token expiré), tenter un refresh
     if (response.status === 401 && token && request) {
-      // eslint-disable-next-line no-console
-      console.log("[API Proxy] 401 detected, attempting token refresh...");
-
       const newToken = await attemptTokenRefresh(request);
 
       if (newToken) {
-        // eslint-disable-next-line no-console
-        console.log("[API Proxy] Token refreshed, retrying request...");
-
         // Retry avec le nouveau token
         backendHeaders["Authorization"] = `Bearer ${newToken}`;
         response = await fetch(backendUrl, fetchOptions);
@@ -138,11 +129,6 @@ async function proxyRequestWithCookies(
       responseData = responseText;
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
-      `[API Proxy] Response ${response.status} for ${method} ${path}`,
-    );
-
     // Retourner la réponse
     return NextResponse.json(responseData, {
       status: response.status,
@@ -155,13 +141,24 @@ async function proxyRequestWithCookies(
       },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(`[API Proxy] Error for ${method} ${path}:`, error);
+    // Vérifier si c'est une erreur de connexion
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const isConnectionError =
+      errorMessage.includes("fetch failed") ||
+      errorMessage.includes("ECONNREFUSED") ||
+      errorMessage.includes("other side closed") ||
+      errorMessage.includes("UND_ERR_SOCKET");
 
     return NextResponse.json(
       {
-        error: "Backend connection error",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: isConnectionError ? "Backend connection error" : "Backend error",
+        message: errorMessage,
+        backendUrl: BACKEND_URL,
+        path: path,
+        hint: isConnectionError
+          ? "Vérifiez que le backend Flask est démarré et accessible sur le port 5000"
+          : undefined,
       },
       {
         status: 500,

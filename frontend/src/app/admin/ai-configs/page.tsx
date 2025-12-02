@@ -46,8 +46,10 @@ export default function AIConfigsPage() {
 
   const [configs, setConfigs] = React.useState<AIModelConfig[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [editingConfig, setEditingConfig] = React.useState<AIModelConfig | null>(null);
-  const [configToDelete, setConfigToDelete] = React.useState<AIModelConfig | null>(null);
+  const [editingConfig, setEditingConfig] =
+    React.useState<AIModelConfig | null>(null);
+  const [configToDelete, setConfigToDelete] =
+    React.useState<AIModelConfig | null>(null);
 
   React.useEffect(() => {
     fetchConfigs();
@@ -190,8 +192,8 @@ export default function AIConfigsPage() {
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant="flat"
             startContent={<RefreshCw className="w-4 h-4" />}
+            variant="flat"
             onPress={handleInitDefaults}
           >
             Initialiser configs par défaut
@@ -215,8 +217,8 @@ export default function AIConfigsPage() {
             </p>
             <Button
               color="primary"
-              variant="flat"
               startContent={<RefreshCw className="w-4 h-4" />}
+              variant="flat"
               onPress={handleInitDefaults}
             >
               Initialiser les configurations par défaut
@@ -241,10 +243,10 @@ export default function AIConfigsPage() {
                     )}
                   </h3>
                   <Chip
-                    size="sm"
-                    color={getProviderColor(config.provider)}
-                    variant="flat"
                     className="mt-1"
+                    color={getProviderColor(config.provider)}
+                    size="sm"
+                    variant="flat"
                   >
                     {config.provider}
                   </Chip>
@@ -308,8 +310,12 @@ export default function AIConfigsPage() {
 
                   {config.description && (
                     <div>
-                      <p className="text-xs text-default-500 mb-1">Description</p>
-                      <p className="text-sm line-clamp-2">{config.description}</p>
+                      <p className="text-xs text-default-500 mb-1">
+                        Description
+                      </p>
+                      <p className="text-sm line-clamp-2">
+                        {config.description}
+                      </p>
                     </div>
                   )}
 
@@ -320,7 +326,9 @@ export default function AIConfigsPage() {
                     </div>
                     <div>
                       <p className="text-xs text-default-500">Temperature</p>
-                      <p className="text-sm font-medium">{config.temperature}</p>
+                      <p className="text-sm font-medium">
+                        {config.temperature}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-default-500">Top P</p>
@@ -328,16 +336,18 @@ export default function AIConfigsPage() {
                     </div>
                     <div>
                       <p className="text-xs text-default-500">Timeout</p>
-                      <p className="text-sm font-medium">{config.timeoutSeconds}s</p>
+                      <p className="text-sm font-medium">
+                        {config.timeoutSeconds}s
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-default-200">
                     <span className="text-xs text-default-500">Statut</span>
                     <Switch
-                      size="sm"
-                      isSelected={config.actif}
                       aria-label="Activer/Désactiver"
+                      isSelected={config.actif}
+                      size="sm"
                     />
                   </div>
 
@@ -357,10 +367,12 @@ export default function AIConfigsPage() {
       )}
 
       {/* Modal Create/Edit */}
-      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+      <Modal isOpen={isOpen} size="2xl" onClose={onClose}>
         <ModalContent>
           <ModalHeader>
-            {editingConfig ? "Modifier la configuration" : "Nouvelle configuration"}
+            {editingConfig
+              ? "Modifier la configuration"
+              : "Nouvelle configuration"}
           </ModalHeader>
           <ModalBody>
             <p className="text-default-500">
@@ -380,16 +392,15 @@ export default function AIConfigsPage() {
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
+        cancelLabel="Annuler"
+        confirmLabel="Supprimer"
         isOpen={isDeleteConfirmOpen}
+        message={`Êtes-vous sûr de vouloir supprimer la configuration "${configToDelete?.nom}" ?`}
+        title="Supprimer la configuration"
+        variant="danger"
         onClose={onDeleteConfirmClose}
         onConfirm={handleDelete}
-        title="Supprimer la configuration"
-        message={`Êtes-vous sûr de vouloir supprimer la configuration "${configToDelete?.nom}" ?`}
-        confirmLabel="Supprimer"
-        cancelLabel="Annuler"
-        variant="danger"
       />
     </div>
   );
 }
-

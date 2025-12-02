@@ -6,6 +6,8 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Switch } from "@heroui/switch";
 import { Textarea } from "@heroui/input";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate } from "@internationalized/date";
 import {
   Calendar,
   Clock,
@@ -234,9 +236,10 @@ export function EventPopover({
 
             {/* Date et heures */}
             <div className="grid grid-cols-2 gap-2">
-              <Input
+              <DatePicker
+                showMonthAndYearPickers
                 classNames={{
-                  input: "bg-default-50 dark:bg-default-800 text-foreground",
+                  base: "bg-default-50 dark:bg-default-800",
                   inputWrapper:
                     "bg-default-50 dark:bg-default-800 border-default-200 dark:border-default-300 hover:border-default-300 dark:hover:border-default-400 focus-within:border-theme-primary",
                   label: "text-default-700 dark:text-default-300",
@@ -245,12 +248,12 @@ export function EventPopover({
                 isInvalid={!!errors.startDate}
                 label="Date"
                 size="sm"
-                startContent={
-                  <Calendar className="w-4 h-4 text-default-500 dark:text-default-300" />
+                value={
+                  formData.startDate ? parseDate(formData.startDate) : null
                 }
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => updateField("startDate", e.target.value)}
+                onChange={(date) =>
+                  updateField("startDate", date ? date.toString() : "")
+                }
               />
             </div>
 

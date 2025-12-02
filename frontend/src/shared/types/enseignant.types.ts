@@ -2,11 +2,11 @@
  * Types pour les Enseignants
  */
 
-import { Matiere } from './matiere.types';
-import { Niveau } from './niveau.types';
-import { Parcours } from './parcours.types';
-import { Mention } from './mention.types';
-import { Etablissement } from './etablissement.types';
+import { Matiere } from "./matiere.types";
+import { Niveau } from "./niveau.types";
+import { Parcours } from "./parcours.types";
+import { Mention } from "./mention.types";
+import { Etablissement } from "./etablissement.types";
 
 export interface Enseignant {
   id: string;
@@ -60,4 +60,3 @@ export interface EnseignantsListResponse {
   per_page: number;
   total_pages: number;
 }
-

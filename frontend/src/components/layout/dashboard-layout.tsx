@@ -8,6 +8,7 @@ import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 
 import { useAuth } from "@/core/providers/AuthProvider";
+import { useSocket } from "@/core/hooks/useSocket";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -23,6 +24,14 @@ export function DashboardLayout({
   const { user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const pathname = usePathname();
+
+  // Initialiser WebSocket pour les admins (gestion automatique des notifications)
+  useSocket({
+    onPendingUser: (notification) => {
+      // Les notifications sont gérées par PendingUsersNotification
+      // Ce hook assure simplement que la connexion WebSocket est active
+    },
+  });
 
   // Déterminer le titre et sous-titre selon le rôle
   const getTitle = () => {

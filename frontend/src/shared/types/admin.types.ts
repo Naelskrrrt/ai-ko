@@ -4,6 +4,7 @@ export interface User {
   name: string;
   role: "admin" | "enseignant" | "etudiant";
   emailVerified: boolean;
+  isActive?: boolean;
   createdAt: string;
   updatedAt?: string;
 }
@@ -119,7 +120,7 @@ export interface Professeur extends User {
 export interface AIModelConfig {
   id: string;
   nom: string;
-  provider: 'huggingface' | 'openai' | 'anthropic' | 'local';
+  provider: "huggingface" | "openai" | "anthropic" | "local";
   modelId: string;
   description?: string;
   apiUrl?: string;
@@ -136,8 +137,8 @@ export interface AIModelConfig {
 
 export interface UrgentAction {
   id: string;
-  type: 'critical' | 'warning' | 'info';
-  category: 'professeur' | 'etudiant' | 'session' | 'ai_config';
+  type: "critical" | "warning" | "info";
+  category: "professeur" | "etudiant" | "session" | "ai_config";
   message: string;
   targetId?: string;
   timestamp: string;
@@ -188,7 +189,7 @@ export interface ProfesseurUpdate {
 
 export interface AIModelConfigCreate {
   nom: string;
-  provider: 'huggingface' | 'openai' | 'anthropic' | 'local';
+  provider: "huggingface" | "openai" | "anthropic" | "local";
   modelId: string;
   description?: string;
   apiUrl?: string;
@@ -203,7 +204,7 @@ export interface AIModelConfigCreate {
 
 export interface AIModelConfigUpdate {
   nom?: string;
-  provider?: 'huggingface' | 'openai' | 'anthropic' | 'local';
+  provider?: "huggingface" | "openai" | "anthropic" | "local";
   modelId?: string;
   description?: string;
   apiUrl?: string;

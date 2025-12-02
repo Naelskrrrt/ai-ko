@@ -38,4 +38,3 @@ export interface ProfileUpdateData {
   enseignant?: EnseignantUpdate;
   etudiant?: EtudiantUpdate;
 }
-

@@ -1,41 +1,44 @@
 /**
  * Service API pour les Enseignants
  */
-import axios from 'axios';
 import type {
   Enseignant,
   EnseignantWithRelations,
   EnseignantCreate,
   EnseignantUpdate,
   EnseignantsListResponse,
-} from '../../types/enseignant.types';
+} from "../../types/enseignant.types";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import axios from "axios";
+
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const enseignantApi = axios.create({
   baseURL: `${API_URL}/api/enseignants`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
 });
 
 // Intercepteur pour ajouter le token JWT
 enseignantApi.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     let token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('auth_token='))
-      ?.split('=')[1];
-    
+      .split("; ")
+      .find((row) => row.startsWith("auth_token="))
+      ?.split("=")[1];
+
     if (!token) {
-      token = localStorage.getItem('auth_token') || undefined;
+      token = localStorage.getItem("auth_token") || undefined;
     }
-    
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
+
   return config;
 });
 
@@ -43,30 +46,41 @@ export const enseignantService = {
   /**
    * Récupère tous les enseignants (avec pagination)
    */
-  async getEnseignants(page = 1, perPage = 50): Promise<EnseignantsListResponse> {
-    const response = await enseignantApi.get('', {
+  async getEnseignants(
+    page = 1,
+    perPage = 50,
+  ): Promise<EnseignantsListResponse> {
+    const response = await enseignantApi.get("", {
       params: { page, per_page: perPage },
     });
+
     return response.data;
   },
 
   /**
    * Récupère le profil de l'enseignant connecté
    */
-  async getMe(includeRelations = false): Promise<Enseignant | EnseignantWithRelations> {
-    const response = await enseignantApi.get('/me', {
-      params: { include_relations: includeRelations ? 'true' : 'false' },
+  async getMe(
+    includeRelations = false,
+  ): Promise<Enseignant | EnseignantWithRelations> {
+    const response = await enseignantApi.get("/me", {
+      params: { include_relations: includeRelations ? "true" : "false" },
     });
+
     return response.data;
   },
 
   /**
    * Récupère un enseignant par son ID
    */
-  async getEnseignantById(id: string, includeRelations = false): Promise<Enseignant | EnseignantWithRelations> {
+  async getEnseignantById(
+    id: string,
+    includeRelations = false,
+  ): Promise<Enseignant | EnseignantWithRelations> {
     const response = await enseignantApi.get(`/${id}`, {
-      params: { include_relations: includeRelations ? 'true' : 'false' },
+      params: { include_relations: includeRelations ? "true" : "false" },
     });
+
     return response.data;
   },
 
@@ -74,15 +88,20 @@ export const enseignantService = {
    * Crée un nouvel enseignant
    */
   async createEnseignant(data: EnseignantCreate): Promise<Enseignant> {
-    const response = await enseignantApi.post('', data);
+    const response = await enseignantApi.post("", data);
+
     return response.data;
   },
 
   /**
    * Met à jour un enseignant
    */
-  async updateEnseignant(id: string, data: EnseignantUpdate): Promise<Enseignant> {
+  async updateEnseignant(
+    id: string,
+    data: EnseignantUpdate,
+  ): Promise<Enseignant> {
     const response = await enseignantApi.put(`/${id}`, data);
+
     return response.data;
   },
 
@@ -98,6 +117,7 @@ export const enseignantService = {
    */
   async getMatieres(enseignantId: string): Promise<any[]> {
     const response = await enseignantApi.get(`/${enseignantId}/matieres`);
+
     return response.data;
   },
 
@@ -111,7 +131,10 @@ export const enseignantService = {
   /**
    * Retire une matière d'un enseignant
    */
-  async unassignMatiere(enseignantId: string, matiereId: string): Promise<void> {
+  async unassignMatiere(
+    enseignantId: string,
+    matiereId: string,
+  ): Promise<void> {
     await enseignantApi.delete(`/${enseignantId}/matieres/${matiereId}`);
   },
 
@@ -120,6 +143,7 @@ export const enseignantService = {
    */
   async getNiveaux(enseignantId: string): Promise<any[]> {
     const response = await enseignantApi.get(`/${enseignantId}/niveaux`);
+
     return response.data;
   },
 
@@ -135,13 +159,17 @@ export const enseignantService = {
    */
   async getParcours(enseignantId: string): Promise<any[]> {
     const response = await enseignantApi.get(`/${enseignantId}/parcours`);
+
     return response.data;
   },
 
   /**
    * Assigne un parcours à un enseignant
    */
-  async assignParcours(enseignantId: string, parcoursId: string): Promise<void> {
+  async assignParcours(
+    enseignantId: string,
+    parcoursId: string,
+  ): Promise<void> {
     await enseignantApi.post(`/${enseignantId}/parcours/${parcoursId}`);
   },
 
@@ -150,6 +178,7 @@ export const enseignantService = {
    */
   async getMentions(enseignantId: string): Promise<any[]> {
     const response = await enseignantApi.get(`/${enseignantId}/mentions`);
+
     return response.data;
   },
 
@@ -157,8 +186,10 @@ export const enseignantService = {
    * Récupère les enseignants d'un établissement
    */
   async getByEtablissement(etablissementId: string): Promise<Enseignant[]> {
-    const response = await enseignantApi.get(`/etablissement/${etablissementId}`);
+    const response = await enseignantApi.get(
+      `/etablissement/${etablissementId}`,
+    );
+
     return response.data;
   },
 };
-

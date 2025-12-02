@@ -33,6 +33,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   UserPlus,
+  Check,
 } from "lucide-react";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
@@ -52,13 +53,17 @@ export default function EtudiantsPage() {
   const [loading, setLoading] = React.useState(true);
   const [totalPages, setTotalPages] = React.useState(1);
   const [total, setTotal] = React.useState(0);
-  const [editingEtudiant, setEditingEtudiant] = React.useState<Etudiant | null>(null);
-  const [etudiantToDelete, setEtudiantToDelete] = React.useState<Etudiant | null>(null);
+  const [editingEtudiant, setEditingEtudiant] = React.useState<Etudiant | null>(
+    null,
+  );
+  const [etudiantToDelete, setEtudiantToDelete] =
+    React.useState<Etudiant | null>(null);
 
   // URL state management
   const [filters, setFilters] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     search: parseAsString.withDefault(""),
+    status: parseAsString.withDefault("all"),
   });
 
   React.useEffect(() => {
@@ -72,6 +77,12 @@ export default function EtudiantsPage() {
         page: filters.page,
         per_page: 10,
         search: filters.search || undefined,
+        active:
+          filters.status === "active"
+            ? true
+            : filters.status === "pending"
+              ? false
+              : undefined,
       });
 
       setEtudiants(response.data);
@@ -157,14 +168,39 @@ export default function EtudiantsPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Input
-                placeholder="Rechercher par nom ou email..."
-                value={filters.search}
-                onChange={(e) => setFilters({ search: e.target.value, page: 1 })}
-                startContent={<Search className="w-4 h-4 text-default-400" />}
                 classNames={{
                   input: "text-sm",
                 }}
+                placeholder="Rechercher par nom ou email..."
+                startContent={<Search className="w-4 h-4 text-default-400" />}
+                value={filters.search}
+                onChange={(e) =>
+                  setFilters({ search: e.target.value, page: 1 })
+                }
               />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant={filters.status === "all" ? "solid" : "bordered"}
+                onClick={() => setFilters({ status: "all", page: 1 })}
+              >
+                Tous
+              </Button>
+              <Button
+                size="sm"
+                variant={filters.status === "active" ? "solid" : "bordered"}
+                onClick={() => setFilters({ status: "active", page: 1 })}
+              >
+                Actifs
+              </Button>
+              <Button
+                size="sm"
+                variant={filters.status === "pending" ? "solid" : "bordered"}
+                onClick={() => setFilters({ status: "pending", page: 1 })}
+              >
+                En attente
+              </Button>
             </div>
           </div>
         </CardBody>
@@ -197,7 +233,10 @@ export default function EtudiantsPage() {
               <tbody className="divide-y divide-default-200">
                 {etudiants.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-default-500">
+                    <td
+                      className="px-4 py-8 text-center text-default-500"
+                      colSpan={5}
+                    >
                       Aucun étudiant trouvé
                     </td>
                   </tr>
@@ -212,7 +251,7 @@ export default function EtudiantsPage() {
                           <div>
                             <p className="font-medium">{etudiant.name}</p>
                             {etudiant.emailVerified && (
-                              <Chip size="sm" color="success" variant="flat">
+                              <Chip color="success" size="sm" variant="flat">
                                 Vérifié
                               </Chip>
                             )}
@@ -236,6 +275,35 @@ export default function EtudiantsPage() {
                             </Button>
                           </DropdownTrigger>
                           <DropdownMenu aria-label="Actions">
+                            {etudiant.isActive === false ? (
+                              <DropdownItem
+                                key="activate"
+                                className="text-success"
+                                startContent={<Check className="w-4 h-4" />}
+                                onPress={async () => {
+                                  try {
+                                    await adminService.activateUser(
+                                      etudiant.id,
+                                    );
+                                    toast({
+                                      title: "Utilisateur activé",
+                                      description: `${etudiant.name} peut maintenant se connecter`,
+                                    });
+                                    fetchEtudiants(); // Recharger la liste
+                                  } catch (error: any) {
+                                    toast({
+                                      title: "Erreur",
+                                      description:
+                                        error.response?.data?.message ||
+                                        "Erreur lors de l'activation",
+                                      variant: "error",
+                                    });
+                                  }
+                                }}
+                              >
+                                Valider le compte
+                              </DropdownItem>
+                            ) : null}
                             <DropdownItem
                               key="edit"
                               startContent={<Edit className="w-4 h-4" />}
@@ -285,18 +353,18 @@ export default function EtudiantsPage() {
           <div className="flex items-center gap-2">
             <Button
               isIconOnly
+              isDisabled={filters.page === 1}
               size="sm"
               variant="flat"
-              isDisabled={filters.page === 1}
               onPress={() => setFilters({ page: 1 })}
             >
               <ChevronsLeft className="w-4 h-4" />
             </Button>
             <Button
               isIconOnly
+              isDisabled={filters.page === 1}
               size="sm"
               variant="flat"
-              isDisabled={filters.page === 1}
               onPress={() => setFilters({ page: filters.page - 1 })}
             >
               <ChevronLeft className="w-4 h-4" />
@@ -306,18 +374,18 @@ export default function EtudiantsPage() {
             </span>
             <Button
               isIconOnly
+              isDisabled={filters.page === totalPages}
               size="sm"
               variant="flat"
-              isDisabled={filters.page === totalPages}
               onPress={() => setFilters({ page: filters.page + 1 })}
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
             <Button
               isIconOnly
+              isDisabled={filters.page === totalPages}
               size="sm"
               variant="flat"
-              isDisabled={filters.page === totalPages}
               onPress={() => setFilters({ page: totalPages })}
             >
               <ChevronsRight className="w-4 h-4" />
@@ -327,7 +395,7 @@ export default function EtudiantsPage() {
       )}
 
       {/* Modal Create/Edit */}
-      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+      <Modal isOpen={isOpen} size="2xl" onClose={onClose}>
         <ModalContent>
           <ModalHeader>
             {editingEtudiant ? "Modifier l'étudiant" : "Nouvel étudiant"}
@@ -350,16 +418,15 @@ export default function EtudiantsPage() {
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
+        cancelLabel="Annuler"
+        confirmLabel="Supprimer"
         isOpen={isDeleteConfirmOpen}
+        message={`Êtes-vous sûr de vouloir supprimer l'étudiant "${etudiantToDelete?.name}" ?`}
+        title="Supprimer l'étudiant"
+        variant="danger"
         onClose={onDeleteConfirmClose}
         onConfirm={handleDelete}
-        title="Supprimer l'étudiant"
-        message={`Êtes-vous sûr de vouloir supprimer l'étudiant "${etudiantToDelete?.name}" ?`}
-        confirmLabel="Supprimer"
-        cancelLabel="Annuler"
-        variant="danger"
       />
     </div>
   );
 }
-

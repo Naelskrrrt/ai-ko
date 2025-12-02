@@ -35,10 +35,12 @@ export function SessionsFilters({
   // Compter le nombre de filtres actifs
   const activeFiltersCount = React.useMemo(() => {
     let count = 0;
+
     if (filters.dateDebut || filters.dateFin) count++;
     if (filters.qcmId && filters.qcmId !== "tous") count++;
     if (filters.matiere && filters.matiere !== "tous") count++;
     if (filters.status && filters.status !== "tous") count++;
+
     return count;
   }, [filters]);
 
@@ -131,15 +133,18 @@ export function SessionsFilters({
               size="md"
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
+
                 onFiltersChange({
                   ...filters,
                   qcmId: selected === "tous" ? null : selected,
                 });
               }}
             >
-              {[{ id: "tous", titre: "Tous les QCMs" }, ...qcmOptions].map((qcm: { id: string; titre: string }) => (
-                <SelectItem key={qcm.id}>{qcm.titre}</SelectItem>
-              ))}
+              {[{ id: "tous", titre: "Tous les QCMs" }, ...qcmOptions].map(
+                (qcm: { id: string; titre: string }) => (
+                  <SelectItem key={qcm.id}>{qcm.titre}</SelectItem>
+                ),
+              )}
             </Select>
           </div>
 
@@ -153,6 +158,7 @@ export function SessionsFilters({
               size="md"
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
+
                 onFiltersChange({
                   ...filters,
                   matiere: selected === "tous" ? null : selected,
@@ -160,7 +166,9 @@ export function SessionsFilters({
               }}
             >
               {["tous", ...matiereOptions].map((matiere: string) => (
-                <SelectItem key={matiere}>{matiere === "tous" ? "Toutes les matières" : matiere}</SelectItem>
+                <SelectItem key={matiere}>
+                  {matiere === "tous" ? "Toutes les matières" : matiere}
+                </SelectItem>
               ))}
             </Select>
           </div>
@@ -175,6 +183,7 @@ export function SessionsFilters({
               size="md"
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
+
                 onFiltersChange({
                   ...filters,
                   status: selected === "tous" ? null : selected,
@@ -207,4 +216,3 @@ export function SessionsFilters({
     </Popover>
   );
 }
-

@@ -25,8 +25,9 @@ export function StatsCards({ userId }: StatsCardsProps) {
   );
 
   // Récupérer le profil enseignant pour obtenir l'ID
-  const { data: enseignantProfile } = useSWR(["enseignant-profile", userId], () =>
-    enseignantService.getMe(),
+  const { data: enseignantProfile } = useSWR(
+    ["enseignant-profile", userId],
+    () => enseignantService.getMe(),
   );
 
   // Récupérer les statistiques complètes avec taux de réussite
@@ -77,7 +78,9 @@ export function StatsCards({ userId }: StatsCardsProps) {
     {
       title: "Taux de Réussite",
       value:
-        stats.taux_reussite !== null ? `${stats.taux_reussite.toFixed(1)}%` : "—",
+        stats.taux_reussite !== null
+          ? `${stats.taux_reussite.toFixed(1)}%`
+          : "—",
       description: "Calculé depuis les résultats des sessions",
       icon: TrendingUp,
       color: "bg-orange-500",

@@ -70,9 +70,11 @@ export const authService = {
   },
 
   async getMe(): Promise<User> {
-    const response = await authApi.get<User>("/me");
+    const response = await authApi.get<{ user: User }>("/me");
 
-    return response.data;
+    // Le backend retourne { user: {...}, onboardingComplete: ..., requiresOnboarding: ... }
+    // On extrait seulement l'objet user
+    return response.data.user;
   },
 
   async updateMyProfile(data: Partial<User>): Promise<User> {

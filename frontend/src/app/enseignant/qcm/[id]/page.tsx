@@ -36,7 +36,6 @@ import { useDisclosure } from "@heroui/modal";
 
 import { useAuth } from "@/core/providers/AuthProvider";
 import { qcmService } from "@/features/enseignant/services/qcm.service";
-import { enseignantService } from "@/features/enseignant/services/enseignant.service";
 import { profileService } from "@/shared/services/api/profile.service";
 import { useToast } from "@/hooks/use-toast";
 import { CreateSessionModal } from "@/features/enseignant/components/sessions/CreateSessionModal";
@@ -125,17 +124,20 @@ export default function QCMDetailPage({ params }: QCMDetailPageProps) {
   // Charger les matières de l'enseignant connecté
   const { user } = useAuth();
   const { data: profileData } = useSWR(
-    user?.role === "enseignant" ? ["profile-enseignant-qcm-edit", "enseignant"] : null,
+    user?.role === "enseignant"
+      ? ["profile-enseignant-qcm-edit", "enseignant"]
+      : null,
     async () => {
       return await profileService.getMyProfile("enseignant");
     },
   );
-  
+
   // Extraire les matières du profil enseignant
   const matieres = React.useMemo(() => {
     if (profileData && "matieres" in profileData && profileData.matieres) {
       return profileData.matieres;
     }
+
     return [];
   }, [profileData]);
 
@@ -490,11 +492,7 @@ export default function QCMDetailPage({ params }: QCMDetailPageProps) {
                         }
                       }}
                     >
-<<<<<<< HEAD
                       {matieres.map((matiere: Matiere) => (
-=======
-                      {matieres.map((matiere) => (
->>>>>>> 03a9ea2b25acd14f988bc0b992de0a4f3c768a74
                         <SelectItem key={matiere.id}>
                           {matiere.nom} ({matiere.code})
                         </SelectItem>
@@ -784,29 +782,6 @@ export default function QCMDetailPage({ params }: QCMDetailPageProps) {
                       });
                     }
                   }}
-<<<<<<< HEAD
-=======
-                  onDelete={async () => {
-                    setQuestionToDelete(question.id)
-                    onDeleteQuestionConfirmOpen()
-                  }}
-                  onMoveUp={index > 0 ? async () => {
-                    // TODO: Implémenter le réarrangement (nécessite un endpoint backend)
-                    toast({
-                      title: 'Info',
-                      description: 'Le réarrangement sera implémenté prochainement',
-                      variant: 'info',
-                    })
-                  } : undefined}
-                  onMoveDown={index < questions.length - 1 ? async () => {
-                    // TODO: Implémenter le réarrangement (nécessite un endpoint backend)
-                    toast({
-                      title: 'Info',
-                      description: 'Le réarrangement sera implémenté prochainement',
-                      variant: 'info',
-                    })
-                  } : undefined}
->>>>>>> 03a9ea2b25acd14f988bc0b992de0a4f3c768a74
                 />
               ))}
 
@@ -922,7 +897,6 @@ function QuestionEditor({
   onMoveUp,
   onMoveDown,
 }: QuestionEditorProps) {
-<<<<<<< HEAD
   // Fonction pour mapper le type de question du backend vers le type local
   const mapTypeQuestion = (
     type: "qcm" | "qcm_multiple" | "vrai_faux" | "text",
@@ -967,36 +941,6 @@ function QuestionEditor({
             : "",
       );
       setExplication(question.explication || "");
-=======
-  const [enonce, setEnonce] = React.useState(question?.enonce || '')
-  const [points, setPoints] = React.useState(question?.points || 1)
-
-  // Map incoming typeQuestion values to valid types
-  const normalizeTypeQuestion = (type?: string): 'qcm' | 'vrai_faux' | 'texte_libre' => {
-    if (type === 'text') return 'texte_libre'
-    if (type === 'qcm_multiple') return 'qcm'
-    if (type === 'vrai_faux') return 'vrai_faux'
-    if (type === 'texte_libre') return 'texte_libre'
-    return 'qcm'
-  }
-
-  const [typeQuestion, setTypeQuestion] = React.useState<'qcm' | 'vrai_faux' | 'texte_libre'>(normalizeTypeQuestion(question?.typeQuestion))
-  const [options, setOptions] = React.useState<any[]>(question?.options || [])
-  const [reponseCorrecte, setReponseCorrecte] = React.useState<string>(
-    typeof question?.reponseCorrecte === 'string' ? question.reponseCorrecte : ''
-  )
-  const [explication, setExplication] = React.useState(question?.explication || '')
-  const [isSaving, setIsSaving] = React.useState(false)
-
-  React.useEffect(() => {
-    if (question) {
-      setEnonce(question.enonce || '')
-      setPoints(question.points || 1)
-      setTypeQuestion(normalizeTypeQuestion(question.typeQuestion))
-      setOptions(question.options || [])
-      setReponseCorrecte(typeof question.reponseCorrecte === 'string' ? question.reponseCorrecte : '')
-      setExplication(question.explication || '')
->>>>>>> 03a9ea2b25acd14f988bc0b992de0a4f3c768a74
     } else {
       // Nouvelle question
       setEnonce("");

@@ -12,10 +12,23 @@ import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Textarea } from "@heroui/input";
-import { Download, User, Mail, Phone, MapPin, Calendar, Award, Edit2, Save, X, RefreshCw } from "lucide-react";
+import {
+  Download,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Award,
+  Edit2,
+  Save,
+  X,
+  RefreshCw,
+} from "lucide-react";
 import useSWR from "swr";
 
 import { sessionService } from "../../services/session.service";
+
 import { downloadPDF } from "@/lib/pdf-utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -35,15 +48,11 @@ export function DetailEtudiantModal({
   const [isEditingComment, setIsEditingComment] = React.useState(false);
   const [commentaire, setCommentaire] = React.useState("");
   const [isSavingComment, setIsSavingComment] = React.useState(false);
-  const [isRegeneratingComment, setIsRegeneratingComment] = React.useState(false);
+  const [isRegeneratingComment, setIsRegeneratingComment] =
+    React.useState(false);
 
   // Récupérer les détails complets
-  const {
-    data,
-    isLoading,
-    error,
-    mutate,
-  } = useSWR(
+  const { data, isLoading, error, mutate } = useSWR(
     isOpen && resultatId ? ["details-etudiant", resultatId] : null,
     () => sessionService.getDetailsEtudiant(resultatId),
   );
@@ -62,7 +71,8 @@ export function DetailEtudiantModal({
     try {
       setIsExporting(true);
       const blob = await sessionService.exporterPDFResultat(resultatId);
-      const etudiantName = data?.etudiant?.name?.replace(/\s+/g, "_") || "etudiant";
+      const etudiantName =
+        data?.etudiant?.name?.replace(/\s+/g, "_") || "etudiant";
       const filename = `resultat_${etudiantName}.pdf`;
 
       downloadPDF(blob, filename);
@@ -126,6 +136,7 @@ export function DetailEtudiantModal({
     try {
       setIsRegeneratingComment(true);
       const result = await sessionService.regenererCommentaire(resultatId);
+
       // Rafraîchir les données
       mutate();
       // Mettre à jour le commentaire local
@@ -408,10 +419,10 @@ export function DetailEtudiantModal({
                         <div className="flex gap-2">
                           <Button
                             color="default"
+                            isLoading={isRegeneratingComment}
                             size="sm"
                             startContent={<RefreshCw className="h-4 w-4" />}
                             variant="flat"
-                            isLoading={isRegeneratingComment}
                             onPress={handleRegenererCommentaire}
                           >
                             Régénérer
@@ -432,7 +443,11 @@ export function DetailEtudiantModal({
                     {isEditingComment ? (
                       <div className="space-y-2">
                         <Textarea
+                          description={`${commentaire.length}/200 caractères${commentaire.length > 100 ? " (idéal: 100)" : ""}`}
                           label="Commentaire"
+                          maxLength={200}
+                          maxRows={6}
+                          minRows={3}
                           placeholder="Ajoutez un commentaire pour cet étudiant..."
                           value={commentaire}
                           onValueChange={(value) => {
@@ -441,10 +456,6 @@ export function DetailEtudiantModal({
                               setCommentaire(value);
                             }
                           }}
-                          minRows={3}
-                          maxRows={6}
-                          maxLength={200}
-                          description={`${commentaire.length}/200 caractères${commentaire.length > 100 ? ' (idéal: 100)' : ''}`}
                         />
                         <div className="flex gap-2 justify-end">
                           <Button
@@ -460,27 +471,27 @@ export function DetailEtudiantModal({
                             color="primary"
                             isLoading={isSavingComment}
                             size="sm"
-                            startContent={!isSavingComment && <Save className="h-4 w-4" />}
+                            startContent={
+                              !isSavingComment && <Save className="h-4 w-4" />
+                            }
                             onPress={handleSaveComment}
                           >
                             Enregistrer
                           </Button>
                         </div>
                       </div>
+                    ) : resultat.commentaireProf ? (
+                      <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg">
+                        <p className="text-sm text-primary-700 whitespace-pre-wrap">
+                          {resultat.commentaireProf}
+                        </p>
+                      </div>
                     ) : (
-                      resultat.commentaireProf ? (
-                        <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg">
-                          <p className="text-sm text-primary-700 whitespace-pre-wrap">
-                            {resultat.commentaireProf}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="p-4 bg-default-50 border border-default-200 rounded-lg">
-                          <p className="text-sm text-default-400 italic">
-                            Aucun commentaire pour le moment
-                          </p>
-                        </div>
-                      )
+                      <div className="p-4 bg-default-50 border border-default-200 rounded-lg">
+                        <p className="text-sm text-default-400 italic">
+                          Aucun commentaire pour le moment
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -497,4 +508,3 @@ export function DetailEtudiantModal({
     </Modal>
   );
 }
-

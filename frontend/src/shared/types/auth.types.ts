@@ -10,6 +10,8 @@ export interface User {
   telephone?: string | null;
   adresse?: string | null;
   dateNaissance?: string | null;
+  etudiantProfil?: any; // Profil étudiant si existe
+  enseignantProfil?: any; // Profil enseignant si existe
 }
 
 export interface LoginCredentials {

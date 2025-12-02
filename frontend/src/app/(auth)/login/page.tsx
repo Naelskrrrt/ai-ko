@@ -126,8 +126,8 @@ function LoginContent() {
         // En cas d'erreur, rediriger vers la page d'accueil
         router.push("/");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Erreur lors de la connexion");
+    } catch (_err: any) {
+      setError(_err.response?.data?.message || "Erreur lors de la connexion");
     } finally {
       setIsLoading(false);
     }
@@ -151,7 +151,7 @@ function LoginContent() {
       if (data.auth_url) {
         window.location.href = data.auth_url;
       }
-    } catch (err) {
+    } catch {
       setError("Erreur lors de la connexion avec Google");
     }
   };

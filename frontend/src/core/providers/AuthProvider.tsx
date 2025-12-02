@@ -6,11 +6,21 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { authService } from "@/shared/services/api/auth.service";
 
+interface AuthResponse {
+  user: User;
+  token?: string;
+  requiresOnboarding?: boolean;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+  ) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   hasRole: (role: string) => boolean;
@@ -28,7 +38,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(userData);
     } catch (error) {
+      // Si getMe échoue (401, 403, etc.), on considère l'utilisateur comme non connecté
       setUser(null);
+      // Nettoyer les tokens invalides
+      if (typeof document !== "undefined") {
+        document.cookie = "auth_token=; path=/; max-age=0; SameSite=Lax";
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("onboarding_token");
+      }
     } finally {
       setLoading(false);
     }
@@ -61,8 +78,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (response.token && typeof document !== "undefined") {
       document.cookie = `auth_token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
       localStorage.setItem("auth_token", response.token);
+      // Stocker aussi dans onboarding_token pour l'onboarding
+      localStorage.setItem("onboarding_token", response.token);
     }
     setUser(response.user);
+
+    // Retourner la réponse complète pour le parcours d'onboarding
+    return response;
   };
 
   const logout = async () => {

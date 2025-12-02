@@ -1,8 +1,10 @@
+import type { ProfileUpdateData } from "@/shared/types/profile.types";
+
 import { useSWRConfig } from "swr";
+
 import { authService } from "@/shared/services/api/auth.service";
 import { enseignantService } from "@/shared/services/api/enseignant.service";
 import { etudiantService } from "@/shared/services/api/etudiant.service";
-import type { ProfileUpdateData } from "@/shared/types/profile.types";
 import { useToast } from "@/hooks/use-toast";
 
 export function useUpdateProfile(role?: string) {
@@ -20,10 +22,15 @@ export function useUpdateProfile(role?: string) {
       if (role === "enseignant" && data.enseignant) {
         // Récupérer l'ID de l'enseignant depuis le profil
         const enseignant = await enseignantService.getMe();
-        await enseignantService.updateEnseignant(enseignant.id, data.enseignant);
+
+        await enseignantService.updateEnseignant(
+          enseignant.id,
+          data.enseignant,
+        );
       } else if (role === "etudiant" && data.etudiant) {
         // Récupérer l'ID de l'étudiant depuis le profil
         const etudiant = await etudiantService.getMe();
+
         await etudiantService.updateEtudiant(etudiant.id, data.etudiant);
       }
 
@@ -58,4 +65,3 @@ export function useUpdateProfile(role?: string) {
 
   return { updateProfile };
 }
-

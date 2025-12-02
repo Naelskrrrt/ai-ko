@@ -1,5 +1,11 @@
 "use client";
 
+import type { ProfileData } from "@/shared/types/profile.types";
+import type { Matiere } from "@/shared/types/matiere.types";
+import type { Niveau } from "@/shared/types/niveau.types";
+import type { Mention } from "@/shared/types/mention.types";
+import type { Parcours } from "@/shared/types/parcours.types";
+
 import * as React from "react";
 import {
   Modal,
@@ -19,22 +25,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { parseDate, DateValue } from "@internationalized/date";
 import useSWR from "swr";
+import { Plus } from "lucide-react";
 
-import type { ProfileData } from "@/shared/types/profile.types";
-import type { Matiere } from "@/shared/types/matiere.types";
-import type { Niveau } from "@/shared/types/niveau.types";
-import type { Mention } from "@/shared/types/mention.types";
-import type { Parcours } from "@/shared/types/parcours.types";
 import { useUpdateProfile } from "../hooks/useUpdateProfile";
+
+import { HorairesInput } from "./HorairesInput";
+
 import { matiereService } from "@/shared/services/api/matiere.service";
 import { niveauService } from "@/shared/services/api/niveau.service";
 import { mentionService } from "@/shared/services/api/mention.service";
 import { parcoursService } from "@/shared/services/api/parcours.service";
-import { HorairesInput } from "./HorairesInput";
+import { CreateMatiereModal } from "@/components/matieres/CreateMatiereModal";
 
 // Schéma de validation pour les données User
 const userSchema = z.object({
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").optional(),
+  name: z
+    .string()
+    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .optional(),
   telephone: z
     .string()
     .max(20, "Le numéro de téléphone est trop long")
@@ -85,10 +93,13 @@ export function EditProfileModal({
   const { updateProfile } = useUpdateProfile(role);
 
   // Charger les matières disponibles
-  const { data: matieres } = useSWR<Matiere[]>(
+  const { data: matieres, mutate: mutateMatieres } = useSWR<Matiere[]>(
     "matieres-list",
     () => matiereService.getMatieres(true),
   );
+
+  const [isCreateMatiereModalOpen, setIsCreateMatiereModalOpen] =
+    React.useState(false);
 
   // Charger les niveaux
   const { data: niveaux } = useSWR<Niveau[]>(
@@ -130,18 +141,23 @@ export function EditProfileModal({
     handleSubmit: handleEnseignantSubmit,
     formState: { errors: enseignantErrors },
     reset: resetEnseignant,
+    getValues: getEnseignantValues,
+    setValue: setEnseignantValue,
   } = useForm<EnseignantFormData>({
     resolver: zodResolver(enseignantSchema),
-    defaultValues: role === "enseignant" && profileData
-      ? {
-          grade: (profileData as any)?.grade || "",
-          specialite: (profileData as any)?.matieres?.map((m: any) => m.id) || [],
-          departement: (profileData as any)?.departement || "",
-          bureau: (profileData as any)?.bureau || "",
-          horairesDisponibilite: (profileData as any)?.horairesDisponibilite || "",
-          dateEmbauche: (profileData as any)?.dateEmbauche || "",
-        }
-      : undefined,
+    defaultValues:
+      role === "enseignant" && profileData
+        ? {
+            grade: (profileData as any)?.grade || "",
+            specialite:
+              (profileData as any)?.matieres?.map((m: any) => m.id) || [],
+            departement: (profileData as any)?.departement || "",
+            bureau: (profileData as any)?.bureau || "",
+            horairesDisponibilite:
+              (profileData as any)?.horairesDisponibilite || "",
+            dateEmbauche: (profileData as any)?.dateEmbauche || "",
+          }
+        : undefined,
   });
 
   // Formulaire Étudiant
@@ -152,15 +168,17 @@ export function EditProfileModal({
     reset: resetEtudiant,
   } = useForm<EtudiantFormData>({
     resolver: zodResolver(etudiantSchema),
-    defaultValues: role === "etudiant" && profileData
-      ? {
-          anneeAdmission: (profileData as any)?.anneeAdmission || "",
-          niveauId: (profileData as any)?.niveauId || "",
-          mentionId: (profileData as any)?.mentionId || "",
-          parcoursId: (profileData as any)?.parcoursId || "",
-          matieres: (profileData as any)?.matieres?.map((m: any) => m.id) || [],
-        }
-      : undefined,
+    defaultValues:
+      role === "etudiant" && profileData
+        ? {
+            anneeAdmission: (profileData as any)?.anneeAdmission || "",
+            niveauId: (profileData as any)?.niveauId || "",
+            mentionId: (profileData as any)?.mentionId || "",
+            parcoursId: (profileData as any)?.parcoursId || "",
+            matieres:
+              (profileData as any)?.matieres?.map((m: any) => m.id) || [],
+          }
+        : undefined,
   });
 
   // Réinitialiser les formulaires quand le modal s'ouvre
@@ -179,7 +197,8 @@ export function EditProfileModal({
           specialite: (profileData as any)?.specialite || "",
           departement: (profileData as any)?.departement || "",
           bureau: (profileData as any)?.bureau || "",
-          horairesDisponibilite: (profileData as any)?.horairesDisponibilite || "",
+          horairesDisponibilite:
+            (profileData as any)?.horairesDisponibilite || "",
           dateEmbauche: (profileData as any)?.dateEmbauche || "",
         });
       }
@@ -219,6 +238,21 @@ export function EditProfileModal({
     }
   };
 
+  const handleMatiereCreated = (newMatiere: Matiere) => {
+    // Rafraîchir la liste des matières
+    mutateMatieres();
+    // Sélectionner automatiquement la nouvelle matière si on est enseignant
+    if (role === "enseignant") {
+      const currentValue = getEnseignantValues("specialite") || [];
+
+      setEnseignantValue("specialite", [
+        ...currentValue,
+        newMatiere.id,
+      ]);
+    }
+    setIsCreateMatiereModalOpen(false);
+  };
+
   const handleFormSubmit = async () => {
     // Valider et soumettre le formulaire User
     handleUserSubmit(async (userData) => {
@@ -236,7 +270,9 @@ export function EditProfileModal({
     })();
   };
 
-  const formatDateForPicker = (dateString?: string | null): DateValue | null => {
+  const formatDateForPicker = (
+    dateString?: string | null,
+  ): DateValue | null => {
     if (!dateString) return null;
     try {
       return parseDate(dateString.split("T")[0]);
@@ -246,354 +282,398 @@ export function EditProfileModal({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="2xl"
-      scrollBehavior="inside"
-      classNames={{
-        base: "max-h-[90vh]",
-      }}
-    >
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              Modifier le profil
-            </ModalHeader>
-            <ModalBody>
-              <form id="profile-form" onSubmit={(e) => e.preventDefault()}>
-                {/* Section Informations personnelles */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                    Informations personnelles
-                  </h3>
+    <>
+      <Modal
+        classNames={{
+          base: "max-h-[90vh]",
+        }}
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size="2xl"
+        onClose={onClose}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Modifier le profil
+              </ModalHeader>
+              <ModalBody>
+                <form id="profile-form" onSubmit={(e) => e.preventDefault()}>
+                  {/* Section Informations personnelles */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">
+                      Informations personnelles
+                    </h3>
 
-                  <Controller
-                    name="name"
-                    control={userControl}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        label="Nom complet"
-                        placeholder="Votre nom complet"
-                        errorMessage={userErrors.name?.message}
-                        isInvalid={!!userErrors.name}
-                      />
-                    )}
-                  />
+                    <Controller
+                      control={userControl}
+                      name="name"
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          errorMessage={userErrors.name?.message}
+                          isInvalid={!!userErrors.name}
+                          label="Nom complet"
+                          placeholder="Votre nom complet"
+                        />
+                      )}
+                    />
 
-                  <Controller
-                    name="telephone"
-                    control={userControl}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        value={field.value ?? ""}
-                        label="Téléphone"
-                        placeholder="+33 6 12 34 56 78"
-                        errorMessage={userErrors.telephone?.message}
-                        isInvalid={!!userErrors.telephone}
-                      />
-                    )}
-                  />
+                    <Controller
+                      control={userControl}
+                      name="telephone"
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          errorMessage={userErrors.telephone?.message}
+                          isInvalid={!!userErrors.telephone}
+                          label="Téléphone"
+                          placeholder="+33 6 12 34 56 78"
+                          value={field.value ?? ""}
+                        />
+                      )}
+                    />
 
-                  <Controller
-                    name="adresse"
-                    control={userControl}
-                    render={({ field }) => (
-                      <Textarea
-                        {...field}
-                        value={field.value ?? ""}
-                        label="Adresse"
-                        placeholder="Votre adresse complète"
-                        errorMessage={userErrors.adresse?.message}
-                        isInvalid={!!userErrors.adresse}
-                        minRows={2}
-                      />
-                    )}
-                  />
+                    <Controller
+                      control={userControl}
+                      name="adresse"
+                      render={({ field }) => (
+                        <Textarea
+                          {...field}
+                          errorMessage={userErrors.adresse?.message}
+                          isInvalid={!!userErrors.adresse}
+                          label="Adresse"
+                          minRows={2}
+                          placeholder="Votre adresse complète"
+                          value={field.value ?? ""}
+                        />
+                      )}
+                    />
 
-                  <Controller
-                    name="dateNaissance"
-                    control={userControl}
-                    render={({ field }) => (
-                      <DatePicker
-                        label="Date de naissance"
-                        value={formatDateForPicker(field.value)}
-                        onChange={(date) => {
-                          field.onChange(
-                            date ? date.toString() : null,
-                          );
-                        }}
-                        errorMessage={userErrors.dateNaissance?.message}
-                        isInvalid={!!userErrors.dateNaissance}
-                        showMonthAndYearPickers 
-                      />
-                    )}
-                  />
-                </div>
+                    <Controller
+                      control={userControl}
+                      name="dateNaissance"
+                      render={({ field }) => (
+                        <DatePicker
+                          showMonthAndYearPickers
+                          errorMessage={userErrors.dateNaissance?.message}
+                          isInvalid={!!userErrors.dateNaissance}
+                          label="Date de naissance"
+                          value={formatDateForPicker(field.value)}
+                          onChange={(date) => {
+                            field.onChange(date ? date.toString() : null);
+                          }}
+                        />
+                      )}
+                    />
+                  </div>
 
-                {/* Section Informations professionnelles (Enseignant) */}
-                {role === "enseignant" && (
-                  <>
-                    <Divider className="my-6" />
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">
-                        Informations professionnelles
-                      </h3>
+                  {/* Section Informations professionnelles (Enseignant) */}
+                  {role === "enseignant" && (
+                    <>
+                      <Divider className="my-6" />
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">
+                          Informations professionnelles
+                        </h3>
 
-                      <Controller
-                        name="grade"
-                        control={enseignantControl}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            value={field.value ?? ""}
-                            label="Grade"
-                            placeholder="Maître de conférence, Professeur, etc."
-                            errorMessage={enseignantErrors.grade?.message}
-                            isInvalid={!!enseignantErrors.grade}
-                          />
-                        )}
-                      />
+                        <Controller
+                          control={enseignantControl}
+                          name="grade"
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              errorMessage={enseignantErrors.grade?.message}
+                              isInvalid={!!enseignantErrors.grade}
+                              label="Grade"
+                              placeholder="Maître de conférence, Professeur, etc."
+                              value={field.value ?? ""}
+                            />
+                          )}
+                        />
 
-                      <Controller
-                        name="specialite"
-                        control={enseignantControl}
-                        render={({ field }) => (
-                          <Select
-                            label="Spécialités (Matières enseignées)"
-                            placeholder="Sélectionnez vos matières"
-                            selectedKeys={field.value || []}
-                            selectionMode="multiple"
-                            errorMessage={enseignantErrors.specialite?.message}
-                            isInvalid={!!enseignantErrors.specialite}
-                            onSelectionChange={(keys) => {
-                              field.onChange(Array.from(keys) as string[]);
-                            }}
+                        <div className="space-y-2">
+                          <div className="flex gap-2 items-end">
+                            <div className="flex-1">
+                              <Controller
+                                control={enseignantControl}
+                                name="specialite"
+                                render={({ field }) => (
+                                  <Select
+                                    errorMessage={
+                                      enseignantErrors.specialite?.message
+                                    }
+                                    isInvalid={!!enseignantErrors.specialite}
+                                    label="Spécialités (Matières enseignées)"
+                                    placeholder="Sélectionnez vos matières"
+                                    selectedKeys={field.value || []}
+                                    selectionMode="multiple"
+                                    onSelectionChange={(keys) => {
+                                      field.onChange(
+                                        Array.from(keys) as string[],
+                                      );
+                                    }}
+                                  >
+                                    {(matieres || []).map((matiere) => (
+                                      <SelectItem key={matiere.id}>
+                                        {matiere.nom}
+                                      </SelectItem>
+                                    ))}
+                                  </Select>
+                                )}
+                              />
+                            </div>
+                            <Button
+                              isIconOnly
+                              color="primary"
+                              size="md"
+                              title="Ajouter une nouvelle matière"
+                              variant="flat"
+                              onPress={() => setIsCreateMatiereModalOpen(true)}
+                            >
+                              <Plus className="w-5 h-5" />
+                            </Button>
+                          </div>
+                          <Button
+                            className="w-full"
+                            color="primary"
+                            size="sm"
+                            startContent={<Plus className="w-4 h-4" />}
+                            variant="flat"
+                            onPress={() => setIsCreateMatiereModalOpen(true)}
                           >
-                            {(matieres || []).map((matiere) => (
-                              <SelectItem key={matiere.id}>
-                                {matiere.nom}
-                              </SelectItem>
-                            ))}
-                          </Select>
-                        )}
-                      />
+                            Ajouter une nouvelle matière
+                          </Button>
+                        </div>
 
-                      <Controller
-                        name="departement"
-                        control={enseignantControl}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            value={field.value ?? ""}
-                            label="Département"
-                            placeholder="Votre département"
-                            errorMessage={enseignantErrors.departement?.message}
-                            isInvalid={!!enseignantErrors.departement}
-                          />
-                        )}
-                      />
+                        <Controller
+                          control={enseignantControl}
+                          name="departement"
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              errorMessage={
+                                enseignantErrors.departement?.message
+                              }
+                              isInvalid={!!enseignantErrors.departement}
+                              label="Département"
+                              placeholder="Votre département"
+                              value={field.value ?? ""}
+                            />
+                          )}
+                        />
 
-                      <Controller
-                        name="bureau"
-                        control={enseignantControl}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            value={field.value ?? ""}
-                            label="Bureau"
-                            placeholder="Numéro de bureau"
-                            errorMessage={enseignantErrors.bureau?.message}
-                            isInvalid={!!enseignantErrors.bureau}
-                          />
-                        )}
-                      />
+                        <Controller
+                          control={enseignantControl}
+                          name="bureau"
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              errorMessage={enseignantErrors.bureau?.message}
+                              isInvalid={!!enseignantErrors.bureau}
+                              label="Bureau"
+                              placeholder="Numéro de bureau"
+                              value={field.value ?? ""}
+                            />
+                          )}
+                        />
 
-                      <Controller
-                        name="horairesDisponibilite"
-                        control={enseignantControl}
-                        render={({ field }) => (
-                          <HorairesInput
-                            value={field.value}
-                            errorMessage={
-                              enseignantErrors.horairesDisponibilite?.message
-                            }
-                            isInvalid={!!enseignantErrors.horairesDisponibilite}
-                            onChange={field.onChange}
-                          />
-                        )}
-                      />
+                        <Controller
+                          control={enseignantControl}
+                          name="horairesDisponibilite"
+                          render={({ field }) => (
+                            <HorairesInput
+                              errorMessage={
+                                enseignantErrors.horairesDisponibilite?.message
+                              }
+                              isInvalid={
+                                !!enseignantErrors.horairesDisponibilite
+                              }
+                              value={field.value}
+                              onChange={field.onChange}
+                            />
+                          )}
+                        />
 
-                      <Controller
-                        name="dateEmbauche"
-                        control={enseignantControl}
-                        render={({ field }) => (
-                          <DatePicker
-                            label="Date d'embauche"
-                            value={formatDateForPicker(field.value)}
-                            onChange={(date) => {
-                              field.onChange(
-                                date ? date.toString() : null,
-                              );
-                            }}
-                            errorMessage={enseignantErrors.dateEmbauche?.message}
-                            isInvalid={!!enseignantErrors.dateEmbauche}
-                            showMonthAndYearPickers 
-                          />
-                        )}
-                      />
-                    </div>
-                  </>
-                )}
+                        <Controller
+                          control={enseignantControl}
+                          name="dateEmbauche"
+                          render={({ field }) => (
+                            <DatePicker
+                              showMonthAndYearPickers
+                              errorMessage={
+                                enseignantErrors.dateEmbauche?.message
+                              }
+                              isInvalid={!!enseignantErrors.dateEmbauche}
+                              label="Date d'embauche"
+                              value={formatDateForPicker(field.value)}
+                              onChange={(date) => {
+                                field.onChange(date ? date.toString() : null);
+                              }}
+                            />
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
 
-                {/* Section Informations académiques (Étudiant) */}
-                {role === "etudiant" && (
-                  <>
-                    <Divider className="my-6" />
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">
-                        Informations académiques
-                      </h3>
+                  {/* Section Informations académiques (Étudiant) */}
+                  {role === "etudiant" && (
+                    <>
+                      <Divider className="my-6" />
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">
+                          Informations académiques
+                        </h3>
 
-                      <Controller
-                        name="anneeAdmission"
-                        control={etudiantControl}
-                        render={({ field }) => (
-                          <Input
-                            {...field}
-                            value={field.value ?? ""}
-                            label="Année d'admission"
-                            placeholder="2024-2025"
-                            errorMessage={etudiantErrors.anneeAdmission?.message}
-                            isInvalid={!!etudiantErrors.anneeAdmission}
-                          />
-                        )}
-                      />
+                        <Controller
+                          control={etudiantControl}
+                          name="anneeAdmission"
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              errorMessage={
+                                etudiantErrors.anneeAdmission?.message
+                              }
+                              isInvalid={!!etudiantErrors.anneeAdmission}
+                              label="Année d'admission"
+                              placeholder="2024-2025"
+                              value={field.value ?? ""}
+                            />
+                          )}
+                        />
 
-                      <Controller
-                        name="niveauId"
-                        control={etudiantControl}
-                        render={({ field }) => (
-                          <Select
-                            label="Niveau"
-                            placeholder="Sélectionner un niveau"
-                            selectedKeys={field.value ? [field.value] : []}
-                            onSelectionChange={(keys) => {
-                              const selected = Array.from(keys)[0] as string;
-                              field.onChange(selected || null);
-                            }}
-                            errorMessage={etudiantErrors.niveauId?.message}
-                            isInvalid={!!etudiantErrors.niveauId}
-                          >
-                            {(niveaux || []).map((niveau) => (
-                              <SelectItem key={niveau.id}>
-                                {niveau.nom}
-                              </SelectItem>
-                            ))}
-                          </Select>
-                        )}
-                      />
+                        <Controller
+                          control={etudiantControl}
+                          name="niveauId"
+                          render={({ field }) => (
+                            <Select
+                              errorMessage={etudiantErrors.niveauId?.message}
+                              isInvalid={!!etudiantErrors.niveauId}
+                              label="Niveau"
+                              placeholder="Sélectionner un niveau"
+                              selectedKeys={field.value ? [field.value] : []}
+                              onSelectionChange={(keys) => {
+                                const selected = Array.from(keys)[0] as string;
 
-                      <Controller
-                        name="mentionId"
-                        control={etudiantControl}
-                        render={({ field }) => (
-                          <Select
-                            label="Mention"
-                            placeholder="Sélectionner une mention"
-                            selectedKeys={field.value ? [field.value] : []}
-                            onSelectionChange={(keys) => {
-                              const selected = Array.from(keys)[0] as string;
-                              field.onChange(selected || null);
-                            }}
-                            errorMessage={etudiantErrors.mentionId?.message}
-                            isInvalid={!!etudiantErrors.mentionId}
-                          >
-                            {(mentions || []).map((mention) => (
-                              <SelectItem key={mention.id}>
-                                {mention.nom}
-                              </SelectItem>
-                            ))}
-                          </Select>
-                        )}
-                      />
+                                field.onChange(selected || null);
+                              }}
+                            >
+                              {(niveaux || []).map((niveau) => (
+                                <SelectItem key={niveau.id}>
+                                  {niveau.nom}
+                                </SelectItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
 
-                      <Controller
-                        name="parcoursId"
-                        control={etudiantControl}
-                        render={({ field }) => (
-                          <Select
-                            label="Parcours"
-                            placeholder="Sélectionner un parcours"
-                            selectedKeys={field.value ? [field.value] : []}
-                            onSelectionChange={(keys) => {
-                              const selected = Array.from(keys)[0] as string;
-                              field.onChange(selected || null);
-                            }}
-                            errorMessage={etudiantErrors.parcoursId?.message}
-                            isInvalid={!!etudiantErrors.parcoursId}
-                          >
-                            {(parcours || []).map((p) => (
-                              <SelectItem key={p.id}>
-                                {p.nom}
-                              </SelectItem>
-                            ))}
-                          </Select>
-                        )}
-                      />
+                        <Controller
+                          control={etudiantControl}
+                          name="mentionId"
+                          render={({ field }) => (
+                            <Select
+                              errorMessage={etudiantErrors.mentionId?.message}
+                              isInvalid={!!etudiantErrors.mentionId}
+                              label="Mention"
+                              placeholder="Sélectionner une mention"
+                              selectedKeys={field.value ? [field.value] : []}
+                              onSelectionChange={(keys) => {
+                                const selected = Array.from(keys)[0] as string;
 
-                      <Controller
-                        name="matieres"
-                        control={etudiantControl}
-                        render={({ field }) => (
-                          <Select
-                            label="Matières"
-                            placeholder="Sélectionner vos matières"
-                            selectionMode="multiple"
-                            selectedKeys={new Set(field.value || [])}
-                            onSelectionChange={(keys) => {
-                              field.onChange(Array.from(keys));
-                            }}
-                            errorMessage={etudiantErrors.matieres?.message}
-                            isInvalid={!!etudiantErrors.matieres}
-                          >
-                            {(matieres || []).map((matiere) => (
-                              <SelectItem key={matiere.id}>
-                                {matiere.nom}
-                              </SelectItem>
-                            ))}
-                          </Select>
-                        )}
-                      />
-                    </div>
-                  </>
-                )}
-              </form>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                color="danger"
-                variant="light"
-                onPress={onClose}
-                isDisabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button
-                color="primary"
-                onPress={handleFormSubmit}
-                isLoading={isSubmitting}
-              >
-                Enregistrer
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+                                field.onChange(selected || null);
+                              }}
+                            >
+                              {(mentions || []).map((mention) => (
+                                <SelectItem key={mention.id}>
+                                  {mention.nom}
+                                </SelectItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
+
+                        <Controller
+                          control={etudiantControl}
+                          name="parcoursId"
+                          render={({ field }) => (
+                            <Select
+                              errorMessage={etudiantErrors.parcoursId?.message}
+                              isInvalid={!!etudiantErrors.parcoursId}
+                              label="Parcours"
+                              placeholder="Sélectionner un parcours"
+                              selectedKeys={field.value ? [field.value] : []}
+                              onSelectionChange={(keys) => {
+                                const selected = Array.from(keys)[0] as string;
+
+                                field.onChange(selected || null);
+                              }}
+                            >
+                              {(parcours || []).map((p) => (
+                                <SelectItem key={p.id}>{p.nom}</SelectItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
+
+                        <Controller
+                          control={etudiantControl}
+                          name="matieres"
+                          render={({ field }) => (
+                            <Select
+                              errorMessage={etudiantErrors.matieres?.message}
+                              isInvalid={!!etudiantErrors.matieres}
+                              label="Matières"
+                              placeholder="Sélectionner vos matières"
+                              selectedKeys={new Set(field.value || [])}
+                              selectionMode="multiple"
+                              onSelectionChange={(keys) => {
+                                field.onChange(Array.from(keys));
+                              }}
+                            >
+                              {(matieres || []).map((matiere) => (
+                                <SelectItem key={matiere.id}>
+                                  {matiere.nom}
+                                </SelectItem>
+                              ))}
+                            </Select>
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
+                </form>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  isDisabled={isSubmitting}
+                  variant="light"
+                  onPress={onClose}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  color="primary"
+                  isLoading={isSubmitting}
+                  onPress={handleFormSubmit}
+                >
+                  Enregistrer
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* Modal de création de matière (enseignant uniquement) */}
+      {role === "enseignant" && (
+        <CreateMatiereModal
+          isOpen={isCreateMatiereModalOpen}
+          onClose={() => setIsCreateMatiereModalOpen(false)}
+          onSuccess={handleMatiereCreated}
+        />
+      )}
+    </>
   );
 }
-

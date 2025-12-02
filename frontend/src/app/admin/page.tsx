@@ -57,8 +57,8 @@ export default function AdminDashboardPage() {
       const actions = await adminService.getUrgentActions();
 
       setUrgentActions(actions);
-    } catch (error) {
-      console.error("Erreur lors du chargement des actions urgentes:", error);
+    } catch {
+      // Ignorer les erreurs de chargement
     }
   };
 
@@ -200,11 +200,11 @@ export default function AdminDashboardPage() {
                 <GraduationCap className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <Button
+                isIconOnly
                 as={NextLink}
                 href="/admin/etudiants"
-                isIconOnly
-                variant="light"
                 size="sm"
+                variant="light"
               >
                 <ArrowRight className="w-4 h-4" />
               </Button>
@@ -214,7 +214,7 @@ export default function AdminDashboardPage() {
               Créer, modifier et assigner des étudiants aux classes et matières
             </p>
             <div className="mt-4 flex items-center gap-2">
-              <Chip size="sm" color="secondary">
+              <Chip color="secondary" size="sm">
                 {stats?.usersByRole?.etudiant || 0} étudiants
               </Chip>
             </div>
@@ -228,21 +228,23 @@ export default function AdminDashboardPage() {
                 <BookOpen className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <Button
+                isIconOnly
                 as={NextLink}
                 href="/admin/professeurs"
-                isIconOnly
-                variant="light"
                 size="sm"
+                variant="light"
               >
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
-            <h3 className="text-lg font-semibold mb-2">Gérer les Professeurs</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Gérer les Professeurs
+            </h3>
             <p className="text-sm text-default-500">
               Créer, modifier et assigner des professeurs aux matières
             </p>
             <div className="mt-4 flex items-center gap-2">
-              <Chip size="sm" color="default">
+              <Chip color="default" size="sm">
                 {stats?.usersByRole?.enseignant || 0} professeurs
               </Chip>
             </div>
@@ -256,11 +258,11 @@ export default function AdminDashboardPage() {
                 <Settings className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <Button
+                isIconOnly
                 as={NextLink}
                 href="/admin/ai-configs"
-                isIconOnly
-                variant="light"
                 size="sm"
+                variant="light"
               >
                 <ArrowRight className="w-4 h-4" />
               </Button>
@@ -270,7 +272,7 @@ export default function AdminDashboardPage() {
               Gérer les modèles IA utilisés pour la génération de QCM
             </p>
             <div className="mt-4 flex items-center gap-2">
-              <Chip size="sm" color="success">
+              <Chip color="success" size="sm">
                 Modèles actifs
               </Chip>
             </div>

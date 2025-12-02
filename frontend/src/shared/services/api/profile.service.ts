@@ -1,8 +1,9 @@
-import { enseignantService } from "./enseignant.service";
-import { etudiantService } from "./etudiant.service";
 import type { EnseignantWithRelations } from "../../types/enseignant.types";
 import type { EtudiantWithRelations } from "../../types/etudiant.types";
 import type { User } from "../../types/auth.types";
+
+import { etudiantService } from "./etudiant.service";
+import { enseignantService } from "./enseignant.service";
 
 export type ProfileData =
   | (EnseignantWithRelations & { role: "enseignant" })
@@ -43,4 +44,3 @@ export const profileService = {
     throw new Error("Profil non disponible pour ce rôle");
   },
 };
-

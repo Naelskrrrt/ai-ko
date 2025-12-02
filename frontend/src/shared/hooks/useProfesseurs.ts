@@ -1,13 +1,17 @@
+import type {
+  Professeur,
+  UsersFilters,
+  PaginatedResponse,
+} from "../types/admin.types";
+
 import useSWR from "swr";
 
-import type { Professeur, UsersFilters, PaginatedResponse } from "../types/admin.types";
 import { adminService } from "../services/api/admin.service";
 
 export function useProfesseurs(filters: UsersFilters = {}) {
-  const { data, error, mutate, isLoading } = useSWR<PaginatedResponse<Professeur>>(
-    ["professeurs", filters],
-    () => adminService.getProfesseurs(filters),
-  );
+  const { data, error, mutate, isLoading } = useSWR<
+    PaginatedResponse<Professeur>
+  >(["professeurs", filters], () => adminService.getProfesseurs(filters));
 
   return {
     professeurs: data?.data || [],
@@ -31,5 +35,3 @@ export function useProfesseur(id: string | null) {
     mutate,
   };
 }
-
-

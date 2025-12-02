@@ -71,6 +71,7 @@ interface ResultatBackend {
   scoreTotal: number;
   scoreMaximum: number;
   status: string;
+  estPublie?: boolean;
   dateDebut: string;
   dateFin?: string;
   dureeReelleSecondes?: number;
@@ -81,9 +82,6 @@ interface ResultatBackend {
   feedbackAuto?: string;
   commentaireProf?: string;
   reponsesDetail?: Record<string, any>;
-  estPublie?: boolean;
-  afficherCorrection?: boolean;
-  message?: string;
 }
 
 /**
@@ -177,8 +175,6 @@ export function transformResultatToResultat(
     nb_correctes: resultat.questionsCorrectes,
     feedback_general: resultat.feedbackAuto || resultat.commentaireProf,
     reponses: transformReponsesDetail(resultat.reponsesDetail || {}),
-    afficherCorrection: resultat.afficherCorrection,
-    message: resultat.message,
   };
 }
 

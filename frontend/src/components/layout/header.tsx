@@ -16,19 +16,17 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/dropdown";
-import { Divider } from "@heroui/divider";
 import NextLink from "next/link";
-import Image from "next/image";
 import clsx from "clsx";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 
 import { siteConfig } from "@/core/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { ThemeColorSwitch } from "@/components/theme-color-switch";
 import { Logo, MenuIcon } from "@/components/icons";
 import { useAuth } from "@/core/providers/AuthProvider";
+import { PendingUsersNotification } from "@/components/admin/PendingUsersNotification";
 
 interface HeaderProps {
   onSidebarToggle?: () => void;
@@ -59,15 +57,6 @@ export const Header = ({
       .join("")
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  const formatRole = (role?: string): string => {
-    const roleMap: Record<string, string> = {
-      admin: "Administrateur",
-      etudiant: "Étudiant",
-      enseignant: "Enseignant",
-    };
-    return roleMap[role || ""] || role || "Utilisateur";
   };
 
   return (
@@ -132,6 +121,8 @@ export const Header = ({
         <NavbarItem className="flex items-center gap-2">
           <ThemeColorSwitch />
           <ThemeSwitch />
+          {/* Notification pour les nouveaux utilisateurs en attente (admins uniquement) */}
+          {user?.role === "admin" && <PendingUsersNotification />}
         </NavbarItem>
 
         {!loading && user ? (
@@ -151,61 +142,6 @@ export const Header = ({
               </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="User menu">
-              {/* Section info utilisateur */}
-              <DropdownItem
-                key="user-info"
-                isReadOnly
-                textValue="User info"
-                className="h-auto py-3 cursor-default"
-              >
-                <div className="flex items-center gap-3 w-full">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
-                    {user.avatar ? (
-                      <Image
-                        src={user.avatar}
-                        alt={user.name || user.email || "User"}
-                        className="rounded-full object-cover"
-                        width={40}
-                        height={40}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-theme-primary/20 flex items-center justify-center text-sm font-semibold text-theme-primary">
-                        {getInitials(user.name || user.email || "")}
-                      </div>
-                    )}
-                  </div>
-                  {/* Infos */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">
-                      {user.name || user.email}
-                    </p>
-                    <p className="text-xs text-default-500 truncate">
-                      {user.email}
-                    </p>
-                    <p className="text-xs text-default-400">
-                      {formatRole(user.role)}
-                    </p>
-                  </div>
-                  {/* Bouton navigation */}
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    onPress={() => router.push("/profile")}
-                    className="flex-shrink-0"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </DropdownItem>
-
-              {/* Divider */}
-              <DropdownItem key="divider" isReadOnly textValue="divider">
-                <Divider />
-              </DropdownItem>
-
-              {/* Items existants */}
               {user?.role === "etudiant" ? (
                 <DropdownItem
                   key="matieres"

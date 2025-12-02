@@ -162,9 +162,9 @@ export default function NotesPage() {
                           <h3 className="font-semibold">
                             {resultat.examen_titre}
                           </h3>
-                          {(!resultat.estPublie || resultat.statut === "en_attente") && (
+                          {resultat.statut === "en_attente" && (
                             <Chip color="warning" size="sm" variant="flat">
-                              Correction en cours
+                              En attente
                             </Chip>
                           )}
                         </div>
@@ -177,44 +177,31 @@ export default function NotesPage() {
 
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          {!resultat.estPublie || resultat.statut === "en_attente" ? (
-                            <div className="text-center">
-                              <span className="text-xl font-bold text-default-400">
-                                —
-                              </span>
-                              <p className="text-xs text-default-400">
-                                En attente
-                              </p>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="flex items-center gap-2">
-                                {isReussi ? (
-                                  <TrendingUp className="h-4 w-4 text-success" />
-                                ) : (
-                                  <TrendingDown className="h-4 w-4 text-danger" />
-                                )}
-                                <span
-                                  className={`text-xl font-bold text-${noteColor}`}
-                                >
-                                  {resultat.note}/{resultat.note_max}
-                                </span>
-                              </div>
-                              <p className="text-xs text-default-500">
-                                {resultat.pourcentage}%
-                              </p>
-                            </>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {isReussi ? (
+                              <TrendingUp className="h-4 w-4 text-success" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4 text-danger" />
+                            )}
+                            <span
+                              className={`text-xl font-bold text-${noteColor}`}
+                            >
+                              {resultat.note}/{resultat.note_max}
+                            </span>
+                          </div>
+                          <p className="text-xs text-default-500">
+                            {resultat.pourcentage}%
+                          </p>
                         </div>
 
-                        {resultat.statut === "corrige" && (resultat.estPublie !== false) && (
+                        {resultat.statut === "corrige" && (
                           <Button
                             isIconOnly
                             size="sm"
                             variant="flat"
                             onPress={() =>
                               router.push(
-                                `/etudiant/notes/${resultat.id}`,
+                                `/etudiant/examens/${resultat.id}/resultat`,
                               )
                             }
                           >

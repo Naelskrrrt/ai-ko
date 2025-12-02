@@ -15,13 +15,12 @@ import useSWR from "swr";
 
 import { qcmService } from "../../services/qcm.service";
 import { useTaskPolling } from "../../hooks/useTaskPolling";
+
 import { profileService } from "@/shared/services/api/profile.service";
 import { useAuth } from "@/core/providers/AuthProvider";
-
 import { mentionService } from "@/shared/services/api/mention.service";
 import { parcoursService } from "@/shared/services/api/parcours.service";
 import { NIVEAUX_STATIQUES } from "@/shared/types/niveau.types";
-
 import { useToast } from "@/hooks/use-toast";
 
 // Schéma de validation Zod
@@ -92,17 +91,20 @@ export function QCMGenerateForm({
   // Récupérer les matières de l'enseignant connecté
   const { user } = useAuth();
   const { data: profileData } = useSWR(
-    user?.role === "enseignant" ? ["profile-enseignant-qcm", "enseignant"] : null,
+    user?.role === "enseignant"
+      ? ["profile-enseignant-qcm", "enseignant"]
+      : null,
     async () => {
       return await profileService.getMyProfile("enseignant");
     },
   );
-  
+
   // Extraire les matières du profil enseignant
   const matieres = React.useMemo(() => {
     if (profileData && "matieres" in profileData && profileData.matieres) {
       return profileData.matieres;
     }
+
     return [];
   }, [profileData]);
 
@@ -116,6 +118,7 @@ export function QCMGenerateForm({
     user?.role === "enseignant" ? ["qcms-for-generate"] : null,
     async () => {
       const response = await qcmService.getQCMs({ status: "published" });
+
       return response.data || [];
     },
   );
@@ -128,25 +131,29 @@ export function QCMGenerateForm({
       ? ["mentions-profile", profileData.id]
       : null,
     async () => {
-      if (profileData && "mentions" in profileData && profileData.mentions && profileData.mentions.length > 0) {
+      if (
+        profileData &&
+        "mentions" in profileData &&
+        profileData.mentions &&
+        profileData.mentions.length > 0
+      ) {
         return profileData.mentions;
       }
+
       return null;
     },
   );
 
-  const { data: allMentions } = useSWR(
-    ["mentions-all"],
-    async () => {
-      return await mentionService.getMentions(true); // Seulement les actives
-    },
-  );
+  const { data: allMentions } = useSWR(["mentions-all"], async () => {
+    return await mentionService.getMentions(true); // Seulement les actives
+  });
 
   const mentions = React.useMemo(() => {
     // Utiliser les mentions du profil s'ils existent, sinon toutes les mentions actives
     if (mentionsFromProfile && mentionsFromProfile.length > 0) {
       return mentionsFromProfile;
     }
+
     return allMentions || [];
   }, [mentionsFromProfile, allMentions]);
 
@@ -160,24 +167,24 @@ export function QCMGenerateForm({
         const parcoursArray = Array.isArray(profileData.parcours)
           ? profileData.parcours
           : [profileData.parcours];
+
         return parcoursArray.length > 0 ? parcoursArray : null;
       }
+
       return null;
     },
   );
 
-  const { data: allParcours } = useSWR(
-    ["parcours-all"],
-    async () => {
-      return await parcoursService.getParcours(true); // Seulement les actifs
-    },
-  );
+  const { data: allParcours } = useSWR(["parcours-all"], async () => {
+    return await parcoursService.getParcours(true); // Seulement les actifs
+  });
 
   const parcours = React.useMemo(() => {
     // Utiliser les parcours du profil s'ils existent, sinon tous les parcours actifs
     if (parcoursFromProfile && parcoursFromProfile.length > 0) {
       return parcoursFromProfile;
     }
+
     return allParcours || [];
   }, [parcoursFromProfile, allParcours]);
 
@@ -203,6 +210,7 @@ export function QCMGenerateForm({
   const selectedQcmId = watch("qcmId");
   const selectedQcm = React.useMemo(() => {
     if (!selectedQcmId) return null;
+
     return qcms.find((q) => q.id === selectedQcmId);
   }, [qcms, selectedQcmId]);
 
@@ -382,6 +390,7 @@ export function QCMGenerateForm({
                 selectedKeys={field.value ? [field.value] : []}
                 onSelectionChange={(keys) => {
                   const selectedKey = Array.from(keys)[0] as string;
+
                   field.onChange(selectedKey || undefined);
                 }}
               >
@@ -435,6 +444,7 @@ export function QCMGenerateForm({
                   selectedKeys={field.value ? [field.value] : []}
                   onSelectionChange={(keys) => {
                     const selectedKey = Array.from(keys)[0] as string;
+
                     field.onChange(selectedKey || undefined);
                   }}
                 >
@@ -447,8 +457,6 @@ export function QCMGenerateForm({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-
             <Controller
               control={control}
               name="mentionId"
@@ -460,6 +468,7 @@ export function QCMGenerateForm({
                   selectedKeys={field.value ? [field.value] : []}
                   onSelectionChange={(keys) => {
                     const selectedKey = Array.from(keys)[0] as string;
+
                     field.onChange(selectedKey || undefined);
                   }}
                 >
@@ -481,6 +490,7 @@ export function QCMGenerateForm({
                   selectedKeys={field.value ? [field.value] : []}
                   onSelectionChange={(keys) => {
                     const selectedKey = Array.from(keys)[0] as string;
+
                     field.onChange(selectedKey || undefined);
                   }}
                 >
