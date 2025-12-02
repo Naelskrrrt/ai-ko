@@ -38,13 +38,13 @@ USER appuser
 
 # Healthcheck - endpoint API correct
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-    CMD curl -f http://localhost:${PORT:-5000}/api/health || exit 1
+    CMD curl -f http://localhost:5000/api/health || exit 1
 
-# Port (Railway utilise $PORT)
-EXPOSE ${PORT:-5000}
+# Port par défaut
+EXPOSE 5000
 
-# Commande par défaut - 1 worker pour économiser RAM sur Railway
-CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --timeout 180 run:app
+# Commande par défaut - utilise shell form pour interpréter $PORT
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --timeout 180 run:app"]
 
 
 
