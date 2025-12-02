@@ -20,15 +20,9 @@ RUN useradd -m -u 1000 appuser && \
 
 WORKDIR /app
 
-# Copier et installer dépendances Python
-# Utiliser requirements-railway.txt si disponible (sans torch), sinon requirements.txt
-COPY requirements-railway.txt requirements.txt ./
-RUN if [ -f requirements-railway.txt ]; then \
-        pip install --no-cache-dir -r requirements-railway.txt; \
-    else \
-        pip install --no-cache-dir -r requirements.txt && \
-        pip install gunicorn; \
-    fi
+# Copier et installer dépendances Python OPTIMISÉES (sans torch/transformers)
+COPY requirements-railway.txt ./
+RUN pip install --no-cache-dir -r requirements-railway.txt
 
 # Copier code
 COPY --chown=appuser:appuser . .
@@ -36,15 +30,13 @@ COPY --chown=appuser:appuser . .
 # Utilisateur non-root
 USER appuser
 
-# Healthcheck - endpoint API correct
+# Healthcheck - endpoint correct
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
     CMD curl -f http://localhost:${PORT:-5000}/api/health || exit 1
 
 # Port (Railway utilise $PORT)
 EXPOSE ${PORT:-5000}
 
-# Commande par défaut - 1 worker pour économiser RAM sur Railway
+# Commande de démarrage optimisée pour Railway (1 worker pour économiser RAM)
 CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --timeout 180 run:app
-
-
 
