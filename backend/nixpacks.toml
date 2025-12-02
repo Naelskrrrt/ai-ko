@@ -5,12 +5,17 @@
 nixPkgs = ["python312", "gcc", "postgresql"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt", "pip install gunicorn"]
+# Utiliser requirements-railway.txt optimisé (sans torch/transformers)
+# pour économiser la RAM sur le plan Hobby
+cmds = ["pip install -r requirements-railway.txt"]
 
 [start]
-cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --preload run:app"
+# 1 worker pour économiser la RAM sur le plan Hobby
+cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 180 run:app"
 
 [variables]
 PYTHONUNBUFFERED = "1"
 FLASK_ENV = "production"
+# Utiliser l'API Hugging Face (pas les modèles locaux)
+HF_USE_CHAT_API = "true"
 
