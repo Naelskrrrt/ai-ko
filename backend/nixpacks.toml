@@ -7,11 +7,11 @@ nixPkgs = ["python312", "gcc", "postgresql"]
 [phases.install]
 # Utiliser requirements-railway.txt optimisé (sans torch/transformers)
 # pour économiser la RAM sur le plan Hobby
-cmds = ["pip install -r requirements-railway.txt"]
+cmds = ["python3 -m pip install -r requirements-railway.txt"]
 
 [start]
 # 1 worker pour économiser la RAM sur le plan Hobby
-cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 180 run:app"
+cmd = "python3 -m gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 180 run:app"
 
 [variables]
 PYTHONUNBUFFERED = "1"
