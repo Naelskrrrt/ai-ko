@@ -35,6 +35,9 @@ jwt = JWTManager()
 # Flask-WTF CSRF n'est pas utilisé car on utilise JWT CSRF protection pour les API
 # Si besoin de formulaires HTML plus tard, réactiver avec: from flask_wtf.csrf import CSRFProtect
 
+# WebSocket
+from app.extensions import socketio
+
 
 def create_app(config=None):
     """Factory pour créer l'application Flask"""
@@ -116,6 +119,16 @@ def create_app(config=None):
 
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Configuration du pool de connexions pour éviter les problèmes de connexion intermittents
+    # Particulièrement important pour les déploiements cloud (Railway, Heroku, etc.)
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_size': 5,           # Nombre de connexions permanentes
+        'pool_recycle': 300,      # Recycler les connexions après 5 minutes
+        'pool_pre_ping': True,    # Vérifier la connexion avant utilisation
+        'pool_timeout': 30,       # Timeout pour obtenir une connexion
+        'max_overflow': 10,       # Connexions supplémentaires si besoin
+    }
     app.config['JWT_SECRET_KEY'] = os.getenv(
         'JWT_SECRET_KEY', 'jwt-secret-key')
     app.config['JWT_TOKEN_LOCATION'] = ['headers']  # Utiliser uniquement les headers pour éviter les conflits CSRF
@@ -155,8 +168,23 @@ def create_app(config=None):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    socketio.init_app(app)
     # Ne pas initialiser CSRF globalement car on utilise JWT CSRF protection pour les API
     # csrf.init_app(app)  # Désactivé - on utilise JWT CSRF protection à la place
+    
+    # Ajouter des claims additionnels au JWT (incluant le rôle)
+    @jwt.additional_claims_loader
+    def add_claims_to_access_token(identity):
+        """Ajoute le rôle de l'utilisateur au token JWT"""
+        from app.models.user import User
+        user = User.query.get(identity)
+        if user:
+            return {
+                'role': user.role.value if hasattr(user.role, 'value') else str(user.role),
+                'email': user.email,
+                'name': user.name
+            }
+        return {}
 
     # Prometheus metrics
     PrometheusMetrics(app)
@@ -166,9 +194,14 @@ def create_app(config=None):
     from app.api.auth import bp as auth_bp
     from app.api.docs import api_bp as docs_bp
     from app.api.admin import bp as admin_bp
-    app.register_blueprint(health_bp)
+    from app.api.seed import bp as seed_bp
+    app.register_blueprint(health_bp, url_prefix='/api')
     app.register_blueprint(auth_bp)
     app.register_blueprint(docs_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(seed_bp, url_prefix='/api')
+
+    # Importer les événements WebSocket (nécessaire pour enregistrer les handlers)
+    from app.events import notifications
 
     return app
