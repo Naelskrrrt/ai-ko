@@ -17,11 +17,12 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 # Copier et installer dépendances Python optimisées (sans torch/transformers)
-COPY requirements-railway.txt ./
+# Note: Dockerfile est exécuté depuis la racine du repo
+COPY backend/requirements-railway.txt ./
 RUN pip install --no-cache-dir -r requirements-railway.txt
 
-# Copier le code
-COPY . .
+# Copier le code backend
+COPY backend/ .
 
 # Port (Railway utilise $PORT)
 EXPOSE 5000
