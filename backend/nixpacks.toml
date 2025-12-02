@@ -1,0 +1,16 @@
+# Configuration Nixpacks pour Railway
+# Ce fichier indique à Railway comment construire et démarrer l'application
+
+[phases.setup]
+nixPkgs = ["python312", "gcc", "postgresql"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt", "pip install gunicorn"]
+
+[start]
+cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --preload run:app"
+
+[variables]
+PYTHONUNBUFFERED = "1"
+FLASK_ENV = "production"
+
