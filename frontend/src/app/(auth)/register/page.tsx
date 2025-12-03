@@ -14,13 +14,68 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/core/providers/AuthProvider";
 import { Logo } from "@/components/icons";
 
+// Interface pour les erreurs backend
+interface BackendFieldErrors {
+  name?: string[];
+  email?: string[];
+  password?: string[];
+  [key: string]: string[] | undefined;
+}
+
+interface BackendError {
+  response?: {
+    data?: {
+      message?: string;
+      errors?: BackendFieldErrors;
+    };
+    status?: number;
+  };
+  message?: string;
+}
+
+// Critères de validation du mot de passe
+const passwordCriteria = {
+  minLength: (value: string) => value.length >= 8,
+  hasUppercase: (value: string) => /[A-Z]/.test(value),
+  hasLowercase: (value: string) => /[a-z]/.test(value),
+  hasNumber: (value: string) => /[0-9]/.test(value),
+  hasSpecial: (value: string) => /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(value),
+};
+
+const passwordCriteriaMessages = {
+  minLength: "Au moins 8 caractères",
+  hasUppercase: "Une lettre majuscule",
+  hasLowercase: "Une lettre minuscule",
+  hasNumber: "Un chiffre",
+  hasSpecial: "Un caractère spécial (!@#$%...)",
+};
+
 const registerSchema = z
   .object({
-    name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-    email: z.string().email("Email invalide"),
+    name: z
+      .string()
+      .min(2, "Le nom doit contenir au moins 2 caractères")
+      .max(255, "Le nom ne doit pas dépasser 255 caractères"),
+    email: z
+      .string()
+      .email("Format d'email invalide")
+      .max(255, "L'email ne doit pas dépasser 255 caractères"),
     password: z
       .string()
-      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+      .max(128, "Le mot de passe ne doit pas dépasser 128 caractères")
+      .refine((val) => /[A-Z]/.test(val), {
+        message: "Le mot de passe doit contenir au moins une majuscule",
+      })
+      .refine((val) => /[a-z]/.test(val), {
+        message: "Le mot de passe doit contenir au moins une minuscule",
+      })
+      .refine((val) => /[0-9]/.test(val), {
+        message: "Le mot de passe doit contenir au moins un chiffre",
+      })
+      .refine((val) => /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(val), {
+        message: "Le mot de passe doit contenir au moins un caractère spécial",
+      }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -35,6 +90,7 @@ export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [backendFieldErrors, setBackendFieldErrors] = useState<BackendFieldErrors>({});
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
@@ -43,6 +99,8 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
+    setError: setFormError,
+    watch,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -51,11 +109,99 @@ export default function RegisterPage() {
       password: "",
       confirmPassword: "",
     },
+    mode: "onChange", // Validation en temps réel
   });
+
+  // Observer le mot de passe pour l'indicateur de force
+  const watchPassword = watch("password", "");
+  const watchConfirmPassword = watch("confirmPassword", "");
+
+  // Calculer la force du mot de passe
+  const getPasswordStrength = (password: string) => {
+    if (!password) return { score: 0, label: "", color: "" };
+    
+    let score = 0;
+    if (passwordCriteria.minLength(password)) score++;
+    if (passwordCriteria.hasUppercase(password)) score++;
+    if (passwordCriteria.hasLowercase(password)) score++;
+    if (passwordCriteria.hasNumber(password)) score++;
+    if (passwordCriteria.hasSpecial(password)) score++;
+
+    if (score <= 2) return { score, label: "Faible", color: "bg-danger" };
+    if (score <= 3) return { score, label: "Moyen", color: "bg-warning" };
+    if (score <= 4) return { score, label: "Fort", color: "bg-success" };
+    return { score, label: "Très fort", color: "bg-success" };
+  };
+
+  const passwordStrength = getPasswordStrength(watchPassword);
+
+  // Fonction utilitaire pour extraire le premier message d'erreur d'un champ
+  const getBackendFieldError = (field: keyof BackendFieldErrors): string | undefined => {
+    const fieldErrors = backendFieldErrors[field];
+    return fieldErrors && fieldErrors.length > 0 ? fieldErrors[0] : undefined;
+  };
+
+  // Fonction pour mapper les erreurs backend vers react-hook-form
+  const handleBackendErrors = (err: BackendError) => {
+    const responseData = err.response?.data;
+    const status = err.response?.status;
+
+    // Réinitialiser les erreurs précédentes
+    setBackendFieldErrors({});
+    setError(null);
+
+    // Gérer les erreurs de validation par champ
+    if (responseData?.errors) {
+      const fieldErrors = responseData.errors;
+      setBackendFieldErrors(fieldErrors);
+
+      // Mapper les erreurs vers react-hook-form pour une meilleure intégration
+      Object.entries(fieldErrors).forEach(([field, messages]) => {
+        if (messages && messages.length > 0 && (field === 'name' || field === 'email' || field === 'password')) {
+          setFormError(field as keyof RegisterFormValues, {
+            type: 'server',
+            message: messages[0],
+          });
+        }
+      });
+    }
+
+    // Gérer le message d'erreur principal
+    if (responseData?.message) {
+      const message = responseData.message;
+
+      // Erreur email déjà utilisé
+      if (message.toLowerCase().includes('email') && message.toLowerCase().includes('utilisé')) {
+        setFormError('email', {
+          type: 'server',
+          message: 'Cet email est déjà associé à un compte',
+        });
+        setError(null);
+        return;
+      }
+
+      // Autres erreurs générales
+      setError(message);
+    } else if (status === 400) {
+      setError("Données de formulaire invalides. Veuillez vérifier vos informations.");
+    } else if (status === 500) {
+      setError("Une erreur serveur s'est produite. Veuillez réessayer plus tard.");
+    } else if (err.message) {
+      // Erreur réseau ou autre
+      if (err.message.includes('Network Error') || err.message.includes('timeout')) {
+        setError("Impossible de contacter le serveur. Vérifiez votre connexion internet.");
+      } else {
+        setError("Une erreur s'est produite lors de l'inscription.");
+      }
+    } else {
+      setError("Une erreur inattendue s'est produite.");
+    }
+  };
 
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     setError(null);
+    setBackendFieldErrors({});
 
     try {
       const response = await registerUser(data.name, data.email, data.password);
@@ -82,9 +228,7 @@ export default function RegisterPage() {
         router.push("/onboarding/role-selection");
       }
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-
-      setError(error.response?.data?.message || "Erreur lors de l'inscription");
+      handleBackendErrors(err as BackendError);
     } finally {
       setIsLoading(false);
     }
@@ -186,6 +330,52 @@ export default function RegisterPage() {
                 variant="bordered"
               />
 
+              {/* Indicateur de force du mot de passe */}
+              {watchPassword && (
+                <div className="space-y-2">
+                  {/* Barre de progression */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-default-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                      />
+                    </div>
+                    <span className={`text-xs font-medium ${
+                      passwordStrength.score <= 2 ? 'text-danger' : 
+                      passwordStrength.score <= 3 ? 'text-warning' : 'text-success'
+                    }`}>
+                      {passwordStrength.label}
+                    </span>
+                  </div>
+
+                  {/* Liste des critères */}
+                  <div className="grid grid-cols-1 gap-1 text-xs">
+                    {Object.entries(passwordCriteriaMessages).map(([key, message]) => {
+                      const isValid = passwordCriteria[key as keyof typeof passwordCriteria](watchPassword);
+                      return (
+                        <div key={key} className="flex items-center gap-1.5">
+                          <span className={`flex-shrink-0 w-3.5 h-3.5 rounded-full flex items-center justify-center ${
+                            isValid ? 'bg-success text-white' : 'bg-default-200 text-default-400'
+                          }`}>
+                            {isValid ? (
+                              <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            ) : (
+                              <span className="w-1 h-1 bg-current rounded-full" />
+                            )}
+                          </span>
+                          <span className={isValid ? 'text-success' : 'text-default-400'}>
+                            {message}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <Input
                 {...register("confirmPassword")}
                 endContent={
@@ -216,56 +406,42 @@ export default function RegisterPage() {
                 variant="bordered"
               />
 
+              {/* Indicateur de correspondance des mots de passe */}
+              {watchConfirmPassword && (
+                <div className="flex items-center gap-1.5 text-xs">
+                  {watchPassword === watchConfirmPassword ? (
+                    <>
+                      <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-success text-white flex items-center justify-center">
+                        <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </span>
+                      <span className="text-success">Les mots de passe correspondent</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-danger text-white flex items-center justify-center">
+                        <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </span>
+                      <span className="text-danger">Les mots de passe ne correspondent pas</span>
+                    </>
+                  )}
+                </div>
+              )}
+
               <Button
                 className="w-full bg-theme-primary text-white hover:bg-theme-primary/90"
                 isLoading={isLoading}
                 size="lg"
                 type="submit"
               >
-                {isLoading ? "Inscription..." : "S'inscrire"}
+                {isLoading ? "Chargement..." : "Continuer"}
               </Button>
             </form>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-divider" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-default-500">
-                  Ou continuer avec
-                </span>
-              </div>
-            </div>
-
-            <Button
-              className="w-full"
-              disabled={isLoading}
-              startContent={
-                <svg className="h-4 w-4" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-              }
-              type="button"
-              variant="bordered"
-              onClick={handleGoogleRegister}
-            >
-              Continuer avec Google
-            </Button>
+            
           </CardBody>
         </Card>
 

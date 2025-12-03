@@ -4,7 +4,7 @@ export interface User {
   name: string;
   role: "admin" | "enseignant" | "etudiant";
   emailVerified: boolean;
-  isActive?: boolean;
+  isActive: boolean;
   createdAt: string;
   updatedAt?: string;
 }

@@ -37,3 +37,6 @@ class ParcoursRepository(BaseRepository[Parcours]):
             )
         ).all()
 
+
+
+

@@ -154,3 +154,6 @@ class ParcoursByMention(Resource):
             logger.error(f"Erreur récupération parcours par mention: {e}", exc_info=True)
             api.abort(500, f"Erreur interne: {str(e)}")
 
+
+
+

@@ -1,7 +1,7 @@
 """
 Schémas de validation pour les utilisateurs
 """
-from marshmallow import Schema, fields, validate, ValidationError
+from marshmallow import Schema, fields, validate, ValidationError, INCLUDE
 from app.models.user import UserRole
 
 
@@ -51,4 +51,11 @@ class UserResponseSchema(Schema):
     emailVerified = fields.Bool()
     createdAt = fields.Str()  # Accepter string (déjà formaté par to_dict)
     updatedAt = fields.Str()  # Accepter string (déjà formaté par to_dict)
+    # Profils liés (optionnels)
+    etudiantProfil = fields.Dict(allow_none=True)
+    enseignantProfil = fields.Dict(allow_none=True)
+    
+    class Meta:
+        # Permettre les champs non déclarés (pour flexibilité)
+        unknown = INCLUDE
 

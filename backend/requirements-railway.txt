@@ -9,9 +9,9 @@ Flask-JWT-Extended==4.7.1
 psycopg2-binary==2.9.10
 SQLAlchemy==2.0.36
 
-# Redis & Celery (optionnel - désactivé pour économiser RAM)
-# redis==5.2.1
-# celery==5.4.0
+# Redis & Celery
+redis==5.2.1
+# celery==5.4.0  # Désactivé pour économiser RAM
 
 # IA & ML - SEULEMENT huggingface-hub pour l'API (pas torch/transformers)
 # Note: Le backend utilise l'API Hugging Face Inference, pas les modèles locaux

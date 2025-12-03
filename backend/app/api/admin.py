@@ -3,6 +3,7 @@ Endpoints d'administration (accès admin uniquement)
 """
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity
+from app import db
 from app.utils.decorators import require_role
 from app.services.user_service import UserService
 from app.services.qcm_service import QCMService
@@ -103,11 +104,11 @@ def get_users(current_user):
         if sort_order not in ['asc', 'desc']:
             sort_order = 'desc'
         
-        # Récupérer les utilisateurs
+        # Récupérer les utilisateurs (déjà sous forme de dictionnaires)
         users, total = user_service.get_users(filters=filters, skip=skip, limit=per_page, sort_by=sort_by, sort_order=sort_order)
         
         return jsonify({
-            'users': [user_response_schema.dump(user) for user in users],
+            'users': users,  # users est déjà une liste de dictionnaires
             'pagination': {
                 'page': page,
                 'per_page': per_page,
@@ -122,14 +123,14 @@ def get_users(current_user):
 
 @bp.route('/users/<user_id>', methods=['GET'])
 @require_role('admin')
-def get_user(user_id, current_user):
+def get_user(current_user, user_id):
     """Récupère les détails d'un utilisateur"""
     try:
-        user = user_service.get_user_by_id(user_id)
+        user = user_service.get_user_by_id(user_id)  # Retourne déjà un dict ou None
         if not user:
             return jsonify({'message': 'Utilisateur non trouvé'}), 404
         
-        return jsonify(user_response_schema.dump(user)), 200
+        return jsonify(user), 200  # user est déjà un dictionnaire
         
     except Exception as e:
         return jsonify({'message': f'Erreur: {str(e)}'}), 500
@@ -149,10 +150,10 @@ def create_user(current_user):
         
         validated_data = user_create_schema.load(data)
         
-        # Créer l'utilisateur via le service
+        # Créer l'utilisateur via le service (retourne déjà un dict)
         user = user_service.create_user(validated_data)
         
-        return jsonify(user_response_schema.dump(user)), 201
+        return jsonify(user), 201  # user est déjà un dictionnaire
         
     except ValueError as e:
         return jsonify({'message': str(e)}), 400
@@ -162,7 +163,7 @@ def create_user(current_user):
 
 @bp.route('/users/<user_id>', methods=['PUT'])
 @require_role('admin')
-def update_user(user_id, current_user):
+def update_user(current_user, user_id):
     """Met à jour un utilisateur"""
     try:
         data = request.get_json()
@@ -174,10 +175,10 @@ def update_user(user_id, current_user):
         
         validated_data = user_update_schema.load(data)
         
-        # Mettre à jour via le service
+        # Mettre à jour via le service (retourne déjà un dict)
         user = user_service.update_user(user_id, validated_data, current_user_id=str(current_user.id))
         
-        return jsonify(user_response_schema.dump(user)), 200
+        return jsonify(user), 200  # user est déjà un dictionnaire
         
     except ValueError as e:
         return jsonify({'message': str(e)}), 400
@@ -187,7 +188,7 @@ def update_user(user_id, current_user):
 
 @bp.route('/users/<user_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_user(user_id, current_user):
+def delete_user(current_user, user_id):
     """Supprime un utilisateur"""
     try:
         user_service.delete_user(user_id, current_user_id=str(current_user.id))
@@ -201,7 +202,7 @@ def delete_user(user_id, current_user):
 
 @bp.route('/users/<user_id>/role', methods=['PATCH'])
 @require_role('admin')
-def change_user_role(user_id, current_user):
+def change_user_role(current_user, user_id):
     """Change le rôle d'un utilisateur"""
     try:
         data = request.get_json()
@@ -213,10 +214,10 @@ def change_user_role(user_id, current_user):
         
         validated_data = change_role_schema.load(data)
         
-        # Changer le rôle via le service
+        # Changer le rôle via le service (retourne déjà un dict)
         user = user_service.change_role(user_id, validated_data['role'], current_user_id=str(current_user.id))
         
-        return jsonify(user_response_schema.dump(user)), 200
+        return jsonify(user), 200  # user est déjà un dictionnaire
         
     except ValueError as e:
         return jsonify({'message': str(e)}), 400
@@ -226,18 +227,84 @@ def change_user_role(user_id, current_user):
 
 @bp.route('/users/<user_id>/status', methods=['PATCH'])
 @require_role('admin')
-def toggle_user_status(user_id, current_user):
-    """Active ou désactive un utilisateur"""
+def toggle_user_status(current_user, user_id):
+    """
+    Bascule le statut d'activation d'un utilisateur.
+    
+    Active un utilisateur inactif ou désactive un utilisateur actif.
+    Un administrateur ne peut pas modifier son propre statut.
+    
+    Returns:
+        200: Statut modifié avec succès
+        400: Erreur de validation (ex: auto-modification)
+        404: Utilisateur non trouvé
+        500: Erreur serveur
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
-        # Basculer le statut via le service
-        user = user_service.toggle_status(user_id, current_user_id=str(current_user.id))
-
-        return jsonify(user_response_schema.dump(user)), 200
-
+        logger.info(
+            f"[API toggle_user_status] Requête reçue - "
+            f"Admin: {current_user.email}, Cible: {user_id}"
+        )
+        
+        # Appeler le service qui retourne un dict enrichi
+        result = user_service.toggle_status(
+            user_id, 
+            current_user_id=str(current_user.id)
+        )
+        
+        logger.info(
+            f"[API toggle_user_status] Succès - "
+            f"Utilisateur: {result['user']['email']}, "
+            f"Statut: {result['previousStatus']} -> {result['newStatus']}"
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': result['message'],
+            'data': {
+                'user': result['user'],
+                'previousStatus': result['previousStatus'],
+                'newStatus': result['newStatus']
+            }
+        }), 200
+        
     except ValueError as e:
-        return jsonify({'message': str(e)}), 400
+        error_message = str(e)
+        logger.warning(
+            f"[API toggle_user_status] Erreur de validation - "
+            f"Admin: {current_user.email}, Cible: {user_id}, Erreur: {error_message}"
+        )
+        
+        # Déterminer le code de statut approprié
+        status_code = 404 if "non trouvé" in error_message else 400
+        
+        return jsonify({
+            'success': False,
+            'message': error_message,
+            'error': {
+                'code': 'USER_NOT_FOUND' if status_code == 404 else 'VALIDATION_ERROR',
+                'details': error_message
+            }
+        }), status_code
+        
     except Exception as e:
-        return jsonify({'message': f'Erreur lors du changement de statut: {str(e)}'}), 500
+        logger.error(
+            f"[API toggle_user_status] Erreur serveur - "
+            f"Admin: {current_user.email}, Cible: {user_id}, Erreur: {str(e)}",
+            exc_info=True
+        )
+        
+        return jsonify({
+            'success': False,
+            'message': 'Une erreur inattendue est survenue',
+            'error': {
+                'code': 'INTERNAL_ERROR',
+                'details': str(e)
+            }
+        }), 500
 
 
 # ========================
@@ -291,7 +358,7 @@ def get_qcms(current_user):
 
 @bp.route('/qcm/<qcm_id>', methods=['GET'])
 @require_role('admin')
-def get_qcm(qcm_id, current_user):
+def get_qcm(current_user, qcm_id):
     """Récupère les détails d'un QCM"""
     try:
         qcm = qcm_service.get_qcm_by_id(qcm_id)
@@ -331,7 +398,7 @@ def create_qcm(current_user):
 
 @bp.route('/qcm/<qcm_id>', methods=['PUT'])
 @require_role('admin')
-def update_qcm(qcm_id, current_user):
+def update_qcm(current_user, qcm_id):
     """Met à jour un QCM"""
     try:
         data = request.get_json()
@@ -356,7 +423,7 @@ def update_qcm(qcm_id, current_user):
 
 @bp.route('/qcm/<qcm_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_qcm(qcm_id, current_user):
+def delete_qcm(current_user, qcm_id):
     """Supprime un QCM"""
     try:
         qcm_service.delete_qcm(qcm_id, user_id=str(current_user.id))
@@ -415,7 +482,7 @@ def get_questions(current_user):
 
 @bp.route('/questions/<question_id>', methods=['GET'])
 @require_role('admin')
-def get_question(question_id, current_user):
+def get_question(current_user, question_id):
     """Récupère les détails d'une question"""
     try:
         question = question_service.get_question_by_id(question_id)
@@ -455,7 +522,7 @@ def create_question(current_user):
 
 @bp.route('/questions/<question_id>', methods=['PUT'])
 @require_role('admin')
-def update_question(question_id, current_user):
+def update_question(current_user, question_id):
     """Met à jour une question"""
     try:
         data = request.get_json()
@@ -480,7 +547,7 @@ def update_question(question_id, current_user):
 
 @bp.route('/questions/<question_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_question(question_id, current_user):
+def delete_question(current_user, question_id):
     """Supprime une question"""
     try:
         question_service.delete_question(question_id, user_id=str(current_user.id))
@@ -561,10 +628,15 @@ def get_etudiants(current_user):
         search = request.args.get('search')
         if search:
             filters['search'] = search
-        
+
         niveau_id = request.args.get('niveau_id')
         if niveau_id:
             filters['niveau_id'] = niveau_id
+
+        # Filtre par statut utilisateur (Tous/Actifs/En attente)
+        status = request.args.get('status', 'all')  # 'all', 'active', 'pending'
+        if status != 'all':
+            filters['user_status'] = status
 
         etudiants, total = admin_service.get_all_etudiants(
             filters=filters, skip=skip, limit=per_page
@@ -586,7 +658,7 @@ def get_etudiants(current_user):
 
 @bp.route('/etudiants/<etudiant_id>', methods=['GET'])
 @require_role('admin')
-def get_etudiant(etudiant_id, current_user):
+def get_etudiant(current_user, etudiant_id):
     """Récupère les détails d'un étudiant"""
     try:
         etudiant = admin_service.get_etudiant_by_id(etudiant_id)
@@ -619,7 +691,7 @@ def create_etudiant(current_user):
 
 @bp.route('/etudiants/<etudiant_id>', methods=['PUT'])
 @require_role('admin')
-def update_etudiant(etudiant_id, current_user):
+def update_etudiant(current_user, etudiant_id):
     """Met à jour un étudiant"""
     try:
         data = request.get_json()
@@ -639,7 +711,7 @@ def update_etudiant(etudiant_id, current_user):
 
 @bp.route('/etudiants/<etudiant_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_etudiant(etudiant_id, current_user):
+def delete_etudiant(current_user, etudiant_id):
     """Supprime un étudiant"""
     try:
         admin_service.delete_etudiant(etudiant_id)
@@ -652,7 +724,7 @@ def delete_etudiant(etudiant_id, current_user):
 
 @bp.route('/etudiants/<etudiant_id>/assign', methods=['POST'])
 @require_role('admin')
-def assign_etudiant(etudiant_id, current_user):
+def assign_etudiant(current_user, etudiant_id):
     """Assigne des niveaux/classes/matières à un étudiant"""
     try:
         data = request.get_json()
@@ -692,6 +764,11 @@ def get_professeurs(current_user):
         if matiere_id:
             filters['matiere_id'] = matiere_id
 
+        # Filtre par statut utilisateur (Tous/Actifs/En attente)
+        status = request.args.get('status', 'all')  # 'all', 'active', 'pending'
+        if status != 'all':
+            filters['user_status'] = status
+
         professeurs, total = admin_service.get_all_professeurs(
             filters=filters, skip=skip, limit=per_page
         )
@@ -712,7 +789,7 @@ def get_professeurs(current_user):
 
 @bp.route('/professeurs/<professeur_id>', methods=['GET'])
 @require_role('admin')
-def get_professeur(professeur_id, current_user):
+def get_professeur(current_user, professeur_id):
     """Récupère les détails d'un professeur"""
     try:
         professeur = admin_service.get_professeur_by_id(professeur_id)
@@ -745,7 +822,7 @@ def create_professeur(current_user):
 
 @bp.route('/professeurs/<professeur_id>', methods=['PUT'])
 @require_role('admin')
-def update_professeur(professeur_id, current_user):
+def update_professeur(current_user, professeur_id):
     """Met à jour un professeur"""
     try:
         data = request.get_json()
@@ -765,7 +842,7 @@ def update_professeur(professeur_id, current_user):
 
 @bp.route('/professeurs/<professeur_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_professeur(professeur_id, current_user):
+def delete_professeur(current_user, professeur_id):
     """Supprime un professeur"""
     try:
         admin_service.delete_professeur(professeur_id)
@@ -778,7 +855,7 @@ def delete_professeur(professeur_id, current_user):
 
 @bp.route('/professeurs/<professeur_id>/assign', methods=['POST'])
 @require_role('admin')
-def assign_professeur(professeur_id, current_user):
+def assign_professeur(current_user, professeur_id):
     """Assigne des matières/niveaux/classes à un professeur"""
     try:
         data = request.get_json()
@@ -868,7 +945,7 @@ def get_default_ai_config(current_user):
 
 @bp.route('/ai-configs/<config_id>', methods=['GET'])
 @require_role('admin')
-def get_ai_config(config_id, current_user):
+def get_ai_config(current_user, config_id):
     """Récupère une configuration IA par ID"""
     try:
         config = ai_config_service.get_config_by_id(config_id)
@@ -901,7 +978,7 @@ def create_ai_config(current_user):
 
 @bp.route('/ai-configs/<config_id>', methods=['PUT'])
 @require_role('admin')
-def update_ai_config(config_id, current_user):
+def update_ai_config(current_user, config_id):
     """Met à jour une configuration IA"""
     try:
         data = request.get_json()
@@ -921,7 +998,7 @@ def update_ai_config(config_id, current_user):
 
 @bp.route('/ai-configs/<config_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_ai_config(config_id, current_user):
+def delete_ai_config(current_user, config_id):
     """Supprime une configuration IA"""
     try:
         ai_config_service.delete_config(config_id)
@@ -934,7 +1011,7 @@ def delete_ai_config(config_id, current_user):
 
 @bp.route('/ai-configs/<config_id>/set-default', methods=['POST'])
 @require_role('admin')
-def set_default_ai_config(config_id, current_user):
+def set_default_ai_config(current_user, config_id):
     """Définit une configuration comme défaut"""
     try:
         config = ai_config_service.set_as_default(config_id)
@@ -947,7 +1024,7 @@ def set_default_ai_config(config_id, current_user):
 
 @bp.route('/ai-configs/<config_id>/apply', methods=['POST'])
 @require_role('admin')
-def apply_ai_config(config_id, current_user):
+def apply_ai_config(current_user, config_id):
     """Applique une configuration IA au système"""
     try:
         ai_config_service.apply_config_to_env(config_id)
@@ -1014,7 +1091,7 @@ def get_sessions_admin(current_user):
 
 @bp.route('/sessions/<session_id>', methods=['PUT'])
 @require_role('admin')
-def update_session_admin(session_id, current_user):
+def update_session_admin(current_user, session_id):
     """Met à jour une session (accès admin)"""
     try:
         data = request.get_json()
@@ -1028,7 +1105,7 @@ def update_session_admin(session_id, current_user):
 
 @bp.route('/sessions/<session_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_session_admin(session_id, current_user):
+def delete_session_admin(current_user, session_id):
     """Supprime une session (accès admin)"""
     try:
         admin_service.delete_session_admin(session_id)
@@ -1083,7 +1160,7 @@ def get_resultats_admin(current_user):
 
 @bp.route('/resultats/<resultat_id>', methods=['PUT'])
 @require_role('admin')
-def update_resultat_admin(resultat_id, current_user):
+def update_resultat_admin(current_user, resultat_id):
     """Met à jour un résultat (accès admin)"""
     try:
         data = request.get_json()
@@ -1097,7 +1174,7 @@ def update_resultat_admin(resultat_id, current_user):
 
 @bp.route('/resultats/<resultat_id>', methods=['DELETE'])
 @require_role('admin')
-def delete_resultat_admin(resultat_id, current_user):
+def delete_resultat_admin(current_user, resultat_id):
     """Supprime un résultat (accès admin)"""
     try:
         admin_service.delete_resultat_admin(resultat_id)
@@ -1117,5 +1194,192 @@ def get_resultats_stats(current_user):
         return jsonify(stats), 200
     except Exception as e:
         return jsonify({'message': f'Erreur: {str(e)}'}), 500
+
+
+# === ENDPOINTS VALIDATION UTILISATEURS ===
+
+@bp.route('/pending-users', methods=['GET'])
+@require_role('admin')
+def get_pending_users(current_user):
+    """Récupère la liste des utilisateurs en attente de validation"""
+    try:
+        from app.models.user import User
+        from app.models.admin_notification import AdminNotification
+
+        # Récupérer les paramètres de requête
+        role_filter = request.args.get('role', 'all')  # etudiant, enseignant, all
+
+        # Construire la requête
+        query = User.query.filter_by(is_active=False)
+
+        if role_filter == 'etudiant':
+            query = query.filter(User.role == UserRole.ETUDIANT)
+        elif role_filter == 'enseignant':
+            query = query.filter((User.role == UserRole.ENSEIGNANT) | (User.role == UserRole.PROFESSEUR))
+
+        users = query.all()
+
+        # Formater la réponse
+        result = []
+        for user in users:
+            user_data = user.to_dict(include_profil=True)
+            user_data['pendingSince'] = user.created_at.isoformat() if user.created_at else None
+
+            # Vérifier s'il y a une notification admin pour cet utilisateur
+            notification = AdminNotification.query.filter_by(
+                target_user_id=user.id,
+                type='pending_user',
+                is_read=False
+            ).first()
+
+            user_data['hasNotification'] = notification is not None
+            result.append(user_data)
+
+        return jsonify({
+            'users': result,
+            'total': len(result)
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Erreur lors de la récupération des utilisateurs en attente: {str(e)}'}), 500
+
+
+@bp.route('/users/<user_id>/activate', methods=['POST'])
+@require_role('admin')
+def activate_user(current_user, user_id):
+    """Active un utilisateur (validation admin)"""
+    try:
+        from app.models.user import User, UserRole
+        from app.models.etudiant import Etudiant
+        from app.models.enseignant import Enseignant
+        from app.models.admin_notification import AdminNotification
+        from datetime import datetime
+
+        # Récupérer les données de la requête
+        data = request.get_json() or {}
+        reason = data.get('reason', 'Validé par administrateur')
+
+        # Trouver l'utilisateur
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'message': 'Utilisateur non trouvé'}), 404
+
+        # Activer l'utilisateur dans la table users
+        user.is_active = True
+        user.updated_at = datetime.utcnow()
+
+        # Activer le profil associé selon le rôle
+        if user.role == UserRole.ETUDIANT:
+            etudiant = Etudiant.query.filter_by(user_id=user_id).first()
+            if etudiant:
+                etudiant.actif = True
+                print(f'[Activation] Profil étudiant activé: {etudiant.numero_etudiant}')
+        elif user.role == UserRole.ENSEIGNANT:
+            enseignant = Enseignant.query.filter_by(user_id=user_id).first()
+            if enseignant:
+                enseignant.actif = True
+                print(f'[Activation] Profil enseignant activé: {enseignant.numero_enseignant}')
+
+        # Supprimer les notifications de cet utilisateur
+        AdminNotification.query.filter_by(
+            target_user_id=user_id,
+            type='pending_user'
+        ).delete()
+
+        # Émettre événement WebSocket vers l'utilisateur
+        from app.events.notifications import notify_user_activated
+        notify_user_activated(user_id)
+
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Utilisateur activé avec succès',
+            'user': user.to_dict(include_profil=True)
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erreur lors de l\'activation: {str(e)}'}), 500
+
+
+@bp.route('/users/<user_id>/reject', methods=['POST'])
+@require_role('admin')
+def reject_user(current_user, user_id):
+    """Rejette un utilisateur (suppression du compte)"""
+    try:
+        from app.models.user import User
+        from app.models.admin_notification import AdminNotification
+
+        # Récupérer les données de la requête
+        data = request.get_json() or {}
+        reason = data.get('reason', 'Rejeté par administrateur')
+
+        # Trouver l'utilisateur
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'message': 'Utilisateur non trouvé'}), 404
+
+        # Supprimer les notifications liées
+        AdminNotification.query.filter_by(target_user_id=user_id).delete()
+
+        # Supprimer l'utilisateur et ses profils associés (cascade)
+        db.session.delete(user)
+
+        # TODO: Émettre événement WebSocket vers l'utilisateur si nécessaire
+        # notify_user_rejected(user_id, reason)
+
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Utilisateur rejeté et supprimé avec succès'
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erreur lors du rejet: {str(e)}'}), 500
+
+
+@bp.route('/notifications', methods=['GET'])
+@require_role('admin')
+def get_admin_notifications(current_user):
+    """Récupère les notifications admin non lues"""
+    try:
+        from app.models.admin_notification import AdminNotification
+
+        notifications = AdminNotification.query.filter_by(is_read=False).order_by(
+            AdminNotification.created_at.desc()
+        ).all()
+
+        # Marquer comme lues
+        for notification in notifications:
+            notification.is_read = True
+
+        db.session.commit()
+
+        return jsonify({
+            'notifications': [n.to_dict() for n in notifications],
+            'total': len(notifications)
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erreur lors de la récupération des notifications: {str(e)}'}), 500
+
+
+
+        # Marquer comme lues
+        for notification in notifications:
+            notification.is_read = True
+
+        db.session.commit()
+
+        return jsonify({
+            'notifications': [n.to_dict() for n in notifications],
+            'total': len(notifications)
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erreur lors de la récupération des notifications: {str(e)}'}), 500
 
 

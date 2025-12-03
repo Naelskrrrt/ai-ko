@@ -193,6 +193,24 @@ class EnseignantService:
         """Retire une matière d'un enseignant"""
         return self.enseignant_repo.remove_matiere(enseignant_id, matiere_id)
 
+    def update_matieres(self, enseignant_id: str, matieres_ids: List[str]) -> bool:
+        """Met à jour toutes les matières d'un enseignant"""
+        enseignant = self.enseignant_repo.get_by_id(enseignant_id)
+        if not enseignant:
+            raise ValueError("Enseignant non trouvé")
+        
+        # Supprimer toutes les anciennes associations
+        enseignant.matieres.clear()
+        
+        # Ajouter les nouvelles matières
+        for matiere_id in matieres_ids:
+            matiere = self.matiere_repo.get_by_id(matiere_id)
+            if matiere:
+                enseignant.matieres.append(matiere)
+        
+        db.session.commit()
+        return True
+
     def get_niveaux(self, enseignant_id: str) -> List[Dict[str, Any]]:
         """Récupère les niveaux d'un enseignant"""
         niveaux = self.enseignant_repo.get_niveaux(enseignant_id)
@@ -319,6 +337,9 @@ class EnseignantService:
                 etudiant_dict['parcours'] = etudiant.parcours.to_dict()
             if etudiant.etablissement:
                 etudiant_dict['etablissement'] = etudiant.etablissement.to_dict()
+            
+            # Ajouter les matières de l'étudiant
+            etudiant_dict['matieres'] = [m.to_dict() for m in etudiant.matieres]
 
             etudiants_data.append(etudiant_dict)
 

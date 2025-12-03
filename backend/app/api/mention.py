@@ -152,3 +152,6 @@ class MentionByEtablissement(Resource):
             logger.error(f"Erreur récupération mentions par établissement: {e}", exc_info=True)
             api.abort(500, f"Erreur interne: {str(e)}")
 
+
+
+

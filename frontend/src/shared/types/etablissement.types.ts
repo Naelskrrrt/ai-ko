@@ -42,3 +42,5 @@ export interface EtablissementCreate {
 }
 
 export interface EtablissementUpdate extends Partial<EtablissementCreate> {}
+
+

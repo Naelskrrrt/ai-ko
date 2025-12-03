@@ -1,89 +1,70 @@
 """
 Documentation API avec Swagger/OpenAPI
+
+IMPORTANT: Ce fichier est uniquement pour la documentation Swagger.
+Les vraies routes sont implémentées dans leurs fichiers respectifs :
+- app/api/health.py
+- app/api/auth.py
+- app/api/admin.py
+- etc.
+
+Pour éviter les conflits de routes, ce fichier utilise le préfixe '/docs'
+et ne crée AUCUNE route réelle sous '/api'.
 """
 from flask import Blueprint
 from flask_restx import Api, Resource, fields, Namespace
 from flask_jwt_extended import jwt_required
 
-# Créer le namespace pour la documentation
-api_bp = Blueprint('api_docs', __name__, url_prefix='/api')
+# IMPORTANT: Blueprint avec préfixe '/docs' pour éviter tout conflit
+api_bp = Blueprint('api_docs', __name__, url_prefix='/docs')
 api = Api(
     api_bp,
     version='1.0',
     title='AI-KO API',
     description='Documentation complète de l\'API AI-KO - Système Intelligent',
-    doc='/docs/swagger/',
-    prefix=''  # Pas de préfixe car le blueprint a déjà url_prefix='/api'
+    doc='/',  # Swagger UI accessible à /docs/
+    prefix='/api'  # Prefix pour afficher les routes comme /api/... dans Swagger
 )
 
-# Namespace pour les health checks
+# ============================================================================
+# RÈGLE: Ne JAMAIS créer de classe Resource ici pour les endpoints existants
+# Seuls les MODÈLES de données sont définis ici pour la documentation
+# ============================================================================
+
+# Namespace pour les health checks (DOCUMENTATION UNIQUEMENT)
 health_ns = Namespace(
     'health', description='Endpoints de vérification de santé')
 api.add_namespace(health_ns)
 
-# Namespace pour l'authentification
+# Namespace pour l'authentification (DOCUMENTATION UNIQUEMENT)
 auth_ns = Namespace('auth', description='Endpoints d\'authentification')
 api.add_namespace(auth_ns)
 
-# Namespace pour l'administration (admin uniquement)
+# Namespace pour l'administration (DOCUMENTATION UNIQUEMENT)
+# Namespace pour l'administration (DOCUMENTATION UNIQUEMENT)
 admin_ns = Namespace(
     'admin', description='Endpoints d\'administration (accès admin uniquement)')
 api.add_namespace(admin_ns)
 
-# Import et ajout des namespaces QCM et Correction (optionnels)
-try:
-    from app.api.qcm import api as qcm_api
-    api.add_namespace(qcm_api, path='/qcm')
-except ImportError as e:
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.warning(f"Namespace QCM non disponible: {e}")
+# ============================================================================
+# NE PAS importer de namespaces réels ici - ils ont leurs propres routes
+# Cette section est commentée pour éviter tout conflit
+# ============================================================================
+# try:
+#     from app.api.qcm import api as qcm_api
+#     api.add_namespace(qcm_api, path='/qcm')
+# except ImportError as e:
+#     import logging
+#     logger = logging.getLogger(__name__)
+#     logger.warning(f"Namespace QCM non disponible: {e}")
 
-try:
-    from app.api.qcm_etudiant import api as qcm_etudiant_api
-    api.add_namespace(qcm_etudiant_api, path='/qcm-etudiant')
-except ImportError as e:
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.warning(f"Namespace QCM Étudiant non disponible: {e}")
+# ============================================================================
+# MODÈLES DE DONNÉES UNIQUEMENT (pas de routes)
+# ============================================================================
+# ============================================================================
+# MODÈLES DE DONNÉES UNIQUEMENT (pas de routes)
+# ============================================================================
 
-try:
-    from app.api.correction import api as correction_api
-    api.add_namespace(correction_api, path='/correction')
-except ImportError as e:
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.warning(f"Namespace Correction non disponible: {e}")
-
-# Import et ajout des nouveaux namespaces (Système éducatif)
-from app.api.niveau import api as niveau_api
-from app.api.matiere import api as matiere_api
-from app.api.classe import api as classe_api
-from app.api.session_examen import api as session_api
-from app.api.resultat import api as resultat_api
-
-# Ajouter les nouveaux namespaces
-api.add_namespace(niveau_api, path='/niveaux')
-api.add_namespace(matiere_api, path='/matieres')
-api.add_namespace(classe_api, path='/classes')
-api.add_namespace(session_api, path='/sessions')
-api.add_namespace(resultat_api, path='/resultats')
-
-# Import et ajout des nouveaux namespaces (Refonte - Enseignants/Étudiants)
-from app.api.etablissement import api as etablissement_api
-from app.api.mention import api as mention_api
-from app.api.parcours import api as parcours_api
-from app.api.enseignant import api as enseignant_api
-from app.api.etudiant import api as etudiant_api
-
-# Ajouter les nouveaux namespaces (refonte)
-api.add_namespace(etablissement_api, path='/etablissements')
-api.add_namespace(mention_api, path='/mentions')
-api.add_namespace(parcours_api, path='/parcours')
-api.add_namespace(enseignant_api, path='/enseignants')
-api.add_namespace(etudiant_api, path='/etudiants')
-
-# Modèles de données pour la documentation
 register_model = api.model('RegisterRequest', {
     'name': fields.String(required=True, description='Nom de l\'utilisateur', example='John Doe'),
     'email': fields.String(required=True, description='Email de l\'utilisateur', example='john@example.com'),
@@ -134,6 +115,12 @@ detailed_health_response = api.model('DetailedHealthResponse', {
     'database': fields.String(description='Statut de la base de données', example='healthy'),
     'redis': fields.String(description='Statut de Redis', example='healthy')
 })
+
+# ============================================================================
+# DOCUMENTATION DES ENDPOINTS (Classes Resource pour documentation Swagger uniquement)
+# ATTENTION: Ces classes NE créent PAS de vraies routes car le blueprint est sur /docs
+# Les vraies routes sont dans health.py, auth.py, admin.py, etc.
+# ============================================================================
 
 # Endpoints de documentation Health
 
@@ -296,37 +283,33 @@ class GoogleOAuthCallback(Resource):
         """
         pass
 
-# Endpoints de documentation Admin
 
+# ========================
+# Modèles de réponse Admin
+# ========================
 
-@admin_ns.route('/users/<user_id>/status')
-@admin_ns.doc('toggle_user_status')
-class ToggleUserStatus(Resource):
-    @admin_ns.marshal_with(user_model, code=200, description='Statut utilisateur modifié avec succès')
-    @admin_ns.response(400, 'Erreur de validation', error_model)
-    @admin_ns.response(401, 'Non authentifié', error_model)
-    @admin_ns.response(403, 'Accès refusé (rôle admin requis)', error_model)
-    @admin_ns.response(404, 'Utilisateur non trouvé', error_model)
-    @admin_ns.response(500, 'Erreur serveur', error_model)
-    def patch(self, user_id):
-        """
-        Activer/Désactiver un utilisateur
+# Note: Les modèles ci-dessous sont définis pour la documentation mais les endpoints
+# réels sont implémentés dans admin.py. Ne pas créer de Resource ici pour éviter
+# les conflits de routes.
 
-        Bascule le statut d'activation d'un utilisateur (emailVerified).
-        Seuls les administrateurs peuvent utiliser cet endpoint.
-        Un administrateur ne peut pas modifier son propre statut.
+toggle_status_response_model = api.model('ToggleStatusResponse', {
+    'success': fields.Boolean(description='Succès de l\'opération', example=True),
+    'message': fields.String(description='Message descriptif', example='L\'utilisateur John Doe a été activé'),
+    'data': fields.Nested(api.model('ToggleStatusData', {
+        'user': fields.Nested(user_model, description='Utilisateur mis à jour'),
+        'previousStatus': fields.Boolean(description='Statut précédent', example=False),
+        'newStatus': fields.Boolean(description='Nouveau statut', example=True)
+    }))
+})
 
-        **Méthode HTTP:** PATCH
-        **URL:** `/api/admin/users/{user_id}/status`
-        **Headers requis:**
-        - `Authorization: Bearer {token}` (token JWT admin)
+toggle_status_error_model = api.model('ToggleStatusError', {
+    'success': fields.Boolean(description='Succès de l\'opération', example=False),
+    'message': fields.String(description='Message d\'erreur', example='Utilisateur non trouvé'),
+    'error': fields.Nested(api.model('ErrorDetails', {
+        'code': fields.String(description='Code d\'erreur', example='USER_NOT_FOUND'),
+        'details': fields.String(description='Détails de l\'erreur', example='Utilisateur non trouvé')
+    }))
+})
 
-        **Réponse:**
-        - 200: Utilisateur avec statut mis à jour
-        - 400: Erreur de validation (ex: tentative de modifier son propre statut)
-        - 401: Token manquant ou invalide
-        - 403: Utilisateur non admin
-        - 404: Utilisateur non trouvé
-        - 500: Erreur serveur
-        """
-        pass
+# Note: L'endpoint PATCH /api/admin/users/{user_id}/status est implémenté dans admin.py
+# Ne pas créer de Resource ici pour éviter les conflits de routes avec flask_restx

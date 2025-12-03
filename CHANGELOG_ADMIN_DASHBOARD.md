@@ -247,3 +247,6 @@ et ce projet adhère à [Semantic Versioning](https://semver.org/lang/fr/).
 - **x.x.x** : Corrections et améliorations mineures
 
 
+
+
+

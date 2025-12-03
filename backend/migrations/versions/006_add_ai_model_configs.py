@@ -12,7 +12,7 @@ from datetime import datetime
 
 # revision identifiers
 revision = '006'
-down_revision = '85d8a335ddf0'
+down_revision = '007_refonte_enseignant_etudiant'
 branch_labels = None
 depends_on = None
 

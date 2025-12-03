@@ -727,8 +727,7 @@ class ResultatService:
                 'note_max': 20.0,
                 'pourcentage': r.pourcentage or 0.0,
                 'date_passage': r.date_fin.isoformat() if r.date_fin else r.created_at.isoformat(),
-                'statut': 'corrige' if r.note_sur_20 is not None else 'en_attente',
-                'estPublie': r.est_publie
+                'statut': 'corrige' if r.note_sur_20 is not None else 'en_attente'
             })
 
         # Calculer les statistiques
@@ -831,10 +830,7 @@ class ResultatService:
         """
         Récupère un résultat avec filtrage selon le rôle et la publication
         - Enseignant/Admin : Voit tout
-        - Étudiant : Ne voit les détails que si:
-            * Le résultat est publié (est_publie = True) OU
-            * La session a resultats_publies = True
-            * ET la session autorise afficher_correction = True
+        - Étudiant : Ne voit les détails que si publié, sinon infos partielles
         """
         resultat = self.resultat_repo.get_by_id(resultat_id)
         if not resultat:
@@ -848,18 +844,8 @@ class ResultatService:
         if user_role in ['enseignant', 'admin']:
             return resultat.to_dict(include_details=True)
         
-        # Pour les étudiants, vérifier la publication
-        session = resultat.session if resultat.session_id else None
-        
-        # Déterminer si le résultat peut être affiché en détail
-        peut_voir_details = False
-        if resultat.est_publie:
-            peut_voir_details = True
-        elif session and session.resultats_publies:
-            peut_voir_details = True
-        
         # Si étudiant et résultat non publié, retourner seulement infos partielles
-        if user_role == 'etudiant' and not peut_voir_details:
+        if user_role == 'etudiant' and not resultat.est_publie:
             return {
                 'id': resultat.id,
                 'sessionId': resultat.session_id,
@@ -871,20 +857,5 @@ class ResultatService:
                 'message': 'En attente de validation par l\'enseignant'
             }
         
-        # Si étudiant et résultat publié, vérifier si on peut afficher la correction
-        resultat_dict = resultat.to_dict(include_details=True)
-        
-        # Si la session n'autorise pas l'affichage de la correction, masquer les détails des réponses
-        if user_role == 'etudiant' and session and not session.afficher_correction:
-            # Retourner le résultat mais sans les détails des réponses correctes
-            resultat_dict['afficherCorrection'] = False
-            if 'reponses' in resultat_dict:
-                # Masquer les informations de correction dans chaque réponse
-                for reponse in resultat_dict['reponses']:
-                    reponse.pop('reponseCorrecte', None)
-                    reponse.pop('explication', None)
-                    reponse.pop('feedback', None)
-        else:
-            resultat_dict['afficherCorrection'] = True
-        
-        return resultat_dict
+        # Si étudiant et résultat publié, retourner tout
+        return resultat.to_dict(include_details=True)

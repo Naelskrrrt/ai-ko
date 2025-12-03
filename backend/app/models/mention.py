@@ -57,3 +57,6 @@ class Mention(db.Model):
     def __repr__(self):
         return f'<Mention {self.code} - {self.nom}>'
 
+
+
+

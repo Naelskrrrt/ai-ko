@@ -164,3 +164,6 @@ class EtablissementService:
         etablissements = self.etablissement_repo.search(query)
         return [e.to_dict() for e in etablissements]
 
+
+
+

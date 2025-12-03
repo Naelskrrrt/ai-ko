@@ -29,3 +29,5 @@ export interface ParcoursCreate {
 }
 
 export interface ParcoursUpdate extends Partial<ParcoursCreate> {}
+
+

@@ -48,6 +48,13 @@ class UserRepository(BaseRepository[User]):
             # Filtre par statut (email_verified peut servir de statut actif/inactif)
             if 'active' in filters and filters['active'] is not None:
                 query = query.filter(User.email_verified == filters['active'])
+
+            # Filtre par statut d'activation (nouveau champ is_active)
+            if 'user_status' in filters and filters['user_status']:
+                if filters['user_status'] == 'active':
+                    query = query.filter(User.is_active == True)
+                elif filters['user_status'] == 'pending':
+                    query = query.filter(User.is_active == False)
         
         # Compter le total avant pagination
         total = query.count()
@@ -91,12 +98,38 @@ class UserRepository(BaseRepository[User]):
         return None
     
     def toggle_status(self, user_id: str) -> Optional[User]:
-        """Active ou désactive un utilisateur (via email_verified)"""
-        user = self.get_by_id(user_id)
-        if user:
-            user.email_verified = not user.email_verified
-            return self.update(user)
-        return None
+        """
+        Bascule le statut d'activation d'un utilisateur.
+        
+        Args:
+            user_id: ID de l'utilisateur à modifier
+            
+        Returns:
+            User: L'utilisateur mis à jour ou None si non trouvé
+        """
+        from app import db
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        user = db.session.query(User).filter(User.id == user_id).first()
+        
+        if not user:
+            logger.warning(f"[UserRepository.toggle_status] Utilisateur non trouvé: {user_id}")
+            return None
+        
+        old_status = user.is_active
+        user.is_active = not old_status
+        
+        db.session.commit()
+        db.session.refresh(user)
+        
+        logger.info(
+            f"[UserRepository.toggle_status] Statut modifié pour {user.email}: "
+            f"{old_status} -> {user.is_active}"
+        )
+        
+        return user
     
     def get_recent_users(self, limit: int = 10) -> List[User]:
         """Récupère les utilisateurs récemment inscrits"""
@@ -109,4 +142,6 @@ class UserRepository(BaseRepository[User]):
             counts[role.value] = self.session.query(User).filter(User.role == role).count()
         return counts
 
+
+# Force reload
 

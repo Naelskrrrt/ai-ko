@@ -164,3 +164,6 @@ class EtablissementByType(Resource):
             logger.error(f"Erreur récupération établissements par type: {e}", exc_info=True)
             api.abort(500, f"Erreur interne: {str(e)}")
 
+
+
+

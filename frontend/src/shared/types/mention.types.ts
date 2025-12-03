@@ -31,3 +31,5 @@ export interface MentionCreate {
 }
 
 export interface MentionUpdate extends Partial<MentionCreate> {}
+
+

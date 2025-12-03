@@ -25,6 +25,8 @@ except Exception as e:
     print(f"[WARNING] Erreur lors du chargement du .env: {e}")
 
 from app import create_app, db
+from app.extensions import socketio
+import click
 
 app = create_app()
 
@@ -35,6 +37,19 @@ def make_shell_context():
     return {'db': db}
 
 
+@app.cli.command('seed-users')
+@click.option('--force', is_flag=True, help='Force la recréation même si les utilisateurs existent')
+def seed_users_command(force):
+    """Crée les utilisateurs de test (Admin, Enseignant, Étudiant)"""
+    from scripts.seed_users import create_seed_data
+    try:
+        create_seed_data()
+        click.echo('✅ Utilisateurs de test créés avec succès!')
+    except Exception as e:
+        click.echo(f'❌ Erreur: {str(e)}', err=True)
+        raise
+
+
 if __name__ == '__main__':
     # Mode développement uniquement
     # Supporte FLASK_DEBUG=1, FLASK_DEBUG=True, ou FLASK_ENV=development
@@ -43,8 +58,10 @@ if __name__ == '__main__':
     debug_mode = flask_debug or flask_env == 'development' or app.config.get(
         'DEBUG', False)
 
+    # Utiliser Flask standard au lieu de SocketIO pour éviter les conflits
+    print(f"Démarrage du serveur sur http://0.0.0.0:{os.getenv('PORT', 5000)}")
     app.run(
         host='0.0.0.0',
         port=int(os.getenv('PORT', 5000)),
-        debug=True
+        debug=debug_mode
     )

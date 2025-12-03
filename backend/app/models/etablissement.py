@@ -65,3 +65,6 @@ class Etablissement(db.Model):
     def __repr__(self):
         return f'<Etablissement {self.code} - {self.nom}>'
 
+
+
+

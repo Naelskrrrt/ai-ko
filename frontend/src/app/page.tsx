@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Link } from "@heroui/link";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
@@ -21,10 +23,46 @@ import { motion } from "framer-motion";
 
 import { title, subtitle } from "@/components/primitives";
 import { Logo } from "@/components/icons";
+import { useAuth } from "@/core/providers/AuthProvider";
 
 export default function Home() {
   const { theme } = useTheme();
   const isSSR = useIsSSR();
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // Rediriger les utilisateurs connectés vers leur dashboard
+  useEffect(() => {
+    if (loading) return;
+
+    if (user) {
+      let redirectPath = "/";
+
+      if (user.role === "admin") {
+        redirectPath = "/admin";
+      } else if (user.role === "etudiant") {
+        redirectPath = "/etudiant";
+      } else if (user.role === "enseignant") {
+        redirectPath = "/enseignant";
+      }
+
+      router.replace(redirectPath);
+    }
+  }, [user, loading, router]);
+
+  // Afficher un loader pendant la vérification ou la redirection
+  if (loading || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-default-50 to-default-100 dark:from-default-950 dark:to-default-900">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
+          <p className="text-default-500">
+            {loading ? "Vérification..." : "Redirection..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Pendant l'hydratation, utiliser le thème par défaut pour éviter les erreurs d'hydratation
   const logoSrc =

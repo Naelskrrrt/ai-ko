@@ -197,3 +197,6 @@ python -m pytest tests/test_admin_complete.py --cov=app --cov-report=html
 Le système de gestion admin est maintenant pleinement opérationnel et vérifié par des tests automatisés. Les administrateurs peuvent gérer l'ensemble du système (étudiants, professeurs, matières, niveaux, configurations IA, sessions et résultats) avec un contrôle total et sécurisé.
 
 
+
+
+

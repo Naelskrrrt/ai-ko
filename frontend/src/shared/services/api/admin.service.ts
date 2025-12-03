@@ -54,8 +54,14 @@ adminApi.interceptors.request.use((config) => {
 
 // Intercepteur pour gérer les erreurs
 adminApi.interceptors.response.use(
-  (response) => response,
-  (error) => Promise.reject(error),
+  (response) => {
+    console.log("[ADMIN API] Response:", response.config.url, response.status, response.data);
+    return response;
+  },
+  (error) => {
+    console.error("[ADMIN API] Error:", error.config?.url, error.response?.status, error.response?.data);
+    return Promise.reject(error);
+  },
 );
 
 export const adminService = {
@@ -113,13 +119,8 @@ export const adminService = {
   },
 
   async toggleUserStatus(id: string): Promise<User> {
-    try {
-      const response = await adminApi.patch<User>(`/users/${id}/status`);
-
-      return response.data;
-    } catch (error: any) {
-      throw error;
-    }
+    const response = await adminApi.patch<User>(`/users/${id}/status`);
+    return response.data;
   },
 
   // Statistiques

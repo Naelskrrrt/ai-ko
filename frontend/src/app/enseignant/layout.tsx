@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { CompleteProfileModal } from "@/components/modals/CompleteProfileModal";
 import { useAuth } from "@/core/providers/AuthProvider";
 
 export default function EnseignantLayout({
@@ -14,79 +15,76 @@ export default function EnseignantLayout({
   const { user, loading, hasRole } = useAuth();
   const router = useRouter();
   const [shouldRedirect, setShouldRedirect] = useState<string | null>(null);
+  const [showCompleteProfileModal, setShowCompleteProfileModal] = useState(false);
+  const [hasShownModal, setHasShownModal] = useState(false);
 
-  // Gérer les redirections UNIQUEMENT via useEffect
+  // Calculer les champs manquants du profil
+  const missingFields = useMemo(() => {
+    if (!user) return [];
+    
+    const missing: string[] = [];
+    const enseignantProfil = (user as any).enseignantProfil;
+    
+    // Vérifier les champs utilisateur de base
+    if (!user.telephone) missing.push("telephone");
+    if (!user.adresse) missing.push("adresse");
+    
+    // Vérifier les champs du profil enseignant
+    if (enseignantProfil) {
+      if (!enseignantProfil.grade) missing.push("grade");
+      if (!enseignantProfil.specialite) missing.push("specialite");
+      if (!enseignantProfil.departement) missing.push("departement");
+    }
+    
+    return missing;
+  }, [user]);
+
+  // Gérer les redirections
   useEffect(() => {
-    // Ne rien faire pendant le chargement
-    if (loading) {
-      setShouldRedirect(null);
+    if (loading) return;
 
-      return;
-    }
-
-    // Si pas d'utilisateur, marquer pour redirection vers login
+    // Si pas d'utilisateur, rediriger vers login
     if (!user) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[EnseignantLayout] Pas d'utilisateur, préparation redirection vers /login",
-      );
       setShouldRedirect("/login");
-
       return;
     }
 
-    // Vérifier si l'onboarding est complet (admins exemptés)
-    if (user.role !== "admin") {
-      const hasProfile = user?.etudiantProfil || user?.enseignantProfil;
-
-      if (!hasProfile) {
-        // eslint-disable-next-line no-console
-        console.log(
-          "[EnseignantLayout] Onboarding incomplet, préparation redirection vers /onboarding/role-selection",
-        );
-        setShouldRedirect("/onboarding/role-selection");
-
-        return;
-      }
-    }
-
-    // Si utilisateur connecté mais pas enseignant, marquer pour redirection
+    // Si pas enseignant ni admin, rediriger vers l'accueil
     if (!hasRole("enseignant") && !hasRole("admin")) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[EnseignantLayout] Utilisateur n'est pas enseignant, préparation redirection vers /",
-      );
       setShouldRedirect("/");
-
       return;
     }
 
-    // Tout est OK, pas de redirection
-    setShouldRedirect(null);
-  }, [user, loading, hasRole]);
+    // Afficher le modal si des champs manquent (une seule fois)
+    if (missingFields.length > 0 && !hasShownModal) {
+      const timer = setTimeout(() => {
+        setShowCompleteProfileModal(true);
+        setHasShownModal(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, loading, hasRole, missingFields, hasShownModal]);
 
-  // Effectuer la redirection dans un useEffect séparé
+  // Effectuer la redirection
   useEffect(() => {
     if (shouldRedirect) {
-      // eslint-disable-next-line no-console
-      console.log(`[EnseignantLayout] Redirection vers ${shouldRedirect}`);
       router.replace(shouldRedirect);
     }
   }, [shouldRedirect, router]);
 
-  // Afficher un loader pendant la vérification
+  // Loader pendant le chargement
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
-          <p className="text-default-500">Vérification des permissions...</p>
+          <p className="text-default-500">Chargement...</p>
         </div>
       </div>
     );
   }
 
-  // Si redirection en cours, afficher un loader
+  // Loader si redirection en cours
   if (shouldRedirect) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -98,18 +96,21 @@ export default function EnseignantLayout({
     );
   }
 
-  // Si pas d'utilisateur ou pas enseignant, afficher loader (ne devrait pas arriver ici normalement)
+  // Si pas d'utilisateur autorisé
   if (!user || (!hasRole("enseignant") && !hasRole("admin"))) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary mx-auto" />
-          <p className="text-default-500">Accès en cours...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
-  // Utilisateur enseignant authentifié, afficher le contenu avec le même layout
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return (
+    <>
+      <DashboardLayout>{children}</DashboardLayout>
+      
+      <CompleteProfileModal
+        isOpen={showCompleteProfileModal}
+        onClose={() => setShowCompleteProfileModal(false)}
+        onComplete={() => setShowCompleteProfileModal(false)}
+        missingFields={missingFields}
+      />
+    </>
+  );
 }

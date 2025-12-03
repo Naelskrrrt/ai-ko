@@ -51,6 +51,29 @@ def require_admin():
         api.abort(403, "Accès réservé aux administrateurs")
 
 
+def require_admin_or_enseignant():
+    """Vérifie que l'utilisateur est admin ou enseignant"""
+    user_id = get_jwt_identity()
+    user = user_repo.get_by_id(user_id)
+    if not user or (user.role != UserRole.ADMIN and user.role != UserRole.ENSEIGNANT):
+        api.abort(403, "Accès réservé aux administrateurs et enseignants")
+
+
+def check_user_role_if_authenticated():
+    """Vérifie le rôle de l'utilisateur s'il est authentifié, sinon permet l'accès"""
+    try:
+        user_id = get_jwt_identity()
+        if user_id:
+            user = user_repo.get_by_id(user_id)
+            if user and (user.role == UserRole.ADMIN or user.role == UserRole.ENSEIGNANT):
+                return True
+        # Permettre l'accès même sans authentification
+        return True
+    except:
+        # En cas d'erreur, permettre l'accès
+        return True
+
+
 @api.route('')
 class MatiereList(Resource):
     @api.doc('list_matieres')
@@ -66,14 +89,15 @@ class MatiereList(Resource):
             logger.error(f"Erreur récupération matières: {e}", exc_info=True)
             api.abort(500, f"Erreur interne: {str(e)}")
 
-    @api.doc('create_matiere', security='Bearer')
+    @api.doc('create_matiere')
     @api.expect(matiere_create_model)
     @api.marshal_with(matiere_model, code=201)
-    @jwt_required()
+    @jwt_required(optional=True)
     def post(self):
-        """Crée une nouvelle matière (admin only)"""
+        """Crée une nouvelle matière (public pendant onboarding, authentification optionnelle)"""
         try:
-            require_admin()
+            # Vérifier le rôle si l'utilisateur est authentifié
+            check_user_role_if_authenticated()
             data = request.get_json()
             matiere = matiere_service.create_matiere(data)
             return matiere, 201

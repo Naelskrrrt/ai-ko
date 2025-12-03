@@ -1,18 +1,8 @@
-Un enseignant peut créer un examen et peux voir les résultats de ce examen fait par les élève (En statistique et surtout en liste (Tableau) avec minimum d'information sur l'elève en colonne et un bouton qui permet de voir tous les informations de l'élève. Et peux exporter tous les informations de l'étudiant en pdf (Surtout avec les notes et les niveaux)
-Un élève n'as pas le droit de voir les resultats de l'examen qu'une fois que l'enseignant valide les examens.
+Dans la page "Mes élèves" en tant qu'enseignant, ajoute une page respectant les designs des autres page (Wrapper, container, design, style).
+Sur cette page figure toute les élèves qui font les matières que j'enseigne en tant qu'enseignant.
+ON a un tableau HeroUI. Avec filtre backend sur les niveaux, matières (Que j'enseigne), et parcours.
+Je peux extraire les élèves suivant le filtre que j'ai défini en PDF. Ajoute une confirmation sur l'extraction en popover si on a pas mis de filtre quand on extrait le pdf.
 
-
-
-Mention
-- Informatique
-    Parcours:
-    ➣ Génie Logiciel et base de Données.
-    ➣ Administration des Système et réseaux.
-    ➣ Informatique Générale
-- Intelligence Artificiel
-    Parcours:
-    ➣ Gouvernance et Ingénierie de Données (GID).
-    ➣ Objets connectés et Cybersécurité (OCC). 
-
-Parcours ENI
-
+Système: 
+- Fait un test de build sur frontend à la fin du mise en place et essaie de le resoudre (Boucle)
+- Une fois que le build est succès redeploie dans railway le frontend et le backend. (En plan mais ne pas executer de suite)

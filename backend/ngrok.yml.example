@@ -1,0 +1,25 @@
+# Configuration Ngrok pour AI-KO Backend
+# Copiez ce fichier vers ngrok.yml et remplacez VOTRE_TOKEN par votre token réel
+
+version: "2"
+authtoken: VOTRE_TOKEN_NGROK_ICI
+
+tunnels:
+  backend:
+    proto: http
+    addr: 5000
+    inspect: true
+    bind_tls: true
+    log_level: info
+    log_format: json
+    
+    # Pour plan Ngrok Pro (URL fixe), décommentez :
+    # hostname: ai-ko.ngrok.io
+    
+    # Headers personnalisés (optionnel)
+    # request_header:
+    #   add:
+    #     - "X-Custom-Header: value"
+
+
+

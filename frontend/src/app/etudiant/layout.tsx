@@ -59,44 +59,18 @@ export default function EtudiantLayout({
     // Ne rien faire pendant le chargement
     if (loading) {
       setShouldRedirect(null);
-
       return;
     }
 
     // Si pas d'utilisateur, marquer pour redirection vers login
     if (!user) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[EtudiantLayout] Pas d'utilisateur, préparation redirection vers /login",
-      );
       setShouldRedirect("/login");
-
       return;
-    }
-
-    // Vérifier si l'onboarding est complet (admins exemptés)
-    if (user.role !== "admin") {
-      const hasProfile = user?.etudiantProfil || user?.enseignantProfil;
-
-      if (!hasProfile) {
-        // eslint-disable-next-line no-console
-        console.log(
-          "[EtudiantLayout] Onboarding incomplet, préparation redirection vers /onboarding/role-selection",
-        );
-        setShouldRedirect("/onboarding/role-selection");
-
-        return;
-      }
     }
 
     // Si utilisateur connecté mais pas étudiant, marquer pour redirection
     if (!hasRole("etudiant") && !hasRole("admin")) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "[EtudiantLayout] Utilisateur n'est pas étudiant, préparation redirection vers /",
-      );
       setShouldRedirect("/");
-
       return;
     }
 
@@ -107,8 +81,6 @@ export default function EtudiantLayout({
   // Effectuer la redirection dans un useEffect séparé
   useEffect(() => {
     if (shouldRedirect) {
-      // eslint-disable-next-line no-console
-      console.log(`[EtudiantLayout] Redirection vers ${shouldRedirect}`);
       router.replace(shouldRedirect);
     }
   }, [shouldRedirect, router]);

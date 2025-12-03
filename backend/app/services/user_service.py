@@ -130,6 +130,7 @@ class UserService:
         
         Validations:
         - Impossibilité de se supprimer soi-même
+        - Supprime également le profil associé (étudiant ou enseignant)
         """
         if current_user_id and user_id == current_user_id:
             raise ValueError("Vous ne pouvez pas supprimer votre propre compte")
@@ -138,6 +139,20 @@ class UserService:
         if not user:
             raise ValueError("Utilisateur non trouvé")
         
+        # Supprimer le profil associé avant de supprimer l'utilisateur
+        from app.models.etudiant import Etudiant
+        from app.models.enseignant import Enseignant
+        from app import db
+        
+        # Supprimer le profil étudiant si existe
+        if hasattr(user, 'etudiant_profil') and user.etudiant_profil:
+            db.session.delete(user.etudiant_profil)
+        
+        # Supprimer le profil enseignant si existe
+        if hasattr(user, 'enseignant_profil') and user.enseignant_profil:
+            db.session.delete(user.enseignant_profil)
+        
+        # Maintenant supprimer l'utilisateur
         return self.user_repo.delete(user)
     
     def change_role(self, user_id: str, new_role_str: str, current_user_id: Optional[str] = None) -> Dict[str, Any]:
@@ -164,19 +179,63 @@ class UserService:
     
     def toggle_status(self, user_id: str, current_user_id: Optional[str] = None) -> Dict[str, Any]:
         """
-        Active ou désactive un utilisateur avec validations hard-codées
+        Bascule le statut d'activation d'un utilisateur (is_active).
         
-        Validations:
-        - Ne peut pas se désactiver soi-même
+        Args:
+            user_id: ID de l'utilisateur à modifier
+            current_user_id: ID de l'admin effectuant l'opération
+            
+        Returns:
+            Dict contenant:
+            - user: Données de l'utilisateur mis à jour
+            - previousStatus: Ancien statut (bool)
+            - newStatus: Nouveau statut (bool)
+            - message: Message descriptif
+            
+        Raises:
+            ValueError: Si l'utilisateur tente de modifier son propre statut
+                       ou si l'utilisateur n'existe pas
         """
-        if current_user_id and user_id == current_user_id:
-            raise ValueError("Vous ne pouvez pas désactiver votre propre compte")
+        import logging
+        logger = logging.getLogger(__name__)
         
-        user = self.user_repo.toggle_status(user_id)
-        if not user:
+        # Validation : ne peut pas modifier son propre statut
+        if current_user_id and user_id == current_user_id:
+            logger.warning(
+                f"[UserService.toggle_status] Tentative de modification de son propre statut "
+                f"par l'utilisateur {current_user_id}"
+            )
+            raise ValueError("Vous ne pouvez pas modifier votre propre statut")
+        
+        # Récupérer l'utilisateur actuel pour avoir l'ancien statut
+        current_user = self.user_repo.get_by_id(user_id)
+        if not current_user:
+            logger.warning(f"[UserService.toggle_status] Utilisateur non trouvé: {user_id}")
             raise ValueError("Utilisateur non trouvé")
         
-        return user.to_dict()
+        previous_status = current_user.is_active
+        
+        # Effectuer le toggle
+        updated_user = self.user_repo.toggle_status(user_id)
+        
+        if not updated_user:
+            logger.error(f"[UserService.toggle_status] Échec de la mise à jour pour: {user_id}")
+            raise ValueError("Erreur lors de la mise à jour du statut")
+        
+        new_status = updated_user.is_active
+        status_text = "activé" if new_status else "désactivé"
+        
+        logger.info(
+            f"[UserService.toggle_status] Utilisateur {updated_user.email} "
+            f"{status_text} par admin {current_user_id}"
+        )
+        
+        return {
+            'user': updated_user.to_dict(),
+            'previousStatus': previous_status,
+            'newStatus': new_status,
+            'message': f"L'utilisateur {updated_user.name or updated_user.email} a été {status_text}"
+        }
     
     def get_recent_users(self, limit: int = 10) -> List[Dict[str, Any]]:
         """Récupère les utilisateurs récemment inscrits"""

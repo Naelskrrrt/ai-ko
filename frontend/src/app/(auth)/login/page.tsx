@@ -14,11 +14,27 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/core/providers/AuthProvider";
 import { Logo } from "@/components/icons";
 
+// Interface pour les erreurs backend
+interface BackendFieldErrors {
+  email?: string[];
+  password?: string[];
+  [key: string]: string[] | undefined;
+}
+
+interface BackendError {
+  response?: {
+    data?: {
+      message?: string;
+      errors?: BackendFieldErrors;
+    };
+    status?: number;
+  };
+  message?: string;
+}
+
 const loginSchema = z.object({
-  email: z.string().email("Email invalide"),
-  password: z
-    .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  email: z.string().email("Format d'email invalide"),
+  password: z.string().min(1, "Le mot de passe est requis"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -31,10 +47,75 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  // Fonction pour gérer les erreurs backend
+  const handleBackendErrors = (err: BackendError) => {
+    const responseData = err.response?.data;
+    const status = err.response?.status;
+
+    setError(null);
+
+    // Gérer les erreurs de validation par champ
+    if (responseData?.errors) {
+      const fieldErrors = responseData.errors;
+
+      // Mapper les erreurs vers react-hook-form
+      Object.entries(fieldErrors).forEach(([field, messages]) => {
+        if (messages && messages.length > 0 && (field === 'email' || field === 'password')) {
+          setFormError(field as keyof LoginFormValues, {
+            type: 'server',
+            message: messages[0],
+          });
+        }
+      });
+    }
+
+    // Gérer le message d'erreur principal
+    if (responseData?.message) {
+      const message = responseData.message;
+
+      // Erreurs spécifiques de connexion
+      if (message.toLowerCase().includes('incorrect') || 
+          message.toLowerCase().includes('invalide')) {
+        setError("Email ou mot de passe incorrect");
+        return;
+      }
+
+      if (message.toLowerCase().includes('attente') && 
+          message.toLowerCase().includes('validation')) {
+        setError("Votre compte est en attente de validation par un administrateur");
+        return;
+      }
+
+      setError(message);
+    } else if (status === 401) {
+      setError("Email ou mot de passe incorrect");
+    } else if (status === 403) {
+      setError("Votre compte est en attente de validation par un administrateur");
+    } else if (status === 500) {
+      setError("Une erreur serveur s'est produite. Veuillez réessayer plus tard.");
+    } else if (err.message) {
+      if (err.message.includes('Network Error') || err.message.includes('timeout')) {
+        setError("Impossible de contacter le serveur. Vérifiez votre connexion internet.");
+      } else {
+        setError("Une erreur s'est produite lors de la connexion.");
+      }
+    } else {
+      setError("Une erreur inattendue s'est produite.");
+    }
+  };
+
   // Vérifier si l'utilisateur est déjà connecté et rediriger automatiquement
   useEffect(() => {
-    // Attendre que le chargement soit terminé
-    if (loading) return;
+    // Attendre que le chargement soit terminé (avec un timeout de sécurité)
+    if (loading) {
+      // Si le chargement prend trop de temps (> 15 secondes), forcer l'affichage du formulaire
+      const timeout = setTimeout(() => {
+        // Ne rien faire, juste laisser le timeout se déclencher
+        // Le loading sera mis à false par le timeout dans AuthProvider
+      }, 15000);
+
+      return () => clearTimeout(timeout);
+    }
 
     // Si l'utilisateur est connecté, rediriger
     if (user) {
@@ -53,27 +134,13 @@ function LoginContent() {
 
       return;
     }
-
-    // Vérifier aussi si un token existe dans les cookies (au cas où l'AuthProvider n'a pas encore chargé)
-    if (typeof document !== "undefined") {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("auth_token="))
-        ?.split("=")[1];
-
-      // Si un token existe, l'AuthProvider devrait le détecter via refreshUser()
-      // On attend un peu pour laisser l'AuthProvider se charger
-      if (token) {
-        // L'AuthProvider va automatiquement appeler refreshUser() qui va charger l'utilisateur
-        // On ne fait rien ici, on attend que l'AuthProvider se charge
-      }
-    }
   }, [user, loading, router, searchParams]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setError: setFormError,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -87,47 +154,27 @@ function LoginContent() {
     setError(null);
 
     try {
-      await login(data.email, data.password);
+      const response = await login(data.email, data.password);
 
-      // Attendre un court instant pour que l'AuthProvider récupère l'utilisateur
+      // Le login() met déjà à jour user dans AuthProvider
+      // Attendre un court instant pour que le state soit synchronisé
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Rediriger selon le rôle (on va chercher l'utilisateur via l'API)
-      const apiUrl =
-        typeof window !== "undefined"
-          ? window.location.origin
-          : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(`${apiUrl}/api/auth/me`, {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${
-            document.cookie
-              .split("; ")
-              .find((row) => row.startsWith("auth_token="))
-              ?.split("=")[1]
-          }`,
-        },
-      });
+      // Déterminer le chemin de redirection selon le rôle
+      let redirectPath = "/";
 
-      if (response.ok) {
-        const userData = await response.json();
-        let redirectPath = "/";
-
-        if (userData.role === "admin") {
-          redirectPath = "/admin";
-        } else if (userData.role === "etudiant") {
-          redirectPath = "/etudiant";
-        } else if (userData.role === "enseignant") {
-          redirectPath = "/enseignant";
-        }
-        router.push(redirectPath);
-      } else {
-        // En cas d'erreur, rediriger vers la page d'accueil
-        router.push("/");
+      if (response.user.role === "admin") {
+        redirectPath = "/admin";
+      } else if (response.user.role === "etudiant") {
+        redirectPath = "/etudiant";
+      } else if (response.user.role === "enseignant") {
+        redirectPath = "/enseignant";
       }
-    } catch (_err: any) {
-      setError(_err.response?.data?.message || "Erreur lors de la connexion");
+
+      // Rediriger immédiatement
+      router.replace(redirectPath);
+    } catch (err: unknown) {
+      handleBackendErrors(err as BackendError);
     } finally {
       setIsLoading(false);
     }

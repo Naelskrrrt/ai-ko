@@ -253,6 +253,22 @@ class EnseignantMatieres(Resource):
             logger.error(f"Erreur récupération matières: {e}", exc_info=True)
             api.abort(500, f"Erreur interne: {str(e)}")
 
+    @api.doc('update_enseignant_matieres', security='Bearer')
+    @jwt_required()
+    def put(self, enseignant_id):
+        """Met à jour toutes les matières de l'enseignant"""
+        try:
+            require_admin_or_self(enseignant_id)
+            data = request.get_json()
+            matieres_ids = data.get('matieres_ids', [])
+            
+            # Appeler le service pour mettre à jour
+            enseignant_service.update_matieres(enseignant_id, matieres_ids)
+            return {'message': 'Matières mises à jour avec succès'}, 200
+        except Exception as e:
+            logger.error(f"Erreur mise à jour matières: {e}", exc_info=True)
+            api.abort(500, f"Erreur interne: {str(e)}")
+
 
 @api.route('/<string:enseignant_id>/matieres/<string:matiere_id>')
 @api.param('enseignant_id', 'ID de l\'enseignant')

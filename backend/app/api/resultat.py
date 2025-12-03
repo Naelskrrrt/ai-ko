@@ -160,19 +160,24 @@ class ResultatDetail(Resource):
     @api.marshal_with(resultat_model)
     @jwt_required()
     def get(self, resultat_id):
-        """Récupère un résultat par son ID avec filtrage selon le rôle"""
+        """Récupère un résultat par son ID"""
         try:
+            include_details = request.args.get(
+                'include_details', 'false').lower() == 'true'
             user_id = get_jwt_identity()
             user = user_repo.get_by_id(user_id)
 
             if not user:
                 api.abort(401, "Utilisateur non trouvé")
 
-            # Utiliser la méthode qui filtre selon le rôle et la publication
-            resultat = resultat_service.get_resultat_etudiant_filtre(
-                resultat_id, user_id, user.role.value)
+            resultat = resultat_service.get_resultat_by_id(
+                resultat_id, include_details=include_details)
             if not resultat:
                 api.abort(404, f"Résultat {resultat_id} non trouvé")
+
+            # Vérifier les permissions (étudiant ne peut voir que ses résultats)
+            if user.role == UserRole.ETUDIANT and resultat.get('etudiantId') != user_id:
+                api.abort(403, "Vous ne pouvez pas voir ce résultat")
 
             return resultat, 200
         except HTTPException:

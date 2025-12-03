@@ -45,6 +45,12 @@ frontend/.turbo/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.backup.*
+
+# Keep environment templates
+!.env.dev
+!.env.prod
+!.env.template
 
 # IDE
 .vscode/
@@ -180,8 +186,9 @@ develop-eggs/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
+# Exclude lib directories at root but not in subdirectories like src/core/lib/
 parts/
 sdist/
 var/

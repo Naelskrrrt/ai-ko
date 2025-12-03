@@ -75,6 +75,9 @@ class User(db.Model):
     adresse = db.Column(db.Text, nullable=True)
     date_naissance = db.Column(db.Date, nullable=True)
 
+    # Activation utilisateur (validation admin)
+    is_active = db.Column(db.Boolean, default=False, nullable=False)
+
     # NOTE: Les relations many-to-many ont été déplacées vers les modèles Enseignant et Etudiant
     # Les backref 'enseignant_profil' et 'etudiant_profil' sont définis dans ces modèles
 
@@ -96,6 +99,7 @@ class User(db.Model):
 
     def to_dict(self, include_profil=False):
         """Convertit l'utilisateur en dictionnaire"""
+        
         # Gérer les dates - s'assurer qu'elles sont toujours des objets datetime
         def format_date(date_value):
             if date_value is None:
@@ -123,6 +127,7 @@ class User(db.Model):
             'telephone': self.telephone,
             'adresse': self.adresse,
             'dateNaissance': format_date(self.date_naissance),
+            'isActive': self.is_active,
             'createdAt': format_date(self.created_at),
             'updatedAt': format_date(self.updated_at),
         }

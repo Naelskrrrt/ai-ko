@@ -100,3 +100,5 @@ export const etablissementService = {
     return response.data;
   },
 };
+
+

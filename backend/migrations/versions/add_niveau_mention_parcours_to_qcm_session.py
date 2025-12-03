@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'add_niveau_mention_parcours'
-down_revision = 'c0e190b74a6e'
+down_revision = '20251201_231833'
 branch_labels = None
 depends_on = None
 
@@ -146,4 +146,5 @@ def downgrade():
     op.drop_column('qcms', 'parcours_id')
     op.drop_column('qcms', 'mention_id')
     op.drop_column('qcms', 'niveau_id')
+
 

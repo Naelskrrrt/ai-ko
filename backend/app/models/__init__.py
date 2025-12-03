@@ -17,6 +17,7 @@ from app.models.mention import Mention
 from app.models.parcours import Parcours
 from app.models.enseignant import Enseignant
 from app.models.etudiant import Etudiant
+from app.models.admin_notification import AdminNotification
 
 # Importer les tables d'association
 from app.models.associations import (
@@ -55,6 +56,7 @@ __all__ = [
     'Parcours',
     'Enseignant',
     'Etudiant',
+    'AdminNotification',
     # Tables d'association (anciennes)
     'professeur_matieres',
     'professeur_niveaux',

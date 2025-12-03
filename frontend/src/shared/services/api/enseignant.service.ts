@@ -192,4 +192,58 @@ export const enseignantService = {
 
     return response.data;
   },
+
+  /**
+   * Récupère les élèves liés à l'enseignant connecté
+   */
+  async getMyEtudiants(params: {
+    page?: number;
+    per_page?: number;
+    niveau_id?: string;
+    matiere_id?: string;
+    parcours_id?: string;
+  }): Promise<{ items: any[]; total: number; page: number; per_page: number; total_pages: number }> {
+    // Récupérer d'abord l'ID de l'enseignant connecté
+    const enseignant = await this.getMe();
+    const enseignantId = enseignant.id;
+
+    const response = await enseignantApi.get(`/${enseignantId}/etudiants`, {
+      params: {
+        page: params.page || 1,
+        per_page: params.per_page || 50,
+        niveau_id: params.niveau_id,
+        matiere_id: params.matiere_id,
+        parcours_id: params.parcours_id,
+      },
+    });
+
+    return response.data;
+  },
+
+  /**
+   * Exporte les élèves liés à l'enseignant connecté en PDF
+   */
+  async exportMyEtudiantsPDF(params: {
+    niveau_id?: string;
+    matiere_id?: string;
+    parcours_id?: string;
+  }): Promise<Blob> {
+    // Récupérer d'abord l'ID de l'enseignant connecté
+    const enseignant = await this.getMe();
+    const enseignantId = enseignant.id;
+
+    const response = await enseignantApi.get(
+      `/${enseignantId}/etudiants/export-pdf`,
+      {
+        params: {
+          niveau_id: params.niveau_id,
+          matiere_id: params.matiere_id,
+          parcours_id: params.parcours_id,
+        },
+        responseType: "blob",
+      },
+    );
+
+    return response.data;
+  },
 };

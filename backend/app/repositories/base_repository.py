@@ -21,7 +21,8 @@ class BaseRepository(Generic[T]):
     
     def get_by_id(self, id: str) -> Optional[T]:
         """Récupère une entité par son ID"""
-        return self.session.query(self.model).get(id)
+        # Utiliser filter au lieu de get() qui est deprecated
+        return self.session.query(self.model).filter(self.model.id == id).first()
     
     def get_all(self, skip: int = 0, limit: int = 100) -> List[T]:
         """Récupère toutes les entités avec pagination"""
@@ -40,6 +41,7 @@ class BaseRepository(Generic[T]):
     
     def update(self, entity: T) -> T:
         """Met à jour une entité existante"""
+        self.session.add(entity)
         self.session.commit()
         self.session.refresh(entity)
         return entity
@@ -56,6 +58,7 @@ class BaseRepository(Generic[T]):
         if entity:
             return self.delete(entity)
         return False
+
 
 
 

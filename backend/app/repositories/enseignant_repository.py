@@ -171,3 +171,6 @@ class EnseignantRepository(BaseRepository[Enseignant]):
             raise e
         return False
 
+
+
+

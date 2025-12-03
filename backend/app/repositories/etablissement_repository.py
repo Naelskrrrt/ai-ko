@@ -43,3 +43,6 @@ class EtablissementRepository(BaseRepository[Etablissement]):
             )
         ).all()
 
+
+
+

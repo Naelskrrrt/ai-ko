@@ -229,43 +229,39 @@ export default function UsersPage() {
   };
 
   const handleToggleStatus = async (user: User) => {
+    console.log("[TOGGLE] Début - User:", user.id, user.email, "isActive:", user.isActive);
+    
     if (isCurrentUser(user)) {
       toast({
         title: "Erreur",
         description: "Vous ne pouvez pas modifier votre propre statut",
         variant: "error",
       });
-
       return;
     }
-
-    const userName = user.name;
 
     setTogglingStatus(user.id);
 
     try {
+      console.log("[TOGGLE] Appel API...");
       const result = await adminService.toggleUserStatus(user.id);
-
-      // Utiliser le nouveau statut depuis la réponse
-      const newStatus = result.isActive;
-      const statusText = newStatus ? "activé" : "désactivé";
+      console.log("[TOGGLE] Résultat API:", result);
+      
+      const statusText = result.isActive ? "activé" : "désactivé";
 
       // Rafraîchir les données
       mutate();
 
-      // Feedback visuel amélioré
       toast({
-        title: "✅ Statut modifié",
-        description: `${userName} a été ${statusText} avec succès`,
+        title: "Succès",
+        description: `${user.name} a été ${statusText}`,
         variant: "success",
       });
     } catch (error: any) {
+      console.error("[TOGGLE] Erreur:", error);
       toast({
-        title: "❌ Erreur",
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "Une erreur est survenue lors du changement de statut",
+        title: "Erreur",
+        description: error.response?.data?.message || "Une erreur est survenue",
         variant: "error",
       });
     } finally {

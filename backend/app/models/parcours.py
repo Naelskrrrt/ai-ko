@@ -52,3 +52,6 @@ class Parcours(db.Model):
     def __repr__(self):
         return f'<Parcours {self.code} - {self.nom}>'
 
+
+
+

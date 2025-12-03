@@ -411,28 +411,38 @@ class PDFService:
         buffer.seek(0)
         return buffer
 
-    def generer_pdf_eleves_enseignant(self, enseignant_id: str, etudiants_data: List[Dict[str, Any]], filters: Optional[Dict[str, Any]] = None) -> BytesIO:
+    def generer_pdf_eleves_enseignant(
+        self,
+        enseignant_id: str,
+        etudiants_data: List[Dict[str, Any]],
+        filters: Optional[Dict[str, Any]] = None
+    ) -> BytesIO:
         """
-        Génère un PDF avec la liste des élèves liés à un enseignant
+        Génère un PDF listant les élèves liés à un enseignant
         """
         from app.repositories.enseignant_repository import EnseignantRepository
-        from app.services.resultat_service import ResultatService
-        
+        from app.repositories.matiere_repository import MatiereRepository
+        from app.repositories.niveau_repository import NiveauRepository
+        from app.repositories.parcours_repository import ParcoursRepository
+
         enseignant_repo = EnseignantRepository()
-        resultat_service = ResultatService()
-        
+        matiere_repo = MatiereRepository()
+        niveau_repo = NiveauRepository()
+        parcours_repo = ParcoursRepository()
+
         # Récupérer l'enseignant
         enseignant = enseignant_repo.get_by_id(enseignant_id)
         if not enseignant:
             raise ValueError(f"Enseignant {enseignant_id} non trouvé")
-        
-        enseignant_user = self.user_repo.get_by_id(enseignant.user_id)
-        
+
+        # Récupérer le nom de l'enseignant
+        enseignant_name = enseignant.user.name if enseignant.user else "Enseignant"
+
         # Créer le buffer PDF
         buffer = BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=72, leftMargin=72,
                                 topMargin=72, bottomMargin=18)
-        
+
         # Styles
         styles = getSampleStyleSheet()
         title_style = ParagraphStyle(
@@ -452,200 +462,132 @@ class PDFService:
             spaceBefore=12
         )
         normal_style = styles['Normal']
-        
+
         # Contenu du document
         story = []
-        
+
         # Titre
-        story.append(Paragraph("Mes Élèves", title_style))
+        story.append(Paragraph("Liste des Élèves", title_style))
         story.append(Spacer(1, 0.2 * inch))
-        
+
         # Informations de l'enseignant
-        if enseignant_user:
-            story.append(Paragraph(f"Enseignant: {enseignant_user.name or 'N/A'}", 
-                                 ParagraphStyle('Info', parent=normal_style, fontSize=12, alignment=TA_CENTER)))
-            story.append(Spacer(1, 0.3 * inch))
+        story.append(Paragraph("Informations de l'Enseignant", heading_style))
         
-        # Filtres appliqués
+        enseignant_data = [
+            ['Nom', enseignant_name],
+            ['Numéro enseignant', enseignant.numero_enseignant or 'Non renseigné'],
+        ]
+
+        enseignant_table = Table(enseignant_data, colWidths=[2 * inch, 4 * inch])
+        enseignant_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f3f4f6')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb'))
+        ]))
+        story.append(enseignant_table)
+        story.append(Spacer(1, 0.3 * inch))
+
+        # Afficher les filtres appliqués si présents
         if filters:
-            story.append(Paragraph("Filtres appliqués", heading_style))
+            story.append(Paragraph("Filtres Appliqués", heading_style))
             filtres_data = []
+            
             if filters.get('matiere_id'):
-                filtres_data.append(['Matière', filters['matiere_id']])
+                matiere = matiere_repo.get_by_id(filters['matiere_id'])
+                if matiere:
+                    filtres_data.append(['Matière', matiere.nom])
+            
             if filters.get('niveau_id'):
-                filtres_data.append(['Niveau', filters['niveau_id']])
+                niveau = niveau_repo.get_by_id(filters['niveau_id'])
+                if niveau:
+                    filtres_data.append(['Niveau', niveau.nom])
+            
             if filters.get('parcours_id'):
-                filtres_data.append(['Parcours', filters['parcours_id']])
+                parcours = parcours_repo.get_by_id(filters['parcours_id'])
+                if parcours:
+                    filtres_data.append(['Parcours', parcours.nom])
+            
             if filters.get('mention_id'):
-                filtres_data.append(['Mention', filters['mention_id']])
-            if filters.get('annee_scolaire'):
-                filtres_data.append(['Année scolaire', filters['annee_scolaire']])
+                from app.repositories.mention_repository import MentionRepository
+                mention_repo = MentionRepository()
+                mention = mention_repo.get_by_id(filters['mention_id'])
+                if mention:
+                    filtres_data.append(['Mention', mention.nom])
             
             if filtres_data:
                 filtres_table = Table(filtres_data, colWidths=[2 * inch, 4 * inch])
                 filtres_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f3f4f6')),
+                    ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#dbeafe')),
                     ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
                     ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                     ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
                     ('FONTSIZE', (0, 0), (-1, -1), 10),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb'))
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#93c5fd'))
                 ]))
                 story.append(filtres_table)
                 story.append(Spacer(1, 0.3 * inch))
-        
+
         # Liste des élèves
-        story.append(Paragraph(f"Liste des Élèves ({len(etudiants_data)} élève(s))", heading_style))
-        story.append(Spacer(1, 0.1 * inch))
-        
-        if not etudiants_data:
-            story.append(Paragraph("Aucun élève trouvé avec les critères sélectionnés.", normal_style))
-        else:
+        if etudiants_data:
+            story.append(Paragraph(f"Liste des Élèves ({len(etudiants_data)} élève(s))", heading_style))
+            story.append(Spacer(1, 0.1 * inch))
+
             # En-têtes du tableau
-            eleves_data = [['Nom', 'Numéro', 'Niveau', 'Matières', 'Moyenne']]
-            
+            eleves_data = [['Nom', 'Email', 'Numéro', 'Niveau', 'Parcours', 'Téléphone']]
+
             # Ajouter chaque élève
             for etudiant in etudiants_data:
-                # Récupérer les statistiques de l'élève
-                user_id = etudiant.get('userId')
-                stats = {}
-                if user_id:
-                    try:
-                        stats = resultat_service.get_statistiques_etudiant(user_id)
-                    except:
-                        stats = {'moyenne_generale': 0, 'nombre_examens': 0}
+                nom = etudiant.get('nom') or etudiant.get('name') or 'N/A'
+                email = etudiant.get('email') or 'N/A'
+                numero = etudiant.get('numero_etudiant') or etudiant.get('numeroEtudiant') or '-'
                 
-                nom = etudiant.get('name', 'N/A')
-                numero = etudiant.get('numeroEtudiant', 'N/A')
-                niveau = etudiant.get('niveau', {}).get('nom', 'N/A') if etudiant.get('niveau') else 'N/A'
+                # Récupérer niveau
+                niveau_nom = '-'
+                if etudiant.get('niveau'):
+                    niveau_nom = etudiant['niveau'].get('nom', '-') if isinstance(etudiant['niveau'], dict) else (etudiant['niveau'].nom if hasattr(etudiant['niveau'], 'nom') else '-')
                 
-                # Matières
-                matieres = etudiant.get('matieres', [])
-                matieres_str = ', '.join([m.get('nom', '') for m in matieres[:3]])
-                if len(matieres) > 3:
-                    matieres_str += f' (+{len(matieres) - 3})'
+                # Récupérer parcours
+                parcours_nom = '-'
+                if etudiant.get('parcours'):
+                    parcours_nom = etudiant['parcours'].get('nom', '-') if isinstance(etudiant['parcours'], dict) else (etudiant['parcours'].nom if hasattr(etudiant['parcours'], 'nom') else '-')
                 
-                moyenne = f"{stats.get('moyenne_generale', 0):.2f}/20" if stats.get('moyenne_generale') else 'N/A'
+                telephone = etudiant.get('telephone') or etudiant.get('user', {}).get('telephone') if isinstance(etudiant.get('user'), dict) else '-'
+                if not telephone or telephone == 'None':
+                    telephone = '-'
                 
-                eleves_data.append([nom, numero, niveau, matieres_str, moyenne])
-            
-            eleves_table = Table(eleves_data, colWidths=[1.8 * inch, 1.2 * inch, 1 * inch, 2 * inch, 0.8 * inch])
+                eleves_data.append([nom, email, numero, niveau_nom, parcours_nom, telephone])
+
+            eleves_table = Table(eleves_data, colWidths=[1.2 * inch, 1.5 * inch, 0.8 * inch, 0.8 * inch, 0.8 * inch, 1 * inch])
             eleves_table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e40af')),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.white),
                 ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
                 ('ALIGN', (0, 1), (1, -1), 'LEFT'),
                 ('ALIGN', (2, 1), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('FONTSIZE', (0, 1), (-1, -1), 8),
                 ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
                 ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db'))
             ]))
             story.append(eleves_table)
-            
-            # Détails par élève (sur nouvelle page si nécessaire)
-            story.append(PageBreak())
-            story.append(Paragraph("Détails des Élèves", heading_style))
-            story.append(Spacer(1, 0.2 * inch))
-            
-            for idx, etudiant in enumerate(etudiants_data):
-                if idx > 0:
-                    story.append(PageBreak())
-                
-                # Informations de base
-                story.append(Paragraph(f"Élève {idx + 1}: {etudiant.get('name', 'N/A')}", 
-                                     ParagraphStyle('EleveTitle', parent=heading_style, fontSize=14)))
-                story.append(Spacer(1, 0.1 * inch))
-                
-                user_id = etudiant.get('userId')
-                stats = {}
-                resultats = []
-                if user_id:
-                    try:
-                        stats = resultat_service.get_statistiques_etudiant(user_id)
-                        resultats = resultat_service.get_resultats_by_etudiant(user_id)
-                        # Limiter aux 5 derniers
-                        resultats = sorted(resultats, key=lambda r: r.get('dateFin') or r.get('dateDebut') or '', reverse=True)[:5]
-                    except:
-                        pass
-                
-                # Tableau d'informations
-                info_data = [
-                    ['Numéro étudiant', etudiant.get('numeroEtudiant', 'N/A')],
-                    ['Email', etudiant.get('email', 'N/A')],
-                    ['Niveau', etudiant.get('niveau', {}).get('nom', 'N/A') if etudiant.get('niveau') else 'N/A'],
-                    ['Mention', etudiant.get('mention', {}).get('nom', 'N/A') if etudiant.get('mention') else 'N/A'],
-                    ['Parcours', etudiant.get('parcours', {}).get('nom', 'N/A') if etudiant.get('parcours') else 'N/A'],
-                    ['Moyenne générale', f"{stats.get('moyenne_generale', 0):.2f}/20" if stats.get('moyenne_generale') else 'N/A'],
-                    ['Nombre d\'examens', str(stats.get('nombre_examens', 0))],
-                    ['Taux de réussite', f"{stats.get('taux_reussite', 0):.1f}%" if stats.get('taux_reussite') else 'N/A']
-                ]
-                
-                info_table = Table(info_data, colWidths=[2 * inch, 4 * inch])
-                info_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f3f4f6')),
-                    ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, -1), 10),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb'))
-                ]))
-                story.append(info_table)
-                story.append(Spacer(1, 0.2 * inch))
-                
-                # Derniers résultats
-                if resultats:
-                    story.append(Paragraph("Derniers résultats", 
-                                         ParagraphStyle('SubHeading', parent=heading_style, fontSize=12)))
-                    story.append(Spacer(1, 0.1 * inch))
-                    
-                    resultats_data = [['Date', 'QCM', 'Note /20', 'Statut']]
-                    for resultat in resultats:
-                        date_str = resultat.get('dateFin', resultat.get('dateDebut', ''))
-                        if date_str:
-                            try:
-                                date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-                                date_str = date_obj.strftime('%d/%m/%Y')
-                            except:
-                                pass
-                        
-                        qcm = resultat.get('qcm', {})
-                        qcm_titre = qcm.get('titre', 'N/A') if qcm else 'N/A'
-                        note = f"{resultat.get('noteSur20', 0):.2f}" if resultat.get('noteSur20') is not None else 'N/A'
-                        statut = 'Réussi' if resultat.get('estReussi') else 'Échoué'
-                        
-                        resultats_data.append([date_str, qcm_titre, note, statut])
-                    
-                    resultats_table = Table(resultats_data, colWidths=[1.2 * inch, 2.5 * inch, 1 * inch, 1.3 * inch])
-                    resultats_table.setStyle(TableStyle([
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e40af')),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                        ('FONTSIZE', (0, 0), (-1, 0), 9),
-                        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-                        ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
-                        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                        ('FONTSIZE', (0, 1), (-1, -1), 8),
-                        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
-                        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db'))
-                    ]))
-                    story.append(resultats_table)
-        
+        else:
+            story.append(Paragraph("Aucun élève trouvé", normal_style))
+
         # Footer
         story.append(Spacer(1, 0.5 * inch))
         footer_text = f"<i>Document généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}</i>"
         story.append(Paragraph(footer_text, ParagraphStyle('Footer', parent=normal_style, fontSize=8, textColor=colors.grey, alignment=TA_CENTER)))
-        
+
         # Construire le PDF
         doc.build(story)
         buffer.seek(0)

@@ -39,24 +39,21 @@ export async function GET(request: NextRequest) {
 
     const { user, token } = response.data;
 
-    // Vérifier si l'utilisateur a un profil complet
-    const hasProfile = user?.etudiantProfil || user?.enseignantProfil;
-
     let redirectPath;
 
-    if (hasProfile) {
-      // Utilisateur avec profil complet -> redirection normale
-      if (user?.role === "admin") {
+    // Si l'utilisateur a un rôle, rediriger vers son dashboard
+    if (user?.role) {
+      if (user.role === "admin") {
         redirectPath = "/admin";
-      } else if (user?.role === "etudiant") {
+      } else if (user.role === "etudiant") {
         redirectPath = "/etudiant";
-      } else if (user?.role === "enseignant") {
+      } else if (user.role === "enseignant") {
         redirectPath = "/enseignant";
       } else {
-        redirectPath = "/dashboard";
+        redirectPath = "/";
       }
     } else {
-      // Nouveau utilisateur OAuth sans profil -> Parcours d'onboarding
+      // Nouveau utilisateur OAuth sans rôle -> Parcours d'onboarding
       redirectPath = `/onboarding/role-selection?userId=${user.id}&oauth=true`;
     }
 

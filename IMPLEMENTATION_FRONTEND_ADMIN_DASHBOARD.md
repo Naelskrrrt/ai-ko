@@ -368,3 +368,6 @@ Le dashboard admin est maintenant **opérationnel** avec :
 **État actuel :** MVP fonctionnel, prêt pour développement des fonctionnalités avancées.
 
 
+
+
+

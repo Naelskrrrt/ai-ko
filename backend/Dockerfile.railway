@@ -40,3 +40,5 @@ EXPOSE ${PORT:-5000}
 # Commande de démarrage optimisée pour Railway (1 worker pour économiser RAM)
 CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --timeout 180 run:app
 
+
+

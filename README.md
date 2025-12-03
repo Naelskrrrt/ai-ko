@@ -32,6 +32,7 @@ AI-KO/
 - Docker 24+ et Docker Compose
 - Git
 - 8GB RAM minimum
+- PowerShell (Windows) ou Bash (Linux/Mac)
 
 ### Installation
 
@@ -41,44 +42,70 @@ git clone <repository-url>
 cd ai-ko
 ```
 
-2. **Configurer l'environnement**
+2. **Basculer vers Développement**
 ```bash
-# Copier le fichier d'exemple
-cp env.example .env
+# Windows PowerShell
+.\switch-env.ps1 dev
 
-# Générer des secrets sécurisés
-# Sur Linux/Mac:
-openssl rand -hex 32  # Pour SECRET_KEY
-openssl rand -hex 32  # Pour JWT_SECRET_KEY
-openssl rand -hex 32  # Pour NEXTAUTH_SECRET
-
-# Sur Windows PowerShell:
--join ((48..57) + (65..90) + (97..122) | Get-Random -Count 32 | % {[char]$_})
-
-# Éditer .env et remplacer tous les "change_me_*"
+# Linux/Mac
+./switch-env.sh dev
 ```
 
 3. **Démarrer les services**
 ```bash
-# Méthode 1: Script automatique (Linux/Mac)
-chmod +x scripts/*.sh
-./scripts/deploy.sh
+# Méthode 1: Avec Make (Linux/Mac)
+make up
 
-# Méthode 2: Commandes manuelles
-docker-compose up -d --build
-docker-compose exec backend flask db upgrade
+# Méthode 2: Avec PowerShell commands (Windows)
+. .\commands.ps1
+Up
+
+# Méthode 3: Docker Compose manuel
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 4. **Vérifier le déploiement**
 ```bash
-# Méthode 1: Script de status
-./scripts/status.sh
+# Méthode 1: Commands helper
+Health
 
 # Méthode 2: Manuellement
 docker-compose ps
 curl http://localhost:5000/health
-curl http://localhost:3000/api/health
+curl http://localhost:3000
 ```
+
+## 🔄 Gestion des Environnements
+
+### Deux Environnements Configurés
+
+**Développement (DEV)** - Localhost avec Docker
+- PostgreSQL & Redis en Docker
+- Backend Flask avec hot-reload
+- Frontend Next.js sur localhost:3000
+- Mode debug activé
+
+**Production (PROD)** - Railway + Vercel
+- PostgreSQL Railway
+- Redis Railway
+- Backend sur Railway
+- Frontend sur Vercel
+- SSL/HTTPS activé
+
+### Basculement Simple
+
+```bash
+# Windows
+.\switch-env.ps1 dev    # Basculer vers dev
+.\switch-env.ps1 prod   # Basculer vers prod
+
+# Linux/Mac
+./switch-env.sh dev     # Basculer vers dev
+./switch-env.sh prod    # Basculer vers prod
+```
+
+**Documentation complète:** [ENV_SETUP_GUIDE.md](./ENV_SETUP_GUIDE.md)
+**Guide rapide:** [QUICK_START.md](./QUICK_START.md)
 
 ## 🌐 Accès aux Services
 

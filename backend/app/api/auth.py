@@ -37,19 +37,12 @@ def register():
         if existing_user:
             return jsonify({'message': 'Cet email est déjà utilisé'}), 400
         
-        # Déterminer le rôle (par défaut admin pour les premiers utilisateurs)
-        role = UserRole.ADMIN
-        if validated_data.get('role'):
-            try:
-                role = UserRole(validated_data['role'])
-            except ValueError:
-                return jsonify({'message': 'Rôle invalide'}), 400
-        
-        # Créer l'utilisateur
+        # Créer l'utilisateur avec un rôle temporaire ADMIN
+        # Le rôle sera définitivement défini lors de l'onboarding
         user = User(
             email=validated_data['email'],
             name=validated_data['name'],
-            role=role,
+            role=UserRole.ADMIN,  # Rôle temporaire
             email_verified=False
         )
         user.set_password(validated_data['password'])
@@ -65,7 +58,8 @@ def register():
         
         response = make_response(jsonify({
             'user': user_response_schema.dump(user.to_dict()),
-            'token': access_token
+            'token': access_token,
+            'requiresOnboarding': True  # Flag indiquant que l'onboarding est requis
         }), 201)
         
         # Utiliser set_access_cookies pour configurer automatiquement les cookies JWT et CSRF
@@ -96,6 +90,10 @@ def login():
         
         if not user or not user.check_password(validated_data['password']):
             return jsonify({'message': 'Email ou mot de passe incorrect'}), 401
+
+        # Vérifier si l'utilisateur est actif (validé par admin)
+        if not user.is_active:
+            return jsonify({'message': 'Votre compte est en attente de validation par un administrateur'}), 403
         
         # Créer le token JWT
         access_token = create_access_token(
@@ -162,7 +160,25 @@ def get_me():
         if not user:
             return jsonify({'message': 'Utilisateur non trouvé'}), 404
         
-        return jsonify(user_response_schema.dump(user.to_dict())), 200
+        # Forcer le rechargement des relations pour s'assurer qu'elles sont à jour
+        db.session.refresh(user)
+        
+        # Forcer le chargement explicite des relations
+        _ = user.etudiant_profil
+        _ = user.enseignant_profil
+        
+        etudiant_profil = getattr(user, 'etudiant_profil', None)
+        enseignant_profil = getattr(user, 'enseignant_profil', None)
+        has_profile = (etudiant_profil is not None) or (enseignant_profil is not None)
+        
+        # Créer le dict utilisateur avec profil
+        user_dict = user.to_dict(include_profil=True)
+        
+        return jsonify({
+            'user': user_response_schema.dump(user_dict),
+            'onboardingComplete': has_profile,
+            'requiresOnboarding': not has_profile
+        }), 200
         
     except Exception as e:
         return jsonify({'message': f'Erreur: {str(e)}'}), 500
@@ -220,6 +236,197 @@ def update_me():
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Erreur lors de la mise à jour: {str(e)}'}), 500
+
+
+@bp.route('/complete-profile', methods=['POST'])
+@jwt_required()
+def complete_profile():
+    """Finaliser le profil après onboarding - Créer Étudiant ou Enseignant"""
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        if not user_id:
+            return jsonify({'message': 'Non authentifié'}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'message': 'Utilisateur non trouvé'}), 404
+        
+        role = data.get('role')  # 'etudiant' ou 'enseignant'
+        
+        if role == 'etudiant':
+            # Vérifier qu'un profil étudiant n'existe pas déjà
+            if hasattr(user, 'etudiant_profil') and user.etudiant_profil:
+                return jsonify({'message': 'Profil étudiant déjà existant'}), 400
+            
+            # Importer Etudiant
+            from app.models.etudiant import Etudiant
+            from datetime import datetime
+            
+            # Valider le numéro d'étudiant requis
+            numero_etudiant = data.get('numeroEtudiant')
+            if not numero_etudiant:
+                return jsonify({'message': 'Numéro d\'étudiant requis'}), 400
+            
+            # Vérifier l'unicité du numéro d'étudiant
+            existing_etudiant = Etudiant.query.filter_by(numero_etudiant=numero_etudiant).first()
+            if existing_etudiant:
+                # Générer un numéro unique automatiquement
+                import random
+                prefix = numero_etudiant[:2] if len(numero_etudiant) >= 2 else 'ET'
+                for attempt in range(100):  # Maximum 100 tentatives
+                    new_numero = f"{prefix}{random.randint(1000, 9999)}"
+                    if not Etudiant.query.filter_by(numero_etudiant=new_numero).first():
+                        numero_etudiant = new_numero
+                        break
+                else:
+                    # Si on n'arrive pas à générer un numéro unique après 100 tentatives
+                    return jsonify({'message': 'Impossible de générer un numéro d\'étudiant unique'}), 500
+            
+            # Créer le profil étudiant
+            etudiant = Etudiant(
+                user_id=user_id,
+                numero_etudiant=numero_etudiant,
+                etablissement_id=data.get('etablissementId'),
+                niveau_id=data.get('niveauId'),
+                mention_id=data.get('mentionId'),
+                parcours_id=data.get('parcoursId'),
+                annee_admission=data.get('anneeAdmission'),
+                actif=False  # Désactivé par défaut, nécessite validation admin
+            )
+            
+            # Mettre à jour le rôle et les infos complémentaires
+            user.role = UserRole.ETUDIANT
+            user.is_active = False  # Désactiver par défaut, nécessite validation admin
+            if data.get('telephone'):
+                user.telephone = data.get('telephone')
+            if data.get('adresse'):
+                user.adresse = data.get('adresse')
+            if data.get('dateNaissance'):
+                try:
+                    user.date_naissance = datetime.fromisoformat(data.get('dateNaissance').replace('Z', '+00:00')).date()
+                except (ValueError, TypeError):
+                    pass
+            
+            db.session.add(etudiant)
+            
+        elif role == 'enseignant':
+            # Vérifier qu'un profil enseignant n'existe pas déjà
+            if hasattr(user, 'enseignant_profil') and user.enseignant_profil:
+                return jsonify({'message': 'Profil enseignant déjà existant'}), 400
+            
+            # Importer Enseignant
+            from app.models.enseignant import Enseignant
+            from datetime import datetime
+            
+            # Valider le numéro d'enseignant requis
+            numero_enseignant = data.get('numeroEnseignant')
+            if not numero_enseignant:
+                return jsonify({'message': 'Numéro d\'enseignant requis'}), 400
+            
+            # Vérifier l'unicité du numéro d'enseignant
+            existing_enseignant = Enseignant.query.filter_by(numero_enseignant=numero_enseignant).first()
+            if existing_enseignant:
+                # Générer un numéro unique automatiquement
+                import random
+                prefix = numero_enseignant[:2] if len(numero_enseignant) >= 2 else 'EN'
+                for attempt in range(100):  # Maximum 100 tentatives
+                    new_numero = f"{prefix}{random.randint(1000, 9999)}"
+                    if not Enseignant.query.filter_by(numero_enseignant=new_numero).first():
+                        numero_enseignant = new_numero
+                        break
+                else:
+                    # Si on n'arrive pas à générer un numéro unique après 100 tentatives
+                    return jsonify({'message': 'Impossible de générer un numéro d\'enseignant unique'}), 500
+            
+            # Gérer date_embauche avec gestion d'erreur
+            date_embauche = None
+            if data.get('dateEmbauche'):
+                try:
+                    date_embauche = datetime.fromisoformat(data.get('dateEmbauche').replace('Z', '+00:00')).date()
+                except (ValueError, TypeError):
+                    # Logger l'erreur mais continuer sans date
+                    pass
+            
+            # Créer le profil enseignant (specialite est géré via les matières, pas ici)
+            enseignant = Enseignant(
+                user_id=user_id,
+                numero_enseignant=numero_enseignant,
+                etablissement_id=data.get('etablissementId'),
+                grade=data.get('grade'),
+                departement=data.get('departement'),
+                bureau=data.get('bureau'),
+                date_embauche=date_embauche,
+                actif=False  # Désactivé par défaut, nécessite validation admin
+            )
+            
+            # Mettre à jour le rôle et les infos complémentaires
+            user.role = UserRole.ENSEIGNANT
+            user.is_active = False  # Désactiver par défaut, nécessite validation admin
+            if data.get('telephone'):
+                user.telephone = data.get('telephone')
+            if data.get('adresse'):
+                user.adresse = data.get('adresse')
+            
+            db.session.add(enseignant)
+        else:
+            return jsonify({'message': 'Rôle invalide. Doit être "etudiant" ou "enseignant"'}), 400
+        
+        # Commit avant de créer le nouveau token pour s'assurer que le rôle est bien enregistré
+        db.session.commit()
+
+        # Créer une notification admin pour la validation
+        try:
+            from app.models.admin_notification import AdminNotification
+            role_name = "étudiant" if role == "etudiant" else "enseignant"
+            notification = AdminNotification(
+                type='pending_user',
+                target_user_id=user_id,
+                message=f'Nouvel {role_name} en attente de validation: {user.name} ({user.email})'
+            )
+            db.session.add(notification)
+            db.session.commit()
+
+            # Émettre événement WebSocket vers tous les admins connectés
+            from app.events.notifications import notify_admin_pending_user
+            notify_admin_pending_user(user_id, user.to_dict(include_profil=True))
+
+        except Exception as notification_error:
+            # Ne pas bloquer l'inscription si la notification échoue
+            print(f"Erreur lors de la création de la notification admin: {notification_error}")
+            db.session.rollback()  # Annuler la création de la notification seulement
+        
+        # Recharger l'utilisateur depuis la DB pour s'assurer que les relations sont chargées
+        db.session.refresh(user)
+        # Forcer le rechargement des relations
+        if role == 'etudiant':
+            _ = user.etudiant_profil  # Forcer le chargement de la relation
+        elif role == 'enseignant':
+            _ = user.enseignant_profil  # Forcer le chargement de la relation
+        
+        # Créer un nouveau token JWT avec le nouveau rôle
+        # Le token précédent contenait le rôle ADMIN, maintenant on crée un nouveau token avec le bon rôle
+        new_access_token = create_access_token(
+            identity=str(user.id),
+            expires_delta=timedelta(days=7)
+        )
+        
+        # Créer la réponse avec le nouveau token
+        response = make_response(jsonify({
+            'message': 'Profil complété avec succès',
+            'user': user_response_schema.dump(user.to_dict(include_profil=True)),
+            'token': new_access_token  # Retourner le nouveau token
+        }), 200)
+        
+        # Mettre à jour les cookies avec le nouveau token (qui contient le bon rôle)
+        set_access_cookies(response, new_access_token)
+        
+        return response
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erreur lors de la création du profil: {str(e)}'}), 500
 
 
 @bp.route('/oauth/google', methods=['GET'])
@@ -305,13 +512,14 @@ def google_oauth_callback():
                 user.avatar = avatar
                 user.email_verified = True
             else:
-                # Créer un nouvel utilisateur
+                # Créer un nouvel utilisateur avec rôle temporaire ADMIN
+                # Le rôle sera définitivement défini lors de l'onboarding
                 user = User(
                     email=email,
                     name=name,
                     google_id=google_id,
                     avatar=avatar,
-                    role=UserRole.ADMIN,  # Par défaut admin pour OAuth
+                    role=UserRole.ADMIN,  # Rôle temporaire
                     email_verified=True
                 )
                 db.session.add(user)

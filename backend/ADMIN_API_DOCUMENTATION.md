@@ -468,3 +468,6 @@ curl -X POST "http://localhost:5000/api/admin/ai-configs/init-defaults" \
 - La suppression de sessions ou résultats est définitive (aucune restauration)
 
 
+
+
+

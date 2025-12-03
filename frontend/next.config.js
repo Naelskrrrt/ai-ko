@@ -6,7 +6,7 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'standalone', // Disabled on Windows due to symlink permission issues
+  // output: 'standalone', // Disabled - using Nixpacks for Railway
   eslint: {
     ignoreDuringBuilds: true,
   },

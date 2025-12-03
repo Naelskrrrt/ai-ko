@@ -15,7 +15,7 @@ interface AuthResponse {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthResponse>;
   register: (
     name: string,
     email: string,
@@ -34,11 +34,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const userData = await authService.getMe();
+      // Ajouter un timeout pour éviter les chargements infinis
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), 10000)
+      );
+
+      const userData = await Promise.race([
+        authService.getMe(),
+        timeoutPromise,
+      ]) as User;
 
       setUser(userData);
-    } catch (error) {
-      // Si getMe échoue (401, 403, etc.), on considère l'utilisateur comme non connecté
+    } catch (error: any) {
+      // Si getMe échoue (401, 403, timeout, erreur réseau, etc.), on considère l'utilisateur comme non connecté
       setUser(null);
       // Nettoyer les tokens invalides
       if (typeof document !== "undefined") {
@@ -47,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("onboarding_token");
       }
     } finally {
+      // Toujours mettre loading à false, même en cas d'erreur
       setLoading(false);
     }
   };
@@ -55,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<AuthResponse> => {
     const response = await authService.login({ email, password });
 
     // Stocker le token dans un cookie ET localStorage
@@ -64,6 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("auth_token", response.token);
     }
     setUser(response.user);
+    
+    return response;
   };
 
   const register = async (name: string, email: string, password: string) => {

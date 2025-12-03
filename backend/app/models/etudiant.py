@@ -93,3 +93,6 @@ class Etudiant(db.Model):
     def __repr__(self):
         return f'<Etudiant {self.numero_etudiant} - {self.user.name if self.user else "N/A"}>'
 
+
+
+
