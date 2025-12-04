@@ -113,11 +113,19 @@ test-cov:
 	docker-compose exec backend pytest --cov=app --cov-report=html
 
 # Production deployment
-deploy-backend:
+deploy-check:
+	@echo "🔍 Vérification pré-déploiement..."
+	cd backend && python scripts/pre_deploy_check.py
+
+deploy-backend: deploy-check
 	cd backend && railway up
 
 deploy-frontend:
 	cd frontend && vercel --prod
+
+install-hooks:
+	@echo "📦 Installation des hooks Git..."
+	cd backend && bash scripts/install-hooks.sh
 
 # Health checks
 health:

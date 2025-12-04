@@ -1,0 +1,38 @@
+#!/bin/bash
+# Hook pre-push pour vérifier le backend avant déploiement
+# Installe ce hook avec: cp scripts/git-hooks/pre-push .git/hooks/ && chmod +x .git/hooks/pre-push
+
+echo "🔍 Exécution des vérifications pré-déploiement..."
+
+# Se positionner dans le répertoire backend
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+BACKEND_DIR="$REPO_ROOT/backend"
+
+# Vérifier si on pousse vers main
+while read local_ref local_sha remote_ref remote_sha
+do
+    if [[ "$remote_ref" == *"main"* ]] || [[ "$remote_ref" == *"master"* ]]; then
+        echo "📦 Push vers la branche principale détecté..."
+        
+        # Exécuter le script de vérification
+        if [ -f "$BACKEND_DIR/scripts/pre_deploy_check.py" ]; then
+            cd "$BACKEND_DIR"
+            python scripts/pre_deploy_check.py
+            
+            if [ $? -ne 0 ]; then
+                echo ""
+                echo "❌ Les vérifications pré-déploiement ont échoué!"
+                echo "   Corrigez les problèmes avant de push vers main."
+                echo ""
+                echo "   Pour forcer le push (non recommandé): git push --no-verify"
+                exit 1
+            fi
+        else
+            echo "⚠️  Script pre_deploy_check.py non trouvé"
+        fi
+    fi
+done
+
+echo "✅ Vérifications pré-déploiement passées!"
+exit 0
