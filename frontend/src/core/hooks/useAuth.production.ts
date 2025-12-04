@@ -313,17 +313,6 @@ export function useAuthProduction(): UseAuthReturn {
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Mock response
-        const _newUser: User = {
-          id: `user_${Date.now()}`,
-          username: credentials.username,
-          email: credentials.email,
-          firstName: credentials.firstName,
-          lastName: credentials.lastName,
-          role: "user",
-          createdAt: new Date().toISOString(),
-        };
-
         // Auto-login après inscription
         return await login({
           username: credentials.username,

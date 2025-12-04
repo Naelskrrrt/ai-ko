@@ -91,7 +91,7 @@ export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [backendFieldErrors, setBackendFieldErrors] =
+  const [, setBackendFieldErrors] =
     useState<BackendFieldErrors>({});
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -138,15 +138,6 @@ export default function RegisterPage() {
   };
 
   const passwordStrength = getPasswordStrength(watchPassword);
-
-  // Fonction utilitaire pour extraire le premier message d'erreur d'un champ
-  const _getBackendFieldError = (
-    field: keyof BackendFieldErrors,
-  ): string | undefined => {
-    const fieldErrors = backendFieldErrors[field];
-
-    return fieldErrors && fieldErrors.length > 0 ? fieldErrors[0] : undefined;
-  };
 
   // Fonction pour mapper les erreurs backend vers react-hook-form
   const handleBackendErrors = (err: BackendError) => {
@@ -256,29 +247,6 @@ export default function RegisterPage() {
       handleBackendErrors(err as BackendError);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const _handleGoogleRegister = async () => {
-    try {
-      const apiUrl =
-        typeof window !== "undefined"
-          ? window.location.origin
-          : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(`${apiUrl}/api/auth/oauth/google`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-
-      if (data.auth_url) {
-        window.location.href = data.auth_url;
-      }
-    } catch {
-      setError("Erreur lors de l'inscription avec Google");
     }
   };
 

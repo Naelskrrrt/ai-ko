@@ -103,7 +103,7 @@ type SessionEditFormData = z.infer<typeof sessionEditSchema>;
 export default function SessionDetailPage({ params }: SessionDetailPageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const { user: _user } = useAuth();
+  const {} = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -155,10 +155,7 @@ export default function SessionDetailPage({ params }: SessionDetailPageProps) {
   const qcms = qcmsData?.data || [];
 
   // Charger les classes
-  const { data: classesData } = useSWR("classes", () =>
-    enseignantService.getClasses(),
-  );
-  const _classes = classesData || [];
+  useSWR("classes", () => enseignantService.getClasses());
 
   // Fonction pour rafraîchir les données
   const handleRefresh = async () => {
@@ -179,7 +176,6 @@ export default function SessionDetailPage({ params }: SessionDetailPageProps) {
     control,
     formState: { errors, isDirty },
     reset,
-    setValue: _setValue,
   } = useForm<SessionEditFormData>({
     resolver: zodResolver(sessionEditSchema),
     defaultValues: session

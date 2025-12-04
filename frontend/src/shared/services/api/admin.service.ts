@@ -54,26 +54,8 @@ adminApi.interceptors.request.use((config) => {
 
 // Intercepteur pour gérer les erreurs
 adminApi.interceptors.response.use(
-  (response) => {
-    console.log(
-      "[ADMIN API] Response:",
-      response.config.url,
-      response.status,
-      response.data,
-    );
-
-    return response;
-  },
-  (error) => {
-    console.error(
-      "[ADMIN API] Error:",
-      error.config?.url,
-      error.response?.status,
-      error.response?.data,
-    );
-
-    return Promise.reject(error);
-  },
+  (response) => response,
+  (error) => Promise.reject(error),
 );
 
 export const adminService = {
@@ -331,12 +313,10 @@ export const adminService = {
 
     try {
       // Récupérer les professeurs
-      const profData = await this.getProfesseurs({ per_page: 1000 });
-      const _professeurs = profData.data;
+      await this.getProfesseurs({ per_page: 1000 });
 
       // Récupérer les étudiants
-      const etudData = await this.getEtudiants({ per_page: 1000 });
-      const _etudiants = etudData.data;
+      await this.getEtudiants({ per_page: 1000 });
 
       // TODO: Ajouter logique pour détecter les professeurs inactifs
       // TODO: Ajouter logique pour détecter les étudiants en difficulté

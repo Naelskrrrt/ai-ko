@@ -79,7 +79,7 @@ function parseBackendErrors(error: any): string {
   if (data.errors && typeof data.errors === "object") {
     const errorMessages: string[] = [];
 
-    for (const [_field, messages] of Object.entries(data.errors)) {
+    for (const [, messages] of Object.entries(data.errors)) {
       if (Array.isArray(messages)) {
         // Messages déjà formatés avec le nom du champ
         errorMessages.push(...messages);

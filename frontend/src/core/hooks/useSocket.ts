@@ -21,12 +21,6 @@ interface UseSocketOptions {
  */
 export function useSocket(options: UseSocketOptions = {}) {
   const { user } = useAuth();
-  const {
-    onPendingUser: _onPendingUser,
-    onUserActivated: _onUserActivated,
-    onUserRejected: _onUserRejected,
-    onStatsUpdate: _onStatsUpdate,
-  } = options;
 
   // Utiliser useRef pour éviter les re-renders inutiles
   const callbacksRef = useRef(options);

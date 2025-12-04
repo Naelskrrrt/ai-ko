@@ -48,8 +48,8 @@ export function ExamPlayer({ examId, userId }: ExamPlayerProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sessionId, setSessionId] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [_dateDebutExamen, setDateDebutExamen] = useState<string>("");
-  const [_dureeTotaleSecondes, setDureeTotaleSecondes] = useState<number>(0);
+  const [, setDateDebutExamen] = useState<string>("");
+  const [, setDureeTotaleSecondes] = useState<number>(0);
 
   const {
     isOpen: isSubmitModalOpen,

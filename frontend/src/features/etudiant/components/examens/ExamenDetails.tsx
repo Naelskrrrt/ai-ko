@@ -57,7 +57,7 @@ export function ExamenDetails({ examId, userId: _userId }: ExamenDetailsProps) {
         hour: "2-digit",
         minute: "2-digit",
       });
-    } catch (_error) {
+    } catch {
       return "Date invalide";
     }
   };

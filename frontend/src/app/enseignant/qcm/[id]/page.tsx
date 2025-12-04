@@ -52,7 +52,7 @@ interface QCMDetailPageProps {
 export default function QCMDetailPage({ params }: QCMDetailPageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const { user: _user } = useAuth();
+  const {} = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);

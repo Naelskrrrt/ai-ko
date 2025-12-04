@@ -41,7 +41,7 @@ export function QCMPlayer({ qcmId, userId: _userId }: QCMPlayerProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resultatId, setResultatId] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [_dateDebutQCM, setDateDebutQCM] = useState<string>("");
+  const [, setDateDebutQCM] = useState<string>("");
 
   const {
     isOpen: isSubmitModalOpen,

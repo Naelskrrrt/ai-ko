@@ -27,9 +27,7 @@ export function QCMList({ userId }: QCMListProps) {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
-    isOpen: _isDeleteConfirmOpen,
     onOpen: onDeleteConfirmOpen,
-    onClose: _onDeleteConfirmClose,
   } = useDisclosure();
   const [qcmToDelete, setQcmToDelete] = React.useState<string | null>(null);
   const { toast } = useToast();
@@ -82,19 +80,6 @@ export function QCMList({ userId }: QCMListProps) {
   const handleDelete = (id: string) => {
     setQcmToDelete(id);
     onDeleteConfirmOpen();
-  };
-
-  const _confirmDelete = async () => {
-    if (!qcmToDelete) return;
-    try {
-      await qcmService.deleteQCM(qcmToDelete);
-      mutate(); // Revalider le cache SWR
-      setQcmToDelete(null);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Erreur suppression QCM:", error);
-      alert("Erreur lors de la suppression du QCM");
-    }
   };
 
   const handlePublish = async (id: string) => {

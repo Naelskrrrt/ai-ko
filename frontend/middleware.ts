@@ -33,6 +33,7 @@ const ONBOARDING_ROUTES = [
   "/onboarding/profile-details",
   "/onboarding/select-matieres",
   "/onboarding/confirmation",
+  "/onboarding/pending-validation",
 ];
 
 /**

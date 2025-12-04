@@ -26,29 +26,109 @@ import { parcoursService } from "@/shared/services/api/parcours.service";
 const etudiantSchema = z.object({
   numeroEtudiant: z
     .string()
-    .min(3, "Le numéro étudiant doit contenir au moins 3 caractères"),
-  etablissementId: z.string().min(1, "L'établissement est requis"),
-  niveauId: z.string().min(1, "Le niveau est requis"),
-  mentionId: z.string().min(1, "La mention est requise"),
-  parcoursId: z.string().min(1, "Le parcours est requis"),
-  anneeAdmission: z.string().min(1, "L'année d'admission est requise"),
-  telephone: z.string().optional(),
-  adresse: z.string().optional(),
-  dateNaissance: z.string().optional(),
+    .min(3, "Le numéro étudiant doit contenir au moins 3 caractères")
+    .max(50, "Le numéro étudiant ne peut pas dépasser 50 caractères")
+    .regex(
+      /^[A-Za-z0-9\-_\s]+$/,
+      "Le numéro étudiant ne peut contenir que des lettres, chiffres, tirets et espaces",
+    ),
+  etablissementId: z
+    .string()
+    .min(1, "L'établissement est requis")
+    .uuid("Sélectionnez un établissement valide"),
+  niveauId: z
+    .string()
+    .min(1, "Le niveau est requis")
+    .uuid("Sélectionnez un niveau valide"),
+  mentionId: z
+    .string()
+    .min(1, "La mention est requise")
+    .uuid("Sélectionnez une mention valide"),
+  parcoursId: z
+    .string()
+    .min(1, "Le parcours est requis")
+    .uuid("Sélectionnez un parcours valide"),
+  anneeAdmission: z
+    .string()
+    .min(1, "L'année d'admission est requise")
+    .regex(/^\d{4}-\d{4}$/, "Format attendu : 2024-2025"),
+  telephone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || /^(\+?[0-9\s\-]{8,20})?$/.test(val),
+      "Numéro de téléphone invalide",
+    ),
+  adresse: z
+    .string()
+    .max(255, "L'adresse ne peut pas dépasser 255 caractères")
+    .optional(),
+  dateNaissance: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val) return true;
+      const date = new Date(val);
+      const now = new Date();
+      const minAge = 15; // Âge minimum
+      const maxAge = 100; // Âge maximum
+      const age =
+        (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+
+      return age >= minAge && age <= maxAge;
+    }, "La date de naissance doit correspondre à un âge entre 15 et 100 ans"),
 });
 
 const enseignantSchema = z.object({
   numeroEnseignant: z
     .string()
-    .min(3, "Le numéro enseignant doit contenir au moins 3 caractères"),
-  etablissementId: z.string().min(1, "L'établissement est requis"),
-  grade: z.string().optional(),
-  specialite: z.string().optional(),
-  departement: z.string().optional(),
-  bureau: z.string().optional(),
-  dateEmbauche: z.string().optional(),
-  telephone: z.string().optional(),
-  adresse: z.string().optional(),
+    .min(3, "Le numéro enseignant doit contenir au moins 3 caractères")
+    .max(50, "Le numéro enseignant ne peut pas dépasser 50 caractères")
+    .regex(
+      /^[A-Za-z0-9\-_\s]+$/,
+      "Le numéro enseignant ne peut contenir que des lettres, chiffres, tirets et espaces",
+    ),
+  etablissementId: z
+    .string()
+    .min(1, "L'établissement est requis")
+    .uuid("Sélectionnez un établissement valide"),
+  grade: z
+    .string()
+    .max(100, "Le grade ne peut pas dépasser 100 caractères")
+    .optional(),
+  specialite: z
+    .string()
+    .max(200, "La spécialité ne peut pas dépasser 200 caractères")
+    .optional(),
+  departement: z
+    .string()
+    .max(100, "Le département ne peut pas dépasser 100 caractères")
+    .optional(),
+  bureau: z
+    .string()
+    .max(50, "Le bureau ne peut pas dépasser 50 caractères")
+    .optional(),
+  dateEmbauche: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val) return true;
+      const date = new Date(val);
+      const now = new Date();
+
+      return date <= now; // La date d'embauche ne peut pas être dans le futur
+    }, "La date d'embauche ne peut pas être dans le futur"),
+  telephone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || /^(\+?[0-9\s\-]{8,20})?$/.test(val),
+      "Numéro de téléphone invalide",
+    ),
+  adresse: z
+    .string()
+    .max(255, "L'adresse ne peut pas dépasser 255 caractères")
+    .optional(),
 });
 
 type EtudiantFormValues = z.infer<typeof etudiantSchema>;
@@ -66,6 +146,8 @@ function ProfileDetailsContent() {
   const [mentions, setMentions] = useState<Mention[]>([]);
   const [parcours, setParcours] = useState<Parcours[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [loadingMentions, setLoadingMentions] = useState(false);
+  const [loadingParcours, setLoadingParcours] = useState(false);
 
   // Charger les données de référence
   useEffect(() => {
@@ -84,8 +166,14 @@ function ProfileDetailsContent() {
         setNiveaux(niveauxRes);
         setMentions(mentionsRes);
         setParcours(parcoursRes);
-      } catch {
-        setError("Erreur lors du chargement des données de référence");
+      } catch (err) {
+        console.error(
+          "[Onboarding] Erreur chargement données de référence:",
+          err,
+        );
+        setError(
+          "Erreur lors du chargement des données de référence. Vérifiez votre connexion.",
+        );
       } finally {
         setLoadingData(false);
       }
@@ -94,10 +182,29 @@ function ProfileDetailsContent() {
     loadReferenceData();
   }, []);
 
-  // Vérifier que le rôle est présent
+  // Vérifier que le rôle est présent et cohérent avec le localStorage
   useEffect(() => {
     if (!role || (role !== "etudiant" && role !== "enseignant")) {
       router.push("/onboarding/role-selection");
+
+      return;
+    }
+
+    // Vérifier la cohérence avec le localStorage
+    if (typeof window !== "undefined") {
+      const storedRole = localStorage.getItem("onboarding_role");
+
+      if (storedRole && storedRole !== role) {
+        // Le rôle URL ne correspond pas au localStorage - mettre à jour le localStorage
+        localStorage.setItem("onboarding_role", role);
+        // Réinitialiser les données précédentes car le rôle a changé
+        localStorage.removeItem("onboarding_details");
+        localStorage.removeItem("onboarding_names");
+        localStorage.removeItem("onboarding_matieres");
+      } else if (!storedRole) {
+        // Pas de rôle stocké, le sauvegarder
+        localStorage.setItem("onboarding_role", role);
+      }
     }
   }, [role, router]);
 
@@ -178,40 +285,84 @@ function ProfileDetailsContent() {
   const selectedEtablissementId = watch("etablissementId");
   const selectedMentionId = watch("mentionId");
 
+  // Réinitialiser mentionId et parcoursId quand l'établissement change
+  const [previousEtablissementId, setPreviousEtablissementId] = useState<
+    string | null
+  >(null);
+
   useEffect(() => {
     const loadFilteredData = async () => {
       if (selectedEtablissementId) {
+        // Si l'établissement a changé, réinitialiser les champs dépendants
+        if (
+          previousEtablissementId &&
+          previousEtablissementId !== selectedEtablissementId
+        ) {
+          reset((values: any) => ({
+            ...values,
+            mentionId: "",
+            parcoursId: "",
+          }));
+          setParcours([]);
+        }
+        setPreviousEtablissementId(selectedEtablissementId);
+
         try {
+          setLoadingMentions(true);
           const mentionsFiltered = await mentionService.getByEtablissement(
             selectedEtablissementId,
           );
 
           setMentions(mentionsFiltered);
-        } catch {
-          // Ignore mention loading errors
+        } catch (err) {
+          console.error(
+            "[Onboarding] Erreur chargement mentions filtrées:",
+            err,
+          );
+        } finally {
+          setLoadingMentions(false);
         }
       }
     };
 
     loadFilteredData();
-  }, [selectedEtablissementId]);
+  }, [selectedEtablissementId, previousEtablissementId, reset]);
+
+  const [previousMentionId, setPreviousMentionId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const loadFilteredParcours = async () => {
       if (selectedMentionId) {
+        // Si la mention a changé, réinitialiser le parcours
+        if (previousMentionId && previousMentionId !== selectedMentionId) {
+          reset((values: any) => ({
+            ...values,
+            parcoursId: "",
+          }));
+        }
+        setPreviousMentionId(selectedMentionId);
+
         try {
+          setLoadingParcours(true);
           const parcoursFiltered =
             await parcoursService.getByMention(selectedMentionId);
 
           setParcours(parcoursFiltered);
-        } catch {
-          // Ignore parcours loading errors
+        } catch (err) {
+          console.error(
+            "[Onboarding] Erreur chargement parcours filtrés:",
+            err,
+          );
+        } finally {
+          setLoadingParcours(false);
         }
       }
     };
 
     loadFilteredParcours();
-  }, [selectedMentionId]);
+  }, [selectedMentionId, previousMentionId, reset]);
 
   const onSubmit = async (data: EtudiantFormValues | EnseignantFormValues) => {
     setIsLoading(true);
@@ -380,11 +531,25 @@ function ProfileDetailsContent() {
                     render={({ field }) => (
                       <Select
                         isRequired
+                        description={
+                          !selectedEtablissementId
+                            ? "Veuillez d'abord sélectionner un établissement"
+                            : loadingMentions
+                              ? "Chargement des mentions..."
+                              : undefined
+                        }
                         errorMessage={errors.mentionId?.message as string}
-                        isDisabled={!selectedEtablissementId}
+                        isDisabled={!selectedEtablissementId || loadingMentions}
                         isInvalid={!!errors.mentionId}
+                        isLoading={loadingMentions}
                         label="Mention"
-                        placeholder="Sélectionnez votre mention"
+                        placeholder={
+                          !selectedEtablissementId
+                            ? "Sélectionnez d'abord un établissement"
+                            : loadingMentions
+                              ? "Chargement..."
+                              : "Sélectionnez votre mention"
+                        }
                         selectedKeys={field.value ? [field.value] : []}
                         variant="bordered"
                         onSelectionChange={(keys) => {
@@ -408,11 +573,25 @@ function ProfileDetailsContent() {
                     render={({ field }) => (
                       <Select
                         isRequired
+                        description={
+                          !selectedMentionId
+                            ? "Veuillez d'abord sélectionner une mention"
+                            : loadingParcours
+                              ? "Chargement des parcours..."
+                              : undefined
+                        }
                         errorMessage={errors.parcoursId?.message as string}
-                        isDisabled={!selectedMentionId}
+                        isDisabled={!selectedMentionId || loadingParcours}
                         isInvalid={!!errors.parcoursId}
+                        isLoading={loadingParcours}
                         label="Parcours"
-                        placeholder="Sélectionnez votre parcours"
+                        placeholder={
+                          !selectedMentionId
+                            ? "Sélectionnez d'abord une mention"
+                            : loadingParcours
+                              ? "Chargement..."
+                              : "Sélectionnez votre parcours"
+                        }
                         selectedKeys={field.value ? [field.value] : []}
                         variant="bordered"
                         onSelectionChange={(keys) => {
@@ -474,6 +653,10 @@ function ProfileDetailsContent() {
                     render={({ field }) => (
                       <DatePicker
                         showMonthAndYearPickers
+                        errorMessage={
+                          (errors as any).dateNaissance?.message as string
+                        }
+                        isInvalid={!!(errors as any).dateNaissance}
                         label="Date de naissance"
                         value={
                           field.value
@@ -501,6 +684,8 @@ function ProfileDetailsContent() {
                 <>
                   <Input
                     {...register("grade")}
+                    errorMessage={(errors as any).grade?.message as string}
+                    isInvalid={!!(errors as any).grade}
                     label="Grade"
                     placeholder="Professeur, Maître de conférence, etc."
                     variant="bordered"
@@ -508,6 +693,8 @@ function ProfileDetailsContent() {
 
                   <Input
                     {...register("specialite")}
+                    errorMessage={(errors as any).specialite?.message as string}
+                    isInvalid={!!(errors as any).specialite}
                     label="Spécialité"
                     placeholder="Votre domaine de spécialité"
                     variant="bordered"
@@ -515,6 +702,10 @@ function ProfileDetailsContent() {
 
                   <Input
                     {...register("departement")}
+                    errorMessage={
+                      (errors as any).departement?.message as string
+                    }
+                    isInvalid={!!(errors as any).departement}
                     label="Département"
                     placeholder="Département d'affectation"
                     variant="bordered"
@@ -522,6 +713,8 @@ function ProfileDetailsContent() {
 
                   <Input
                     {...register("bureau")}
+                    errorMessage={(errors as any).bureau?.message as string}
+                    isInvalid={!!(errors as any).bureau}
                     label="Bureau"
                     placeholder="Numéro de bureau"
                     variant="bordered"
@@ -533,6 +726,10 @@ function ProfileDetailsContent() {
                     render={({ field }) => (
                       <DatePicker
                         showMonthAndYearPickers
+                        errorMessage={
+                          (errors as any).dateEmbauche?.message as string
+                        }
+                        isInvalid={!!(errors as any).dateEmbauche}
                         label="Date d'embauche"
                         value={
                           field.value
@@ -558,6 +755,9 @@ function ProfileDetailsContent() {
               {/* Champs communs suite */}
               <Input
                 {...register("telephone")}
+                description="Format: +261 XX XX XXX XX ou 0XX XX XXX XX"
+                errorMessage={errors.telephone?.message as string}
+                isInvalid={!!errors.telephone}
                 label="Téléphone"
                 placeholder="+261 XX XX XXX XX"
                 type="tel"
@@ -566,6 +766,8 @@ function ProfileDetailsContent() {
 
               <Input
                 {...register("adresse")}
+                errorMessage={errors.adresse?.message as string}
+                isInvalid={!!errors.adresse}
                 label="Adresse"
                 placeholder="Votre adresse"
                 variant="bordered"

@@ -4,7 +4,7 @@ import * as React from "react";
 import { use } from "react";
 import { ArrowLeft, FileText } from "lucide-react";
 import { Button } from "@heroui/button";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { QCMResultatView } from "@/features/etudiant/components/qcms/QCMResultatView";
 
@@ -17,7 +17,6 @@ interface QCMResultatPageProps {
 export default function QCMResultatPage({ params }: QCMResultatPageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const _urlParams = useParams();
   // Le resultat_id est dans l'URL, mais on peut aussi le passer en query param
   // Pour l'instant, on utilise l'ID de l'URL comme resultat_id
   const resultatId = id;

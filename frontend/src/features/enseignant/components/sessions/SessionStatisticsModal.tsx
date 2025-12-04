@@ -87,14 +87,6 @@ export function SessionStatisticsModal({
     }
   };
 
-  const _formatDuree = (secondes: number | null | undefined) => {
-    if (!secondes) return "—";
-    const minutes = Math.floor(secondes / 60);
-    const secs = Math.floor(secondes % 60);
-
-    return `${minutes}min ${secs}s`;
-  };
-
   const isLoading = isLoadingStats || isLoadingResultats;
   const error = errorStats || errorResultats;
 

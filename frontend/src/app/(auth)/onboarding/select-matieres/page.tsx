@@ -36,7 +36,11 @@ export default function SelectMatieresPage() {
     if (typeof window !== "undefined") {
       const storedRole = localStorage.getItem("onboarding_role");
 
-      if (!storedRole) {
+      if (
+        !storedRole ||
+        (storedRole !== "etudiant" && storedRole !== "enseignant")
+      ) {
+        console.warn("[Onboarding] Rôle invalide ou manquant:", storedRole);
         router.push("/onboarding/role-selection");
 
         return;
@@ -63,26 +67,54 @@ export default function SelectMatieresPage() {
     }
   }, [role]);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
   const loadMatieres = async () => {
     if (!role) return;
 
     try {
       setIsLoading(true);
-      // Utiliser l'endpoint approprié selon le rôle
+      // Utiliser l'endpoint approprié selon le rôle - toujours utiliser l'API backend
       const endpoint =
-        role === "etudiant" ? "/api/qcm-etudiant/matieres" : "/api/matieres";
+        role === "etudiant"
+          ? `${API_URL}/api/qcm-etudiant/matieres`
+          : `${API_URL}/api/matieres`;
+
+      // Récupérer le token pour l'authentification
+      let token: string | undefined;
+
+      if (typeof window !== "undefined") {
+        token = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("auth_token="))
+          ?.split("=")[1];
+        if (!token) {
+          token = localStorage.getItem("auth_token") || undefined;
+        }
+      }
 
       const response = await fetch(endpoint, {
         credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
-      if (!response.ok) throw new Error("Erreur chargement matières");
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        console.error(
+          "[Onboarding] Erreur API matières:",
+          response.status,
+          errorText,
+        );
+        throw new Error(`Erreur ${response.status}: ${errorText}`);
+      }
 
       const data = await response.json();
 
       setMatieresDisponibles(data);
-    } catch {
-      setError("Impossible de charger les matières");
+    } catch (err) {
+      console.error("[Onboarding] Erreur chargement matières:", err);
+      setError("Impossible de charger les matières. Vérifiez votre connexion.");
     } finally {
       setIsLoading(false);
     }

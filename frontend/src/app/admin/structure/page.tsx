@@ -200,7 +200,7 @@ export default function StructurePage() {
       const data = await niveauService.getNiveaux();
 
       setNiveaux(data);
-    } catch (_error) {
+    } catch {
       toast({
         title: "Erreur",
         description: "Impossible de charger les niveaux",
@@ -217,7 +217,7 @@ export default function StructurePage() {
       const data = await mentionService.getMentions();
 
       setMentions(data);
-    } catch (_error) {
+    } catch {
       toast({
         title: "Erreur",
         description: "Impossible de charger les mentions",
@@ -234,7 +234,7 @@ export default function StructurePage() {
       const data = await parcoursService.getParcours();
 
       setParcours(data);
-    } catch (_error) {
+    } catch {
       toast({
         title: "Erreur",
         description: "Impossible de charger les parcours",
@@ -251,7 +251,7 @@ export default function StructurePage() {
       const data = await matiereService.getMatieres();
 
       setMatieres(data);
-    } catch (_error) {
+    } catch {
       toast({
         title: "Erreur",
         description: "Impossible de charger les matières",

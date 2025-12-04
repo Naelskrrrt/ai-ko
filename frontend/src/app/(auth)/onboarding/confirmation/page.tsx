@@ -143,7 +143,7 @@ export default function ConfirmationPage() {
         return;
       }
 
-      // Récupérer le token
+      // Récupérer le token depuis le cookie ou localStorage
       let token = document.cookie
         .split("; ")
         .find((row) => row.startsWith("auth_token="))
@@ -153,13 +153,14 @@ export default function ConfirmationPage() {
         token = localStorage.getItem("auth_token") || undefined;
       }
 
-      // Si toujours pas de token, essayer onboarding_token (pendant l'onboarding)
       if (!token) {
-        token = localStorage.getItem("onboarding_token") || undefined;
-      }
-
-      if (!token) {
+        console.error("[Onboarding] Aucun token trouvé - session expirée");
         setError("Session expirée. Veuillez vous reconnecter.");
+        // Nettoyer le localStorage avant la redirection
+        localStorage.removeItem("onboarding_role");
+        localStorage.removeItem("onboarding_details");
+        localStorage.removeItem("onboarding_names");
+        localStorage.removeItem("onboarding_matieres");
         router.push("/login");
 
         return;
@@ -220,17 +221,18 @@ export default function ConfirmationPage() {
               );
             } else if (role === "enseignant" && matieresIds.length > 0) {
               // Enregistrer les matières de l'enseignant
-              const userId = response.data.user?.id;
+              // Note: On utilise l'ID du profil enseignant, pas l'ID utilisateur
+              const enseignantId = response.data.user?.enseignantProfil?.id;
 
-              if (userId) {
+              if (enseignantId) {
                 await axios.put(
-                  `${API_URL}/api/enseignants/${userId}/matieres`,
+                  `${API_URL}/api/enseignants/${enseignantId}/matieres`,
                   {
                     matieres_ids: matieresIds,
                   },
                   {
                     headers: {
-                      Authorization: `Bearer ${token}`,
+                      Authorization: `Bearer ${newToken || token}`,
                       "Content-Type": "application/json",
                     },
                     withCredentials: true,
@@ -251,7 +253,6 @@ export default function ConfirmationPage() {
         localStorage.removeItem("onboarding_names");
         localStorage.removeItem("onboarding_matieres");
         localStorage.removeItem("onboarding_userId");
-        localStorage.removeItem("onboarding_token"); // Supprimer l'ancien token d'onboarding
         // Le nouveau token est maintenant dans auth_token
       }
 
@@ -271,10 +272,45 @@ export default function ConfirmationPage() {
         window.location.href = "/onboarding/pending-validation";
       }
     } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-          "Erreur lors de la création du profil. Veuillez réessayer.",
+      console.error(
+        "[Onboarding] Erreur confirmation:",
+        err.response?.data || err.message,
       );
+
+      // Gérer les différents types d'erreurs backend
+      const errorData = err.response?.data;
+      let errorMessage =
+        "Erreur lors de la création du profil. Veuillez réessayer.";
+
+      if (errorData) {
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.errors) {
+          // Erreurs de validation multiples
+          if (Array.isArray(errorData.errors)) {
+            errorMessage = errorData.errors.join(", ");
+          } else if (typeof errorData.errors === "object") {
+            // Format { field: "message" }
+            const fieldErrors = Object.entries(errorData.errors)
+              .map(([field, msg]) => `${field}: ${msg}`)
+              .join("; ");
+
+            errorMessage = fieldErrors || errorMessage;
+          }
+        }
+      } else if (err.message === "Network Error") {
+        errorMessage =
+          "Erreur de connexion. Vérifiez votre connexion internet.";
+      } else if (err.response?.status === 401) {
+        errorMessage = "Session expirée. Veuillez vous reconnecter.";
+      } else if (err.response?.status === 409) {
+        errorMessage = "Un profil existe déjà pour cet utilisateur.";
+      } else if (err.response?.status === 400) {
+        errorMessage =
+          "Données invalides. Veuillez vérifier les informations saisies.";
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

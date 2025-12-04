@@ -16,7 +16,6 @@ export function QCMsList() {
     data: qcms,
     isLoading,
     error,
-    mutate: _mutate,
   } = useSWR("qcms-disponibles", () => qcmsService.getDisponibles(), {
     revalidateOnFocus: true,
     refreshInterval: 30000, // Rafraîchir toutes les 30 secondes

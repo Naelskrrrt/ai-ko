@@ -231,7 +231,7 @@ export function EditProfileModal({
 
       onSuccess?.();
       onClose();
-    } catch (_error) {
+    } catch {
       // L'erreur est déjà gérée dans useUpdateProfile
     } finally {
       setIsSubmitting(false);

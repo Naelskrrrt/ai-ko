@@ -68,7 +68,7 @@ export function useCalendar(): CalendarHook {
 
   // Ref pour forcer le scroll même si l'état n'est pas synchronisé
   const scrollTriggerRef = React.useRef<number>(0);
-  const [isLoading, _setIsLoading] = useState<boolean>(false);
+  const [isLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Actions pour la gestion des événements

@@ -41,10 +41,6 @@ export function ExamenCard({ examen, onUpdate: _onUpdate }: ExamenCardProps) {
     router.push(`/etudiant/examens/${examen.id}`);
   };
 
-  const _handleViewDetails = () => {
-    router.push(`/etudiant/examens/${examen.id}`);
-  };
-
   const handleContinueExam = () => {
     router.push(`/etudiant/examens/${examen.id}/start`);
   };
@@ -96,7 +92,7 @@ export function ExamenCard({ examen, onUpdate: _onUpdate }: ExamenCardProps) {
         hour: "2-digit",
         minute: "2-digit",
       });
-    } catch (_error) {
+    } catch {
       return "Date invalide";
     }
   };

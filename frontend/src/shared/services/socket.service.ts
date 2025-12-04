@@ -85,12 +85,12 @@ class SocketService {
       });
 
       // Gestionnaire de connexion réussie
-      this.socket.on("connected", (_data) => {
+      this.socket.on("connected", () => {
         // Connection confirmed
       });
 
       return this.socket;
-    } catch (_error) {
+    } catch {
       this.isConnecting = false;
 
       return null;

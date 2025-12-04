@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { Link } from "@heroui/link";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
-import { useTheme } from "next-themes";
-import { useIsSSR } from "@react-aria/ssr";
 import {
   Brain,
   FileCheck,
@@ -26,8 +24,6 @@ import { Logo } from "@/components/icons";
 import { useAuth } from "@/core/providers/AuthProvider";
 
 export default function Home() {
-  const { theme } = useTheme();
-  const isSSR = useIsSSR();
   const router = useRouter();
   const { user, loading } = useAuth();
 
@@ -63,12 +59,6 @@ export default function Home() {
       </div>
     );
   }
-
-  // Pendant l'hydratation, utiliser le thème par défaut pour éviter les erreurs d'hydratation
-  const _logoSrc =
-    isSSR || theme === "dark"
-      ? "/logo-capt_dark-mode.png"
-      : "/logo-capt_light-mode.png";
 
   const features = [
     {
