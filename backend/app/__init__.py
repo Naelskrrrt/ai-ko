@@ -122,13 +122,22 @@ def create_app(config=None):
     
     # Configuration du pool de connexions pour éviter les problèmes de connexion intermittents
     # Particulièrement important pour les déploiements cloud (Railway, Heroku, etc.)
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    engine_options = {
         'pool_size': 5,           # Nombre de connexions permanentes
         'pool_recycle': 300,      # Recycler les connexions après 5 minutes
         'pool_pre_ping': True,    # Vérifier la connexion avant utilisation
-        'pool_timeout': 30,       # Timeout pour obtenir une connexion
+        'pool_timeout': 20,       # Timeout pour obtenir une connexion (réduit)
         'max_overflow': 10,       # Connexions supplémentaires si besoin
     }
+    
+    # Ajouter timeout de connexion pour PostgreSQL
+    if database_url and 'postgresql' in database_url:
+        engine_options['connect_args'] = {
+            'connect_timeout': 10,  # Timeout de connexion à la DB (10 secondes)
+            'options': '-c statement_timeout=30000'  # Timeout des requêtes (30 secondes)
+        }
+    
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
     app.config['JWT_SECRET_KEY'] = os.getenv(
         'JWT_SECRET_KEY', 'jwt-secret-key')
     app.config['JWT_TOKEN_LOCATION'] = ['headers']  # Utiliser uniquement les headers pour éviter les conflits CSRF

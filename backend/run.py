@@ -81,12 +81,18 @@ def init_database():
         # Ne pas bloquer le démarrage - les migrations peuvent gérer ça
         print("[WARNING] L'application va démarrer malgré l'erreur DB. Les endpoints health répondront.")
 
-print("[INFO] Initialisation de l'application Flask...")
-# Exécuter l'initialisation (non bloquant)
-try:
-    init_database()
-except Exception as e:
-    print(f"[ERROR] Erreur critique lors de l'init: {e}")
+# Ne PAS initialiser la DB au démarrage sur Railway/Production
+# Les migrations Alembic gèrent la structure de la DB
+# L'init au démarrage peut bloquer si la DB n'est pas immédiatement disponible
+if os.getenv('FLASK_ENV') == 'development' or os.getenv('INIT_DB_ON_START') == '1':
+    print("[INFO] Initialisation de la base de données (mode dev)...")
+    try:
+        init_database()
+    except Exception as e:
+        print(f"[ERROR] Erreur lors de l'init DB: {e}")
+else:
+    print("[INFO] Démarrage en mode production - skip init DB (utiliser les migrations)")
+
 print("[INFO] Application Flask prête à recevoir des requêtes.")
 
 
