@@ -1,7 +1,11 @@
 /**
  * Service API pour les Matières
  */
-import type { Matiere } from "../../types/matiere.types";
+import type {
+  Matiere,
+  MatiereCreate,
+  MatiereUpdate,
+} from "../../types/matiere.types";
 
 import axios from "axios";
 
@@ -51,15 +55,6 @@ matiereApi.interceptors.request.use((config) => {
   return config;
 });
 
-export interface CreateMatiereData {
-  code: string;
-  nom: string;
-  description?: string;
-  coefficient?: number;
-  couleur?: string;
-  actif?: boolean;
-}
-
 export const matiereService = {
   /**
    * Récupère toutes les matières
@@ -84,9 +79,25 @@ export const matiereService = {
   /**
    * Crée une nouvelle matière
    */
-  async createMatiere(data: CreateMatiereData): Promise<Matiere> {
+  async createMatiere(data: MatiereCreate): Promise<Matiere> {
     const response = await matiereApi.post("", data);
 
     return response.data;
+  },
+
+  /**
+   * Met à jour une matière
+   */
+  async updateMatiere(id: string, data: MatiereUpdate): Promise<Matiere> {
+    const response = await matiereApi.put(`/${id}`, data);
+
+    return response.data;
+  },
+
+  /**
+   * Supprime une matière
+   */
+  async deleteMatiere(id: string): Promise<void> {
+    await matiereApi.delete(`/${id}`);
   },
 };

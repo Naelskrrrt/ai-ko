@@ -168,5 +168,3 @@ export const etudiantService = {
     return response.data;
   },
 };
-
-

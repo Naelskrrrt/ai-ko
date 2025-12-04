@@ -36,16 +36,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Ajouter un timeout pour éviter les chargements infinis
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Timeout")), 10000)
+        setTimeout(() => reject(new Error("Timeout")), 10000),
       );
 
-      const userData = await Promise.race([
+      const userData = (await Promise.race([
         authService.getMe(),
         timeoutPromise,
-      ]) as User;
+      ])) as User;
 
       setUser(userData);
-    } catch (error: any) {
+    } catch (_error: any) {
       // Si getMe échoue (401, 403, timeout, erreur réseau, etc.), on considère l'utilisateur comme non connecté
       setUser(null);
       // Nettoyer les tokens invalides
@@ -64,7 +64,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, []);
 
-  const login = async (email: string, password: string): Promise<AuthResponse> => {
+  const login = async (
+    email: string,
+    password: string,
+  ): Promise<AuthResponse> => {
     const response = await authService.login({ email, password });
 
     // Stocker le token dans un cookie ET localStorage
@@ -73,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("auth_token", response.token);
     }
     setUser(response.user);
-    
+
     return response;
   };
 

@@ -1,5 +1,9 @@
 "use client";
 
+import type { Niveau } from "@/shared/types/niveau.types";
+import type { Parcours } from "@/shared/types/parcours.types";
+import type { Matiere } from "@/shared/types/matiere.types";
+
 import * as React from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -11,11 +15,11 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Download,
   FileDown,
   Eye,
 } from "lucide-react";
 import useSWR from "swr";
+import { Chip } from "@heroui/chip";
 
 import { useAuth } from "@/core/providers/AuthProvider";
 import { enseignantService } from "@/shared/services/api/enseignant.service";
@@ -24,10 +28,6 @@ import { parcoursService } from "@/shared/services/api/parcours.service";
 import { useToast } from "@/hooks/use-toast";
 import { downloadPDF } from "@/lib/pdf-utils";
 import { DetailEleveModal } from "@/features/enseignant/components/eleves/DetailEleveModal";
-import { Chip } from "@heroui/chip";
-import type { Niveau } from "@/shared/types/niveau.types";
-import type { Parcours } from "@/shared/types/parcours.types";
-import type { Matiere } from "@/shared/types/matiere.types";
 
 interface EtudiantEleve {
   id: string;
@@ -76,19 +76,16 @@ export default function ElevesPage() {
   );
 
   // Charger les niveaux et parcours pour les filtres
-  const { data: niveaux } = useSWR<Niveau[]>(
-    "niveaux-list",
-    () => niveauService.getNiveaux(true),
+  const { data: niveaux } = useSWR<Niveau[]>("niveaux-list", () =>
+    niveauService.getNiveaux(true),
   );
 
-  const { data: parcours } = useSWR<Parcours[]>(
-    "parcours-list",
-    () => parcoursService.getParcours(true),
+  const { data: parcours } = useSWR<Parcours[]>("parcours-list", () =>
+    parcoursService.getParcours(true),
   );
 
   // Récupérer les matières de l'enseignant
-  const matieresEnseignant: Matiere[] =
-    (enseignantData as any)?.matieres || [];
+  const matieresEnseignant: Matiere[] = (enseignantData as any)?.matieres || [];
 
   React.useEffect(() => {
     fetchEleves();
@@ -149,6 +146,7 @@ export default function ElevesPage() {
       });
 
       const filename = `eleves_${new Date().toISOString().split("T")[0]}.pdf`;
+
       downloadPDF(blob, filename);
 
       toast({
@@ -160,8 +158,7 @@ export default function ElevesPage() {
       toast({
         title: "Erreur",
         description:
-          error.response?.data?.message ||
-          "Erreur lors de l'export PDF",
+          error.response?.data?.message || "Erreur lors de l'export PDF",
         variant: "error",
       });
     } finally {
@@ -218,14 +215,14 @@ export default function ElevesPage() {
         </div>
         <Popover
           isOpen={showExportConfirm}
-          onOpenChange={setShowExportConfirm}
           placement="bottom"
+          onOpenChange={setShowExportConfirm}
         >
           <PopoverTrigger>
             <Button
               className="bg-theme-primary text-white hover:bg-theme-primary/90"
-              startContent={<FileDown className="w-4 h-4" />}
               isLoading={exporting}
+              startContent={<FileDown className="w-4 h-4" />}
               onPress={handleExportPDF}
             >
               Exporter en PDF
@@ -249,8 +246,8 @@ export default function ElevesPage() {
                   Annuler
                 </Button>
                 <Button
-                  size="sm"
                   className="bg-theme-primary text-white"
+                  size="sm"
                   onPress={doExportPDF}
                 >
                   Confirmer
@@ -271,6 +268,7 @@ export default function ElevesPage() {
               selectedKeys={filters.niveau_id ? [filters.niveau_id] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
+
                 setFilters({
                   niveau_id: selected || null,
                   page: 1,
@@ -288,6 +286,7 @@ export default function ElevesPage() {
               selectedKeys={filters.matiere_id ? [filters.matiere_id] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
+
                 setFilters({
                   matiere_id: selected || null,
                   page: 1,
@@ -305,6 +304,7 @@ export default function ElevesPage() {
               selectedKeys={filters.parcours_id ? [filters.parcours_id] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
+
                 setFilters({
                   parcours_id: selected || null,
                   page: 1,
@@ -504,5 +504,3 @@ export default function ElevesPage() {
     </div>
   );
 }
-
-

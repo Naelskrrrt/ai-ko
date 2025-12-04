@@ -134,7 +134,7 @@ export function RecentQCMs({ userId }: RecentQCMsProps) {
       <CreateQCMModal
         isOpen={isOpen}
         onClose={onClose}
-        onSuccess={(qcmId) => {
+        onSuccess={(_qcmId) => {
           onClose();
           // Optionnel : recharger les données
         }}

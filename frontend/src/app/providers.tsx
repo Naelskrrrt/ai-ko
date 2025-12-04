@@ -10,7 +10,6 @@ import { SWRConfig } from "swr";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { swrConfig } from "@/core/lib/swr-config";
-
 import { ColorThemeProvider } from "@/components/color-theme-provider";
 
 export interface ProvidersProps {

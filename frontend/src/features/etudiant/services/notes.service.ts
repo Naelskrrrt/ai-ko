@@ -68,7 +68,7 @@ export const notesService = {
    * Récupère le résultat d'un examen spécifique
    * examId peut être soit l'ID du résultat, soit l'ID de la session
    */
-  async getResultat(examId: string, userId: string): Promise<Resultat> {
+  async getResultat(examId: string, _userId: string): Promise<Resultat> {
     try {
       // D'abord, essayer de récupérer par ID de résultat (cas après soumission)
       const response = await notesApi.get<any>(

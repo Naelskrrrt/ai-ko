@@ -75,7 +75,7 @@ export const examensService = {
   /**
    * Récupère tous les examens disponibles pour l'étudiant
    */
-  async getAll(userId: string): Promise<Examen[]> {
+  async getAll(_userId: string): Promise<Examen[]> {
     // Récupérer les sessions disponibles formatées
     const response = await examensApi.get<any[]>(
       `/sessions/disponibles?format=examen`,
@@ -100,7 +100,7 @@ export const examensService = {
    * Démarre un examen pour l'étudiant
    * Note: examId est en fait le sessionId
    */
-  async startExam(examId: string, userId: string): Promise<StartExamResponse> {
+  async startExam(examId: string, _userId: string): Promise<StartExamResponse> {
     const response = await examensApi.post<any>(`/resultats/demarrer`, {
       sessionId: examId,
     });
@@ -137,9 +137,9 @@ export const examensService = {
    * On peut la laisser vide ou créer un endpoint dédié plus tard
    */
   async saveAnswers(
-    examId: string,
-    sessionId: string,
-    reponses: Record<string, any>,
+    _examId: string,
+    _sessionId: string,
+    _reponses: Record<string, any>,
   ): Promise<void> {
     // TODO: Implémenter un endpoint de sauvegarde automatique si nécessaire
     // Pour l'instant, on ne fait rien car les réponses sont soumises à la fin
@@ -170,9 +170,9 @@ export const examensService = {
    */
   async submitExam(
     examId: string,
-    userId: string,
+    _userId: string,
     reponses: Record<string, any>,
-    tempsTotal?: number,
+    _tempsTotal?: number,
   ): Promise<SubmitExamResponse> {
     // examId est en fait le resultatId (session_id du StartExamResponse)
     const response = await examensApi.post<any>(

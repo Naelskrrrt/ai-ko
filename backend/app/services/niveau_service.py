@@ -161,6 +161,14 @@ class NiveauService:
         if not niveau:
             raise ValueError("Niveau non trouvé")
 
+        # Vérifier s'il y a des classes associées à ce niveau
+        if hasattr(niveau, 'classes') and niveau.classes:
+            classes_count = len(niveau.classes)
+            raise ValueError(
+                f"Impossible de supprimer ce niveau car {classes_count} classe(s) y sont associée(s). "
+                "Veuillez d'abord supprimer ou réassigner ces classes."
+            )
+
         return self.niveau_repo.delete(niveau)
 
     def search_niveaux(self, query: str) -> List[Dict[str, Any]]:

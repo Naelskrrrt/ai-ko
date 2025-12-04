@@ -39,7 +39,8 @@ const passwordCriteria = {
   hasUppercase: (value: string) => /[A-Z]/.test(value),
   hasLowercase: (value: string) => /[a-z]/.test(value),
   hasNumber: (value: string) => /[0-9]/.test(value),
-  hasSpecial: (value: string) => /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(value),
+  hasSpecial: (value: string) =>
+    /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~;']/.test(value),
 };
 
 const passwordCriteriaMessages = {
@@ -90,7 +91,8 @@ export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [backendFieldErrors, setBackendFieldErrors] = useState<BackendFieldErrors>({});
+  const [backendFieldErrors, setBackendFieldErrors] =
+    useState<BackendFieldErrors>({});
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
@@ -119,8 +121,9 @@ export default function RegisterPage() {
   // Calculer la force du mot de passe
   const getPasswordStrength = (password: string) => {
     if (!password) return { score: 0, label: "", color: "" };
-    
+
     let score = 0;
+
     if (passwordCriteria.minLength(password)) score++;
     if (passwordCriteria.hasUppercase(password)) score++;
     if (passwordCriteria.hasLowercase(password)) score++;
@@ -130,14 +133,18 @@ export default function RegisterPage() {
     if (score <= 2) return { score, label: "Faible", color: "bg-danger" };
     if (score <= 3) return { score, label: "Moyen", color: "bg-warning" };
     if (score <= 4) return { score, label: "Fort", color: "bg-success" };
+
     return { score, label: "Très fort", color: "bg-success" };
   };
 
   const passwordStrength = getPasswordStrength(watchPassword);
 
   // Fonction utilitaire pour extraire le premier message d'erreur d'un champ
-  const getBackendFieldError = (field: keyof BackendFieldErrors): string | undefined => {
+  const _getBackendFieldError = (
+    field: keyof BackendFieldErrors,
+  ): string | undefined => {
     const fieldErrors = backendFieldErrors[field];
+
     return fieldErrors && fieldErrors.length > 0 ? fieldErrors[0] : undefined;
   };
 
@@ -153,13 +160,18 @@ export default function RegisterPage() {
     // Gérer les erreurs de validation par champ
     if (responseData?.errors) {
       const fieldErrors = responseData.errors;
+
       setBackendFieldErrors(fieldErrors);
 
       // Mapper les erreurs vers react-hook-form pour une meilleure intégration
       Object.entries(fieldErrors).forEach(([field, messages]) => {
-        if (messages && messages.length > 0 && (field === 'name' || field === 'email' || field === 'password')) {
+        if (
+          messages &&
+          messages.length > 0 &&
+          (field === "name" || field === "email" || field === "password")
+        ) {
           setFormError(field as keyof RegisterFormValues, {
-            type: 'server',
+            type: "server",
             message: messages[0],
           });
         }
@@ -171,25 +183,38 @@ export default function RegisterPage() {
       const message = responseData.message;
 
       // Erreur email déjà utilisé
-      if (message.toLowerCase().includes('email') && message.toLowerCase().includes('utilisé')) {
-        setFormError('email', {
-          type: 'server',
-          message: 'Cet email est déjà associé à un compte',
+      if (
+        message.toLowerCase().includes("email") &&
+        message.toLowerCase().includes("utilisé")
+      ) {
+        setFormError("email", {
+          type: "server",
+          message: "Cet email est déjà associé à un compte",
         });
         setError(null);
+
         return;
       }
 
       // Autres erreurs générales
       setError(message);
     } else if (status === 400) {
-      setError("Données de formulaire invalides. Veuillez vérifier vos informations.");
+      setError(
+        "Données de formulaire invalides. Veuillez vérifier vos informations.",
+      );
     } else if (status === 500) {
-      setError("Une erreur serveur s'est produite. Veuillez réessayer plus tard.");
+      setError(
+        "Une erreur serveur s'est produite. Veuillez réessayer plus tard.",
+      );
     } else if (err.message) {
       // Erreur réseau ou autre
-      if (err.message.includes('Network Error') || err.message.includes('timeout')) {
-        setError("Impossible de contacter le serveur. Vérifiez votre connexion internet.");
+      if (
+        err.message.includes("Network Error") ||
+        err.message.includes("timeout")
+      ) {
+        setError(
+          "Impossible de contacter le serveur. Vérifiez votre connexion internet.",
+        );
       } else {
         setError("Une erreur s'est produite lors de l'inscription.");
       }
@@ -234,7 +259,7 @@ export default function RegisterPage() {
     }
   };
 
-  const handleGoogleRegister = async () => {
+  const _handleGoogleRegister = async () => {
     try {
       const apiUrl =
         typeof window !== "undefined"
@@ -338,40 +363,69 @@ export default function RegisterPage() {
                     <div className="flex-1 h-1.5 bg-default-200 rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 ${passwordStrength.color}`}
-                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                        style={{
+                          width: `${(passwordStrength.score / 5) * 100}%`,
+                        }}
                       />
                     </div>
-                    <span className={`text-xs font-medium ${
-                      passwordStrength.score <= 2 ? 'text-danger' : 
-                      passwordStrength.score <= 3 ? 'text-warning' : 'text-success'
-                    }`}>
+                    <span
+                      className={`text-xs font-medium ${
+                        passwordStrength.score <= 2
+                          ? "text-danger"
+                          : passwordStrength.score <= 3
+                            ? "text-warning"
+                            : "text-success"
+                      }`}
+                    >
                       {passwordStrength.label}
                     </span>
                   </div>
 
                   {/* Liste des critères */}
                   <div className="grid grid-cols-1 gap-1 text-xs">
-                    {Object.entries(passwordCriteriaMessages).map(([key, message]) => {
-                      const isValid = passwordCriteria[key as keyof typeof passwordCriteria](watchPassword);
-                      return (
-                        <div key={key} className="flex items-center gap-1.5">
-                          <span className={`flex-shrink-0 w-3.5 h-3.5 rounded-full flex items-center justify-center ${
-                            isValid ? 'bg-success text-white' : 'bg-default-200 text-default-400'
-                          }`}>
-                            {isValid ? (
-                              <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            ) : (
-                              <span className="w-1 h-1 bg-current rounded-full" />
-                            )}
-                          </span>
-                          <span className={isValid ? 'text-success' : 'text-default-400'}>
-                            {message}
-                          </span>
-                        </div>
-                      );
-                    })}
+                    {Object.entries(passwordCriteriaMessages).map(
+                      ([key, message]) => {
+                        const isValid =
+                          passwordCriteria[
+                            key as keyof typeof passwordCriteria
+                          ](watchPassword);
+
+                        return (
+                          <div key={key} className="flex items-center gap-1.5">
+                            <span
+                              className={`flex-shrink-0 w-3.5 h-3.5 rounded-full flex items-center justify-center ${
+                                isValid
+                                  ? "bg-success text-white"
+                                  : "bg-default-200 text-default-400"
+                              }`}
+                            >
+                              {isValid ? (
+                                <svg
+                                  className="w-2 h-2"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    clipRule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    fillRule="evenodd"
+                                  />
+                                </svg>
+                              ) : (
+                                <span className="w-1 h-1 bg-current rounded-full" />
+                              )}
+                            </span>
+                            <span
+                              className={
+                                isValid ? "text-success" : "text-default-400"
+                              }
+                            >
+                              {message}
+                            </span>
+                          </div>
+                        );
+                      },
+                    )}
                   </div>
                 </div>
               )}
@@ -412,20 +466,40 @@ export default function RegisterPage() {
                   {watchPassword === watchConfirmPassword ? (
                     <>
                       <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-success text-white flex items-center justify-center">
-                        <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="w-2 h-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            clipRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            fillRule="evenodd"
+                          />
                         </svg>
                       </span>
-                      <span className="text-success">Les mots de passe correspondent</span>
+                      <span className="text-success">
+                        Les mots de passe correspondent
+                      </span>
                     </>
                   ) : (
                     <>
                       <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-danger text-white flex items-center justify-center">
-                        <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        <svg
+                          className="w-2 h-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            clipRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            fillRule="evenodd"
+                          />
                         </svg>
                       </span>
-                      <span className="text-danger">Les mots de passe ne correspondent pas</span>
+                      <span className="text-danger">
+                        Les mots de passe ne correspondent pas
+                      </span>
                     </>
                   )}
                 </div>
@@ -440,8 +514,6 @@ export default function RegisterPage() {
                 {isLoading ? "Chargement..." : "Continuer"}
               </Button>
             </form>
-
-            
           </CardBody>
         </Card>
 

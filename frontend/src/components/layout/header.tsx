@@ -15,7 +15,9 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  DropdownSection,
 } from "@heroui/dropdown";
+import { User } from "@heroui/user";
 import NextLink from "next/link";
 import clsx from "clsx";
 import { useState } from "react";
@@ -48,6 +50,17 @@ export const Header = ({
   const handleLogout = async () => {
     await logout();
     router.push("/login");
+  };
+
+  const getProfileUrl = () => {
+    if (!user?.role) return "/";
+    const roleRoutes: Record<string, string> = {
+      admin: "/admin/profile",
+      enseignant: "/enseignant/profile",
+      etudiant: "/etudiant/profile",
+    };
+
+    return roleRoutes[user.role] || "/";
   };
 
   const getInitials = (name: string) => {
@@ -141,28 +154,58 @@ export const Header = ({
                 {user.name}
               </Button>
             </DropdownTrigger>
-            <DropdownMenu aria-label="User menu">
-              {user?.role === "etudiant" ? (
+            <DropdownMenu aria-label="User menu" className="min-w-[240px]">
+              <DropdownSection showDivider aria-label="Profile">
                 <DropdownItem
-                  key="matieres"
-                  onPress={() => {
-                    // Le modal sera géré par le layout étudiant
-                    const event = new CustomEvent("open-matieres-modal");
-
-                    window.dispatchEvent(event);
-                  }}
+                  key="profile-info"
+                  isReadOnly
+                  className="h-auto gap-3 cursor-default"
+                  textValue="Profile"
                 >
-                  Mes matières
+                  <User
+                    avatarProps={{
+                      size: "md",
+                      src: user.avatar || undefined,
+                      name: getInitials(user.name || user.email || ""),
+                      className: "bg-theme-primary/20 text-theme-primary",
+                    }}
+                    classNames={{
+                      name: "text-default-900 font-semibold",
+                      description: "text-default-500 text-xs",
+                    }}
+                    description={user.email}
+                    name={user.name || "Utilisateur"}
+                  />
                 </DropdownItem>
-              ) : null}
-              <DropdownItem
-                key="logout"
-                className="text-danger"
-                color="danger"
-                onPress={handleLogout}
-              >
-                Déconnexion
-              </DropdownItem>
+                <DropdownItem
+                  key="profile"
+                  onPress={() => router.push(getProfileUrl())}
+                >
+                  Voir le profil
+                </DropdownItem>
+              </DropdownSection>
+              <DropdownSection aria-label="Actions">
+                {user?.role === "etudiant" ? (
+                  <DropdownItem
+                    key="matieres"
+                    onPress={() => {
+                      const event = new CustomEvent("open-matieres-modal");
+
+                      window.dispatchEvent(event);
+                    }}
+                  >
+                    Mes matières
+                  </DropdownItem>
+                ) : null}
+                <DropdownItem
+                  key="logout"
+                  className="text-danger"
+                  color="danger"
+                  onPress={handleLogout}
+                >
+                  Déconnexion
+                </DropdownItem>
+              </DropdownSection>
             </DropdownMenu>
           </Dropdown>
         ) : (

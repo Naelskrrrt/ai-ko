@@ -195,11 +195,13 @@ def create_app(config=None):
     from app.api.docs import api_bp as docs_bp
     from app.api.admin import bp as admin_bp
     from app.api.seed import bp as seed_bp
+    from app.api.referentiels import bp as referentiels_bp
     app.register_blueprint(health_bp, url_prefix='/api')
     app.register_blueprint(auth_bp)
     app.register_blueprint(docs_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(seed_bp, url_prefix='/api')
+    app.register_blueprint(referentiels_bp)  # Niveaux et Matières
 
     # Importer les événements WebSocket (nécessaire pour enregistrer les handlers)
     from app.events import notifications

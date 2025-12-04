@@ -6,36 +6,6 @@ import type { Examen, Question } from "../types/examens.types";
 import type { Resultat } from "../types/notes.types";
 
 /**
- * Type pour une session backend
- */
-interface SessionBackend {
-  id: string;
-  titre: string;
-  description?: string;
-  dateDebut: string;
-  dateFin: string;
-  dureeMinutes: number;
-  tentativesMax: number;
-  status: string;
-  qcmId: string;
-  qcm?: {
-    id: string;
-    titre: string;
-    matiere?: string;
-  };
-  classe?: {
-    id: string;
-    code: string;
-    nom: string;
-    niveau?: {
-      nom: string;
-    };
-  };
-  nombreQuestions?: number;
-  totalPoints?: number;
-}
-
-/**
  * Type pour une question backend
  */
 interface QuestionBackend {

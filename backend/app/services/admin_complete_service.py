@@ -57,7 +57,7 @@ class AdminCompleteService:
         """Crée un nouvel étudiant"""
         # Vérifier email unique
         if self.user_repo.get_by_email(data['email']):
-            raise ValueError("Cet email est déjà utilisé")
+            raise ValueError("Email : cette adresse est déjà utilisée par un autre utilisateur")
 
         # Créer l'utilisateur
         user = User(
@@ -99,12 +99,12 @@ class AdminCompleteService:
         """Met à jour un étudiant"""
         user = self.user_repo.get_by_id(etudiant_id)
         if not user or user.role != UserRole.ETUDIANT:
-            raise ValueError("Étudiant non trouvé")
+            raise ValueError("Étudiant : utilisateur non trouvé ou rôle incorrect")
 
         # Mettre à jour les champs
         if 'email' in data and data['email'] != user.email:
             if self.user_repo.get_by_email(data['email']):
-                raise ValueError("Cet email est déjà utilisé")
+                raise ValueError("Email : cette adresse est déjà utilisée par un autre utilisateur")
             user.email = data['email']
 
         if 'name' in data:
@@ -127,7 +127,7 @@ class AdminCompleteService:
         """Supprime un étudiant"""
         user = self.user_repo.get_by_id(etudiant_id)
         if not user or user.role != UserRole.ETUDIANT:
-            raise ValueError("Étudiant non trouvé")
+            raise ValueError("Étudiant : utilisateur non trouvé ou rôle incorrect")
         
         db.session.delete(user)
         db.session.commit()
@@ -137,7 +137,7 @@ class AdminCompleteService:
         """Assigne des niveaux/classes/matières à un étudiant"""
         user = self.user_repo.get_by_id(etudiant_id)
         if not user or user.role != UserRole.ETUDIANT:
-            raise ValueError("Étudiant non trouvé")
+            raise ValueError("Étudiant : utilisateur non trouvé ou rôle incorrect")
 
         annee = data['annee_scolaire']
 
@@ -239,7 +239,7 @@ class AdminCompleteService:
     def create_professeur(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Crée un nouveau professeur"""
         if self.user_repo.get_by_email(data['email']):
-            raise ValueError("Cet email est déjà utilisé")
+            raise ValueError("Email : cette adresse est déjà utilisée par un autre utilisateur")
 
         user = User(
             email=data['email'],
@@ -270,11 +270,11 @@ class AdminCompleteService:
         """Met à jour un professeur"""
         user = self.user_repo.get_by_id(professeur_id)
         if not user or user.role not in [UserRole.ENSEIGNANT, UserRole.PROFESSEUR]:
-            raise ValueError("Professeur non trouvé")
+            raise ValueError("Enseignant : utilisateur non trouvé ou rôle incorrect")
 
         if 'email' in data and data['email'] != user.email:
             if self.user_repo.get_by_email(data['email']):
-                raise ValueError("Cet email est déjà utilisé")
+                raise ValueError("Email : cette adresse est déjà utilisée par un autre utilisateur")
             user.email = data['email']
 
         if 'name' in data:
@@ -295,7 +295,7 @@ class AdminCompleteService:
         """Supprime un professeur"""
         user = self.user_repo.get_by_id(professeur_id)
         if not user or user.role not in [UserRole.ENSEIGNANT, UserRole.PROFESSEUR]:
-            raise ValueError("Professeur non trouvé")
+            raise ValueError("Enseignant : utilisateur non trouvé ou rôle incorrect")
 
         db.session.delete(user)
         db.session.commit()
@@ -305,7 +305,7 @@ class AdminCompleteService:
         """Assigne des matières/niveaux/classes à un professeur"""
         user = self.user_repo.get_by_id(professeur_id)
         if not user or user.role not in [UserRole.ENSEIGNANT, UserRole.PROFESSEUR]:
-            raise ValueError("Professeur non trouvé")
+            raise ValueError("Enseignant : utilisateur non trouvé ou rôle incorrect")
 
         annee = data.get('annee_scolaire', f"{datetime.now().year}-{datetime.now().year + 1}")
 
@@ -377,7 +377,7 @@ class AdminCompleteService:
         """Affecte des professeurs à une matière"""
         matiere = self.matiere_repo.get_by_id(matiere_id)
         if not matiere:
-            raise ValueError("Matière non trouvée")
+            raise ValueError("Matière : identifiant invalide ou matière non trouvée")
 
         annee = annee_scolaire or f"{datetime.now().year}-{datetime.now().year + 1}"
 
@@ -421,7 +421,7 @@ class AdminCompleteService:
         """Récupère les professeurs affectés à une matière"""
         matiere = self.matiere_repo.get_by_id(matiere_id)
         if not matiere:
-            raise ValueError("Matière non trouvée")
+            raise ValueError("Matière : identifiant invalide ou matière non trouvée")
 
         # Requête pour récupérer les professeurs
         result = db.session.execute(
@@ -449,7 +449,7 @@ class AdminCompleteService:
         """Met à jour une session (accès admin complet)"""
         session = self.session_repo.get_by_id(session_id)
         if not session:
-            raise ValueError("Session non trouvée")
+            raise ValueError("Session : identifiant invalide ou session non trouvée")
 
         # Mettre à jour tous les champs autorisés
         updatable_fields = [
@@ -469,7 +469,7 @@ class AdminCompleteService:
         """Supprime une session (accès admin)"""
         session = self.session_repo.get_by_id(session_id)
         if not session:
-            raise ValueError("Session non trouvée")
+            raise ValueError("Session : identifiant invalide ou session non trouvée")
 
         db.session.delete(session)
         db.session.commit()
@@ -491,7 +491,7 @@ class AdminCompleteService:
         """Met à jour un résultat (accès admin pour validation/invalidation)"""
         resultat = self.resultat_repo.get_by_id(resultat_id)
         if not resultat:
-            raise ValueError("Résultat non trouvé")
+            raise ValueError("Résultat : identifiant invalide ou résultat non trouvé")
 
         # Champs modifiables par admin
         if 'est_valide' in data:
@@ -510,7 +510,7 @@ class AdminCompleteService:
         """Supprime un résultat (accès admin)"""
         resultat = self.resultat_repo.get_by_id(resultat_id)
         if not resultat:
-            raise ValueError("Résultat non trouvé")
+            raise ValueError("Résultat : identifiant invalide ou résultat non trouvé")
 
         db.session.delete(resultat)
         db.session.commit()

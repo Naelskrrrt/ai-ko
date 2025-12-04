@@ -9,14 +9,14 @@ export const Logo: React.FC<{
   width?: number;
   height?: number;
   className?: string;
-}> = ({ size = 36, width, height, className }) => {
-  const logoWidth = width || size;
-  const logoHeight = height || size;
+}> = ({ size = 36, width, height, className: _className }) => {
+  const _logoWidth = width || size;
+  const _logoHeight = height || size;
   const { theme } = useTheme();
   const isSSR = useIsSSR();
 
   // Pendant l'hydratation, utiliser le thème par défaut pour éviter les erreurs d'hydratation
-  const logoSrc =
+  const _logoSrc =
     isSSR || theme === "dark"
       ? "/logo-capt_dark-mode.png"
       : "/logo-capt_light-mode.png";

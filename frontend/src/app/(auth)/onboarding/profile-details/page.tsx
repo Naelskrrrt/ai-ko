@@ -598,13 +598,15 @@ function ProfileDetailsContent() {
 
 export default function ProfileDetailsPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-default-500">Chargement...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <p className="text-default-500">Chargement...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ProfileDetailsContent />
     </Suspense>
   );

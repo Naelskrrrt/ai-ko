@@ -12,6 +12,7 @@ import {
   SelectItem,
 } from "@heroui/react";
 import { useState, useEffect } from "react";
+
 import { useAuth } from "@/core/providers/AuthProvider";
 
 interface CompleteProfileModalProps {
@@ -97,19 +98,19 @@ export function CompleteProfileModal({
               specialite: formData.specialite,
               departement: formData.departement,
             }),
-          }
+          },
         );
 
         if (!enseignantUpdateResponse.ok) {
-          console.warn("Erreur lors de la mise à jour du profil enseignant");
+          // Erreur silencieuse - le profil principal a été mis à jour
         }
       }
 
       // Rafraîchir les données utilisateur
       await refreshUser();
       onComplete();
-    } catch (error) {
-      console.error("Erreur:", error);
+    } catch {
+      // Erreur silencieuse lors de la mise à jour
     } finally {
       setIsLoading(false);
     }
@@ -125,11 +126,11 @@ export function CompleteProfileModal({
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      isDismissable={false}
       hideCloseButton
+      isDismissable={false}
+      isOpen={isOpen}
       size="lg"
+      onClose={onClose}
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
@@ -146,10 +147,10 @@ export function CompleteProfileModal({
                 label="Téléphone"
                 placeholder="Votre numéro de téléphone"
                 value={formData.telephone}
+                variant="bordered"
                 onChange={(e) =>
                   setFormData({ ...formData, telephone: e.target.value })
                 }
-                variant="bordered"
               />
             )}
 
@@ -158,10 +159,10 @@ export function CompleteProfileModal({
                 label="Adresse"
                 placeholder="Votre adresse"
                 value={formData.adresse}
+                variant="bordered"
                 onChange={(e) =>
                   setFormData({ ...formData, adresse: e.target.value })
                 }
-                variant="bordered"
               />
             )}
 
@@ -170,15 +171,13 @@ export function CompleteProfileModal({
                 label="Grade"
                 placeholder="Sélectionnez votre grade"
                 selectedKeys={formData.grade ? [formData.grade] : []}
+                variant="bordered"
                 onChange={(e) =>
                   setFormData({ ...formData, grade: e.target.value })
                 }
-                variant="bordered"
               >
                 {grades.map((grade) => (
-                  <SelectItem key={grade} value={grade}>
-                    {grade}
-                  </SelectItem>
+                  <SelectItem key={grade}>{grade}</SelectItem>
                 ))}
               </Select>
             )}
@@ -188,10 +187,10 @@ export function CompleteProfileModal({
                 label="Spécialité"
                 placeholder="Votre spécialité"
                 value={formData.specialite}
+                variant="bordered"
                 onChange={(e) =>
                   setFormData({ ...formData, specialite: e.target.value })
                 }
-                variant="bordered"
               />
             )}
 
@@ -200,10 +199,10 @@ export function CompleteProfileModal({
                 label="Département"
                 placeholder="Votre département"
                 value={formData.departement}
+                variant="bordered"
                 onChange={(e) =>
                   setFormData({ ...formData, departement: e.target.value })
                 }
-                variant="bordered"
               />
             )}
           </div>
@@ -212,7 +211,7 @@ export function CompleteProfileModal({
           <Button color="default" variant="light" onPress={onClose}>
             Plus tard
           </Button>
-          <Button color="primary" onPress={handleSubmit} isLoading={isLoading}>
+          <Button color="primary" isLoading={isLoading} onPress={handleSubmit}>
             Enregistrer
           </Button>
         </ModalFooter>

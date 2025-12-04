@@ -194,7 +194,7 @@ export function QCMGenerateForm({
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-    reset,
+    reset: _reset,
     setValue,
     watch,
   } = useForm<GenerateFormData>({

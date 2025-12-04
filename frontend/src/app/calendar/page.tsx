@@ -21,7 +21,6 @@ function CalendarPageContent() {
     events,
     shouldScrollToDefault,
     scrollTriggerRef,
-    setCurrentDate: _setCurrentDate,
     setSelectedDate,
     setView,
     createEvent,
@@ -107,7 +106,12 @@ function CalendarPageContent() {
       updateEvent(event.id, event);
     } else {
       // Pour la création, on passe seulement les données sans id, createdAt, updatedAt
-      const { id, createdAt, updatedAt, ...eventData } = event;
+      const {
+        id: _id,
+        createdAt: _createdAt,
+        updatedAt: _updatedAt,
+        ...eventData
+      } = event;
 
       // eslint-disable-next-line no-console
       console.log("Creating new event with data:", eventData);

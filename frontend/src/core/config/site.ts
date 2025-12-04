@@ -54,15 +54,9 @@ export const siteConfig = {
       primary: false,
     },
     {
-      label: "Étudiants",
-      href: "/admin/etudiants",
-      icon: "team",
-      primary: false,
-    },
-    {
-      label: "Professeurs",
-      href: "/admin/professeurs",
-      icon: "team",
+      label: "Structure",
+      href: "/admin/structure",
+      icon: "settings",
       primary: false,
     },
     {

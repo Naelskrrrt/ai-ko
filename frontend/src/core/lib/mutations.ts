@@ -36,7 +36,7 @@ async function putFetcher<T>(url: string, { arg }: { arg?: any }): Promise<T> {
  */
 async function deleteFetcher<T>(
   url: string,
-  { arg }: { arg?: any },
+  { arg: _arg }: { arg?: any },
 ): Promise<T> {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 300));

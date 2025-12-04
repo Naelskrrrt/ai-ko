@@ -314,7 +314,7 @@ export function useAuthProduction(): UseAuthReturn {
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Mock response
-        const newUser: User = {
+        const _newUser: User = {
           id: `user_${Date.now()}`,
           username: credentials.username,
           email: credentials.email,

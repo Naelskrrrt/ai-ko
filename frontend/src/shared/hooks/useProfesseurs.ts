@@ -35,5 +35,3 @@ export function useProfesseur(id: string | null) {
     mutate,
   };
 }
-
-

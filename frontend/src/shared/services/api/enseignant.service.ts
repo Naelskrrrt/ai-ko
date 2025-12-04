@@ -202,7 +202,13 @@ export const enseignantService = {
     niveau_id?: string;
     matiere_id?: string;
     parcours_id?: string;
-  }): Promise<{ items: any[]; total: number; page: number; per_page: number; total_pages: number }> {
+  }): Promise<{
+    items: any[];
+    total: number;
+    page: number;
+    per_page: number;
+    total_pages: number;
+  }> {
     // Récupérer d'abord l'ID de l'enseignant connecté
     const enseignant = await this.getMe();
     const enseignantId = enseignant.id;

@@ -10,29 +10,105 @@ from marshmallow import Schema, fields, validate
 
 class EtudiantCreateSchema(Schema):
     """Schéma pour créer un étudiant"""
-    email = fields.Email(required=True, validate=validate.Length(max=255))
-    name = fields.Str(required=True, validate=validate.Length(min=2, max=100))
+    email = fields.Email(
+        required=True,
+        validate=validate.Length(max=255),
+        error_messages={
+            'required': 'Email : ce champ est obligatoire',
+            'invalid': 'Email : format invalide (ex: nom@domaine.com)'
+        }
+    )
+    name = fields.Str(
+        required=True,
+        validate=validate.Length(min=2, max=100),
+        error_messages={
+            'required': 'Nom : ce champ est obligatoire',
+            'invalid': 'Nom : doit contenir entre 2 et 100 caractères'
+        }
+    )
     password = fields.Str(
-        required=True, validate=validate.Length(min=8, max=128))
+        required=True,
+        validate=validate.Length(min=8, max=128),
+        error_messages={
+            'required': 'Mot de passe : ce champ est obligatoire',
+            'invalid': 'Mot de passe : doit contenir au moins 8 caractères'
+        }
+    )
     numero_etudiant = fields.Str(
-        validate=validate.Length(max=50), data_key='numeroEtudiant')
-    telephone = fields.Str(validate=validate.Length(max=20))
-    date_naissance = fields.Date(data_key='dateNaissance')
-    niveau_ids = fields.List(fields.Str(), data_key='niveauIds')
+        validate=validate.Length(max=50),
+        data_key='numeroEtudiant',
+        error_messages={
+            'invalid': 'Numéro étudiant : ne peut pas dépasser 50 caractères'
+        }
+    )
+    telephone = fields.Str(
+        validate=validate.Length(max=20),
+        error_messages={
+            'invalid': 'Téléphone : ne peut pas dépasser 20 caractères'
+        }
+    )
+    date_naissance = fields.Date(
+        data_key='dateNaissance',
+        error_messages={
+            'invalid': 'Date de naissance : format invalide (attendu: YYYY-MM-DD)'
+        }
+    )
+    niveau_ids = fields.List(
+        fields.Str(),
+        data_key='niveauIds',
+        error_messages={
+            'invalid': 'Niveaux : doit être une liste d\'identifiants valides'
+        }
+    )
     classe_ids = fields.List(fields.Str(), data_key='classeIds')
     matiere_ids = fields.List(fields.Str(), data_key='matiereIds')
-    annee_scolaire = fields.Str(data_key='anneeScolaire')
+    annee_scolaire = fields.Str(
+        data_key='anneeScolaire',
+        error_messages={
+            'invalid': 'Année scolaire : format invalide (ex: 2024-2025)'
+        }
+    )
 
 
 class EtudiantUpdateSchema(Schema):
     """Schéma pour mettre à jour un étudiant"""
-    email = fields.Email(validate=validate.Length(max=255))
-    name = fields.Str(validate=validate.Length(min=2, max=100))
-    password = fields.Str(validate=validate.Length(min=8, max=128))
+    email = fields.Email(
+        validate=validate.Length(max=255),
+        error_messages={
+            'invalid': 'Email : format invalide (ex: nom@domaine.com)'
+        }
+    )
+    name = fields.Str(
+        validate=validate.Length(min=2, max=100),
+        error_messages={
+            'invalid': 'Nom : doit contenir entre 2 et 100 caractères'
+        }
+    )
+    password = fields.Str(
+        validate=validate.Length(min=8, max=128),
+        error_messages={
+            'invalid': 'Mot de passe : doit contenir au moins 8 caractères'
+        }
+    )
     numero_etudiant = fields.Str(
-        validate=validate.Length(max=50), data_key='numeroEtudiant')
-    telephone = fields.Str(validate=validate.Length(max=20))
-    date_naissance = fields.Date(data_key='dateNaissance')
+        validate=validate.Length(max=50),
+        data_key='numeroEtudiant',
+        error_messages={
+            'invalid': 'Numéro étudiant : ne peut pas dépasser 50 caractères'
+        }
+    )
+    telephone = fields.Str(
+        validate=validate.Length(max=20),
+        error_messages={
+            'invalid': 'Téléphone : ne peut pas dépasser 20 caractères'
+        }
+    )
+    date_naissance = fields.Date(
+        data_key='dateNaissance',
+        error_messages={
+            'invalid': 'Date de naissance : format invalide (attendu: YYYY-MM-DD)'
+        }
+    )
     email_verified = fields.Bool(data_key='emailVerified')
 
 
@@ -42,7 +118,12 @@ class EtudiantAssignSchema(Schema):
     classe_ids = fields.List(fields.Str(), data_key='classeIds')
     matiere_ids = fields.List(fields.Str(), data_key='matiereIds')
     annee_scolaire = fields.Str(
-        required=True, data_key='anneeScolaire')  # Ex: "2024-2025"
+        required=True,
+        data_key='anneeScolaire',
+        error_messages={
+            'required': 'Année scolaire : ce champ est obligatoire (ex: 2024-2025)'
+        }
+    )
 
 
 # ========================
@@ -51,27 +132,99 @@ class EtudiantAssignSchema(Schema):
 
 class ProfesseurCreateSchema(Schema):
     """Schéma pour créer un professeur"""
-    email = fields.Email(required=True, validate=validate.Length(max=255))
-    name = fields.Str(required=True, validate=validate.Length(min=2, max=100))
+    email = fields.Email(
+        required=True,
+        validate=validate.Length(max=255),
+        error_messages={
+            'required': 'Email : ce champ est obligatoire',
+            'invalid': 'Email : format invalide (ex: nom@domaine.com)'
+        }
+    )
+    name = fields.Str(
+        required=True,
+        validate=validate.Length(min=2, max=100),
+        error_messages={
+            'required': 'Nom : ce champ est obligatoire',
+            'invalid': 'Nom : doit contenir entre 2 et 100 caractères'
+        }
+    )
     password = fields.Str(
-        required=True, validate=validate.Length(min=8, max=128))
+        required=True,
+        validate=validate.Length(min=8, max=128),
+        error_messages={
+            'required': 'Mot de passe : ce champ est obligatoire',
+            'invalid': 'Mot de passe : doit contenir au moins 8 caractères'
+        }
+    )
     numero_enseignant = fields.Str(
-        validate=validate.Length(max=50), data_key='numeroEnseignant')
-    telephone = fields.Str(validate=validate.Length(max=20))
-    matiere_ids = fields.List(fields.Str(), data_key='matiereIds')
-    niveau_ids = fields.List(fields.Str(), data_key='niveauIds')
+        validate=validate.Length(max=50),
+        data_key='numeroEnseignant',
+        error_messages={
+            'invalid': 'Numéro enseignant : ne peut pas dépasser 50 caractères'
+        }
+    )
+    telephone = fields.Str(
+        validate=validate.Length(max=20),
+        error_messages={
+            'invalid': 'Téléphone : ne peut pas dépasser 20 caractères'
+        }
+    )
+    matiere_ids = fields.List(
+        fields.Str(),
+        data_key='matiereIds',
+        error_messages={
+            'invalid': 'Matières : doit être une liste d\'identifiants valides'
+        }
+    )
+    niveau_ids = fields.List(
+        fields.Str(),
+        data_key='niveauIds',
+        error_messages={
+            'invalid': 'Niveaux : doit être une liste d\'identifiants valides'
+        }
+    )
     classe_ids = fields.List(fields.Str(), data_key='classeIds')
-    annee_scolaire = fields.Str(data_key='anneeScolaire')
+    annee_scolaire = fields.Str(
+        data_key='anneeScolaire',
+        error_messages={
+            'invalid': 'Année scolaire : format invalide (ex: 2024-2025)'
+        }
+    )
 
 
 class ProfesseurUpdateSchema(Schema):
     """Schéma pour mettre à jour un professeur"""
-    email = fields.Email(validate=validate.Length(max=255))
-    name = fields.Str(validate=validate.Length(min=2, max=100))
-    password = fields.Str(validate=validate.Length(min=8, max=128))
+    email = fields.Email(
+        validate=validate.Length(max=255),
+        error_messages={
+            'invalid': 'Email : format invalide (ex: nom@domaine.com)'
+        }
+    )
+    name = fields.Str(
+        validate=validate.Length(min=2, max=100),
+        error_messages={
+            'invalid': 'Nom : doit contenir entre 2 et 100 caractères'
+        }
+    )
+    password = fields.Str(
+        validate=validate.Length(min=8, max=128),
+        error_messages={
+            'invalid': 'Mot de passe : doit contenir au moins 8 caractères'
+        }
+    )
     numero_enseignant = fields.Str(
-        validate=validate.Length(max=50), data_key='numeroEnseignant')
-    telephone = fields.Str(validate=validate.Length(max=20))
+        validate=validate.Length(max=50),
+        data_key='numeroEnseignant',
+        error_messages={
+            'invalid': 'Numéro enseignant : ne peut pas dépasser 50 caractères'
+        }
+    )
+    telephone = fields.Str(
+        validate=validate.Length(max=20),
+        error_messages={
+            'invalid': 'Téléphone : ne peut pas dépasser 20 caractères'
+        }
+    )
     email_verified = fields.Bool(data_key='emailVerified')
 
 
@@ -80,7 +233,12 @@ class ProfesseurAssignSchema(Schema):
     matiere_ids = fields.List(fields.Str(), data_key='matiereIds')
     niveau_ids = fields.List(fields.Str(), data_key='niveauIds')
     classe_ids = fields.List(fields.Str(), data_key='classeIds')
-    annee_scolaire = fields.Str(data_key='anneeScolaire')  # Optionnel
+    annee_scolaire = fields.Str(
+        data_key='anneeScolaire',
+        error_messages={
+            'invalid': 'Année scolaire : format invalide (ex: 2024-2025)'
+        }
+    )
 
 
 # ========================

@@ -1,7 +1,11 @@
 /**
  * Service API pour les Niveaux
  */
-import type { Niveau } from "../../types/niveau.types";
+import type {
+  Niveau,
+  NiveauCreate,
+  NiveauUpdate,
+} from "../../types/niveau.types";
 
 import axios from "axios";
 
@@ -56,6 +60,29 @@ export const niveauService = {
 
     return response.data;
   },
+
+  /**
+   * Crée un nouveau niveau
+   */
+  async createNiveau(data: NiveauCreate): Promise<Niveau> {
+    const response = await niveauApi.post("", data);
+
+    return response.data;
+  },
+
+  /**
+   * Met à jour un niveau
+   */
+  async updateNiveau(id: string, data: NiveauUpdate): Promise<Niveau> {
+    const response = await niveauApi.put(`/${id}`, data);
+
+    return response.data;
+  },
+
+  /**
+   * Supprime un niveau
+   */
+  async deleteNiveau(id: string): Promise<void> {
+    await niveauApi.delete(`/${id}`);
+  },
 };
-
-

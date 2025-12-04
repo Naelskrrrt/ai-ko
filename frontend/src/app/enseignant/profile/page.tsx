@@ -256,6 +256,7 @@ export default function ProfilePage() {
                         (user && "avatar" in user && user.avatar) ? (
                           <Image
                             priority
+                            unoptimized
                             alt={
                               (displayUser && "name" in displayUser
                                 ? displayUser.name

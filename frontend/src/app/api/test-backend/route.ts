@@ -41,15 +41,12 @@ export async function GET() {
   // Test 2: OAuth Google endpoint
   try {
     const oauthStart = Date.now();
-    const oauthResponse = await fetch(
-      `${BACKEND_URL}/api/auth/oauth/google`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const oauthResponse = await fetch(`${BACKEND_URL}/api/auth/oauth/google`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     const oauthDuration = Date.now() - oauthStart;
     const oauthData = await oauthResponse.json();
 
@@ -90,9 +87,6 @@ export async function GET() {
         "Content-Type": "application/json",
         "Cache-Control": "no-store",
       },
-    }
+    },
   );
 }
-
-
-

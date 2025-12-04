@@ -55,11 +55,23 @@ adminApi.interceptors.request.use((config) => {
 // Intercepteur pour gérer les erreurs
 adminApi.interceptors.response.use(
   (response) => {
-    console.log("[ADMIN API] Response:", response.config.url, response.status, response.data);
+    console.log(
+      "[ADMIN API] Response:",
+      response.config.url,
+      response.status,
+      response.data,
+    );
+
     return response;
   },
   (error) => {
-    console.error("[ADMIN API] Error:", error.config?.url, error.response?.status, error.response?.data);
+    console.error(
+      "[ADMIN API] Error:",
+      error.config?.url,
+      error.response?.status,
+      error.response?.data,
+    );
+
     return Promise.reject(error);
   },
 );
@@ -120,6 +132,7 @@ export const adminService = {
 
   async toggleUserStatus(id: string): Promise<User> {
     const response = await adminApi.patch<User>(`/users/${id}/status`);
+
     return response.data;
   },
 
@@ -319,11 +332,11 @@ export const adminService = {
     try {
       // Récupérer les professeurs
       const profData = await this.getProfesseurs({ per_page: 1000 });
-      const professeurs = profData.data;
+      const _professeurs = profData.data;
 
       // Récupérer les étudiants
       const etudData = await this.getEtudiants({ per_page: 1000 });
-      const etudiants = etudData.data;
+      const _etudiants = etudData.data;
 
       // TODO: Ajouter logique pour détecter les professeurs inactifs
       // TODO: Ajouter logique pour détecter les étudiants en difficulté

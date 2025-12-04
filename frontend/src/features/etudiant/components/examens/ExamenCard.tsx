@@ -28,7 +28,7 @@ interface ExamenCardProps {
   onUpdate?: () => void;
 }
 
-export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
+export function ExamenCard({ examen, onUpdate: _onUpdate }: ExamenCardProps) {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -41,7 +41,7 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
     router.push(`/etudiant/examens/${examen.id}`);
   };
 
-  const handleViewDetails = () => {
+  const _handleViewDetails = () => {
     router.push(`/etudiant/examens/${examen.id}`);
   };
 
@@ -96,7 +96,7 @@ export function ExamenCard({ examen, onUpdate }: ExamenCardProps) {
         hour: "2-digit",
         minute: "2-digit",
       });
-    } catch (error) {
+    } catch (_error) {
       return "Date invalide";
     }
   };

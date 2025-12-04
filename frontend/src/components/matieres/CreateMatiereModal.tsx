@@ -1,5 +1,7 @@
 "use client";
 
+import type { MatiereCreate } from "@/shared/types/matiere.types";
+
 import * as React from "react";
 import {
   Modal,
@@ -14,10 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import {
-  matiereService,
-  type CreateMatiereData,
-} from "@/shared/services/api/matiere.service";
+import { matiereService } from "@/shared/services/api/matiere.service";
 import { useToast } from "@/hooks/use-toast";
 
 const matiereSchema = z.object({
@@ -84,7 +83,7 @@ export function CreateMatiereModal({
     try {
       setIsLoading(true);
 
-      const createData: CreateMatiereData = {
+      const createData: MatiereCreate = {
         code: data.code.trim(),
         nom: data.nom.trim(),
         description: data.description?.trim() || undefined,
@@ -220,7 +219,9 @@ export function CreateMatiereModal({
                             className="h-10 w-20 rounded-lg border-2 border-default-200 cursor-pointer"
                             type="color"
                             value={field.value || "#3B82F6"}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => field.onChange(e.target.value)}
                           />
                           <Input
                             className="flex-1"
@@ -229,7 +230,9 @@ export function CreateMatiereModal({
                             placeholder="#3B82F6"
                             value={field.value || ""}
                             variant="bordered"
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => field.onChange(e.target.value)}
                           />
                         </div>
                       </div>

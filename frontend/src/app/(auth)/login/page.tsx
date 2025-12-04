@@ -60,9 +60,13 @@ function LoginContent() {
 
       // Mapper les erreurs vers react-hook-form
       Object.entries(fieldErrors).forEach(([field, messages]) => {
-        if (messages && messages.length > 0 && (field === 'email' || field === 'password')) {
+        if (
+          messages &&
+          messages.length > 0 &&
+          (field === "email" || field === "password")
+        ) {
           setFormError(field as keyof LoginFormValues, {
-            type: 'server',
+            type: "server",
             message: messages[0],
           });
         }
@@ -74,15 +78,23 @@ function LoginContent() {
       const message = responseData.message;
 
       // Erreurs spécifiques de connexion
-      if (message.toLowerCase().includes('incorrect') || 
-          message.toLowerCase().includes('invalide')) {
+      if (
+        message.toLowerCase().includes("incorrect") ||
+        message.toLowerCase().includes("invalide")
+      ) {
         setError("Email ou mot de passe incorrect");
+
         return;
       }
 
-      if (message.toLowerCase().includes('attente') && 
-          message.toLowerCase().includes('validation')) {
-        setError("Votre compte est en attente de validation par un administrateur");
+      if (
+        message.toLowerCase().includes("attente") &&
+        message.toLowerCase().includes("validation")
+      ) {
+        setError(
+          "Votre compte est en attente de validation par un administrateur",
+        );
+
         return;
       }
 
@@ -90,12 +102,21 @@ function LoginContent() {
     } else if (status === 401) {
       setError("Email ou mot de passe incorrect");
     } else if (status === 403) {
-      setError("Votre compte est en attente de validation par un administrateur");
+      setError(
+        "Votre compte est en attente de validation par un administrateur",
+      );
     } else if (status === 500) {
-      setError("Une erreur serveur s'est produite. Veuillez réessayer plus tard.");
+      setError(
+        "Une erreur serveur s'est produite. Veuillez réessayer plus tard.",
+      );
     } else if (err.message) {
-      if (err.message.includes('Network Error') || err.message.includes('timeout')) {
-        setError("Impossible de contacter le serveur. Vérifiez votre connexion internet.");
+      if (
+        err.message.includes("Network Error") ||
+        err.message.includes("timeout")
+      ) {
+        setError(
+          "Impossible de contacter le serveur. Vérifiez votre connexion internet.",
+        );
       } else {
         setError("Une erreur s'est produite lors de la connexion.");
       }

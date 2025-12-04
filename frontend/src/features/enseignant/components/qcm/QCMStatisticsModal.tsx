@@ -342,7 +342,7 @@ export function QCMStatisticsModal({
                     Aucune statistique par question disponible
                   </p>
                 ) : (
-                  stats.statistiques_par_question.map((qStat, index) => (
+                  stats.statistiques_par_question.map((qStat, _index) => (
                     <Card key={qStat.question_id} className="w-full px-2">
                       <CardHeader>
                         <div className="flex items-start justify-between w-full">

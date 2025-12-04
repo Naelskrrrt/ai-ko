@@ -17,7 +17,7 @@ interface QCMResultatPageProps {
 export default function QCMResultatPage({ params }: QCMResultatPageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const urlParams = useParams();
+  const _urlParams = useParams();
   // Le resultat_id est dans l'URL, mais on peut aussi le passer en query param
   // Pour l'instant, on utilise l'ID de l'URL comme resultat_id
   const resultatId = id;

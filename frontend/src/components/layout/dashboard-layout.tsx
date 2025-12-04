@@ -27,7 +27,7 @@ export function DashboardLayout({
 
   // Initialiser WebSocket pour les admins (gestion automatique des notifications)
   useSocket({
-    onPendingUser: (notification) => {
+    onPendingUser: (_notification) => {
       // Les notifications sont gérées par PendingUsersNotification
       // Ce hook assure simplement que la connexion WebSocket est active
     },

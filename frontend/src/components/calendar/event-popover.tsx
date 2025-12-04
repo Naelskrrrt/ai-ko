@@ -113,7 +113,7 @@ export function EventPopover({
   };
 
   // État pour l'animation de fermeture
-  const [isClosing, setIsClosing] = React.useState(false);
+  const [_isClosing, setIsClosing] = React.useState(false);
 
   // Référence pour le popover
   const popoverRef = React.useRef<HTMLDivElement>(null);

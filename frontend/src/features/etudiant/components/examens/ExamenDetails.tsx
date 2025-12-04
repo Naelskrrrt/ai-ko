@@ -30,7 +30,7 @@ interface ExamenDetailsProps {
   userId: string;
 }
 
-export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
+export function ExamenDetails({ examId, userId: _userId }: ExamenDetailsProps) {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -57,7 +57,7 @@ export function ExamenDetails({ examId, userId }: ExamenDetailsProps) {
         hour: "2-digit",
         minute: "2-digit",
       });
-    } catch (error) {
+    } catch (_error) {
       return "Date invalide";
     }
   };

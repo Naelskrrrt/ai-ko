@@ -8,8 +8,6 @@ import {
   FileQuestion,
   ClipboardList,
   UserCheck,
-  GraduationCap,
-  BookOpen,
   Settings,
   ArrowRight,
 } from "lucide-react";
@@ -192,65 +190,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Navigation rapide */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardBody className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <GraduationCap className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <Button
-                isIconOnly
-                as={NextLink}
-                href="/admin/etudiants"
-                size="sm"
-                variant="light"
-              >
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Gérer les Étudiants</h3>
-            <p className="text-sm text-default-500">
-              Créer, modifier et assigner des étudiants aux classes et matières
-            </p>
-            <div className="mt-4 flex items-center gap-2">
-              <Chip color="secondary" size="sm">
-                {stats?.usersByRole?.etudiant || 0} étudiants
-              </Chip>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-          <CardBody className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/30">
-                <BookOpen className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-              <Button
-                isIconOnly
-                as={NextLink}
-                href="/admin/professeurs"
-                size="sm"
-                variant="light"
-              >
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-            <h3 className="text-lg font-semibold mb-2">
-              Gérer les Professeurs
-            </h3>
-            <p className="text-sm text-default-500">
-              Créer, modifier et assigner des professeurs aux matières
-            </p>
-            <div className="mt-4 flex items-center gap-2">
-              <Chip color="default" size="sm">
-                {stats?.usersByRole?.enseignant || 0} professeurs
-              </Chip>
-            </div>
-          </CardBody>
-        </Card>
-
+      <div className="grid gap-4 md:grid-cols-2">
         <Card className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardBody className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -274,6 +214,36 @@ export default function AdminDashboardPage() {
             <div className="mt-4 flex items-center gap-2">
               <Chip color="success" size="sm">
                 Modèles actifs
+              </Chip>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <CardBody className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <Button
+                isIconOnly
+                as={NextLink}
+                href="/admin/users"
+                size="sm"
+                variant="light"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">
+              Gérer les Utilisateurs
+            </h3>
+            <p className="text-sm text-default-500">
+              Gérer tous les utilisateurs du système
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Chip color="primary" size="sm">
+                {stats?.metrics?.totalUsers || 0} utilisateurs
               </Chip>
             </div>
           </CardBody>

@@ -1,6 +1,8 @@
 "use client";
 
 import type { User, UserUpdate } from "@/shared/types/admin.types";
+import type { Niveau } from "@/shared/types/niveau.types";
+import type { Matiere } from "@/shared/types/matiere.types";
 
 import * as React from "react";
 import { Card, CardBody } from "@heroui/card";
@@ -8,6 +10,9 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate } from "@internationalized/date";
 import {
   Dropdown,
   DropdownTrigger,
@@ -23,7 +28,7 @@ import {
 } from "@heroui/modal";
 import { useDisclosure } from "@heroui/react";
 import { parseAsString, parseAsInteger, useQueryStates } from "nuqs";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -40,29 +45,120 @@ import {
   ChevronsRight,
   ArrowUpDown,
   EyeOff,
+  GraduationCap,
+  BookOpen,
 } from "lucide-react";
 import { Switch } from "@heroui/switch";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import { useUsers } from "@/shared/hooks/useUsers";
 import { adminService } from "@/shared/services/api/admin.service";
+import { niveauService } from "@/shared/services/api/niveau.service";
+import { matiereService } from "@/shared/services/api/matiere.service";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/core/providers/AuthProvider";
 import { RoleChangeMenu } from "@/components/admin/RoleChangeMenu";
 
+/**
+ * Parse les erreurs retournées par le backend Flask/Marshmallow
+ * et retourne un message lisible pour l'utilisateur
+ */
+function parseBackendErrors(error: any): string {
+  const data = error?.response?.data;
+
+  if (!data) {
+    return "Une erreur de connexion est survenue. Vérifiez votre réseau.";
+  }
+
+  // Cas 1: Message simple
+  if (typeof data.message === "string") {
+    return data.message;
+  }
+
+  // Cas 2: Erreurs de validation Marshmallow (objet avec champs)
+  if (data.errors && typeof data.errors === "object") {
+    const errorMessages: string[] = [];
+
+    for (const [_field, messages] of Object.entries(data.errors)) {
+      if (Array.isArray(messages)) {
+        // Messages déjà formatés avec le nom du champ
+        errorMessages.push(...messages);
+      } else if (typeof messages === "string") {
+        errorMessages.push(messages);
+      } else if (typeof messages === "object" && messages !== null) {
+        // Cas imbriqué (ex: { _schema: ["message"] })
+        for (const subMessages of Object.values(messages)) {
+          if (Array.isArray(subMessages)) {
+            errorMessages.push(...(subMessages as string[]));
+          }
+        }
+      }
+    }
+
+    if (errorMessages.length > 0) {
+      // Retourner les erreurs séparées par des retours à la ligne
+      return errorMessages.join("\n");
+    }
+  }
+
+  // Cas 3: Message dans un tableau
+  if (Array.isArray(data.message)) {
+    return data.message.join("\n");
+  }
+
+  // Cas 4: Erreur générique avec status
+  if (data.error) {
+    return typeof data.error === "string"
+      ? data.error
+      : "Une erreur est survenue";
+  }
+
+  return "Une erreur inattendue est survenue";
+}
+
 // Schema de validation
-const userSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Le nom doit contenir au moins 2 caractères")
-    .max(100, "Le nom ne peut pas dépasser 100 caractères"),
-  email: z.string().email("Email invalide"),
-  role: z.enum(["admin", "enseignant", "etudiant"], {
-    required_error: "Le rôle est requis",
-  }),
-  password: z.string().optional(),
-  emailVerified: z.boolean().optional(),
-});
+const userSchema = z
+  .object({
+    name: z
+      .string()
+      .min(2, "Nom : doit contenir au moins 2 caractères")
+      .max(100, "Nom : ne peut pas dépasser 100 caractères"),
+    email: z.string().email("Email : format invalide (ex: nom@domaine.com)"),
+    role: z.enum(["admin", "enseignant", "etudiant"], {
+      required_error: "Rôle : veuillez sélectionner un rôle",
+    }),
+    password: z.string().optional(),
+    emailVerified: z.boolean().optional(),
+    // Champs communs
+    telephone: z.string().optional(),
+    adresse: z.string().optional(),
+    // Champs spécifiques étudiant
+    numeroEtudiant: z.string().optional(),
+    dateNaissance: z.string().optional(),
+    anneeAdmission: z.string().optional(),
+    niveauId: z.string().optional(),
+    mentionId: z.string().optional(),
+    parcoursId: z.string().optional(),
+    // Champs spécifiques enseignant
+    numeroEnseignant: z.string().optional(),
+    grade: z.string().optional(),
+    specialite: z.string().optional(),
+    departement: z.string().optional(),
+    bureau: z.string().optional(),
+    dateEmbauche: z.string().optional(),
+    matiereIds: z.array(z.string()).optional(),
+    niveauIds: z.array(z.string()).optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Validation conditionnelle pour les étudiants
+    if (data.role === "etudiant" && (!data.niveauId || data.niveauId === "")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Niveau : obligatoire pour un étudiant",
+        path: ["niveauId"],
+      });
+    }
+  });
 
 type UserFormValues = z.infer<typeof userSchema>;
 
@@ -82,6 +178,9 @@ export default function UsersPage() {
     null,
   );
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
+  const [niveaux, setNiveaux] = React.useState<Niveau[]>([]);
+  const [matieres, setMatieres] = React.useState<Matiere[]>([]);
+  const [loadingReferentiels, setLoadingReferentiels] = React.useState(false);
 
   // État dans l'URL avec nuqs
   const [filters, setFilters] = useQueryStates({
@@ -110,10 +209,42 @@ export default function UsersPage() {
     register,
     handleSubmit,
     reset,
+    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
   });
+
+  // Surveiller le rôle sélectionné pour afficher le bloc conditionnel
+  const selectedRole = watch("role");
+
+  // Charger les référentiels (niveaux et matières) à l'ouverture du modal
+  React.useEffect(() => {
+    const loadReferentiels = async () => {
+      if (
+        isOpen &&
+        (selectedRole === "etudiant" || selectedRole === "enseignant")
+      ) {
+        setLoadingReferentiels(true);
+        try {
+          const [niveauxData, matieresData] = await Promise.all([
+            niveauService.getNiveaux(true),
+            matiereService.getMatieres(true),
+          ]);
+
+          setNiveaux(niveauxData);
+          setMatieres(matieresData);
+        } catch (error) {
+          console.error("Erreur chargement référentiels:", error);
+        } finally {
+          setLoadingReferentiels(false);
+        }
+      }
+    };
+
+    loadReferentiels();
+  }, [isOpen, selectedRole]);
 
   const openCreateModal = () => {
     setEditingUser(null);
@@ -124,6 +255,25 @@ export default function UsersPage() {
       role: "etudiant",
       password: "",
       emailVerified: true,
+      // Champs communs
+      telephone: "",
+      adresse: "",
+      // Champs étudiant
+      numeroEtudiant: "",
+      dateNaissance: "",
+      anneeAdmission: "",
+      niveauId: "",
+      mentionId: "",
+      parcoursId: "",
+      // Champs enseignant
+      numeroEnseignant: "",
+      grade: "",
+      specialite: "",
+      departement: "",
+      bureau: "",
+      dateEmbauche: "",
+      matiereIds: [],
+      niveauIds: [],
     });
     onOpen();
   };
@@ -180,13 +330,48 @@ export default function UsersPage() {
 
           return;
         }
-        await adminService.createUser({
-          name: data.name,
-          email: data.email,
-          role: data.role,
-          password: data.password,
-          emailVerified: data.emailVerified,
-        });
+
+        // Utiliser le bon endpoint selon le rôle
+        if (data.role === "etudiant") {
+          // Créer un étudiant avec les infos académiques
+          await adminService.createEtudiant({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            numeroEtudiant: data.numeroEtudiant || undefined,
+            telephone: data.telephone || undefined,
+            dateNaissance: data.dateNaissance || undefined,
+            niveauIds: data.niveauId ? [data.niveauId] : undefined,
+            anneeScolaire: data.anneeAdmission || undefined,
+          });
+        } else if (data.role === "enseignant") {
+          // Créer un enseignant avec les infos professionnelles
+          await adminService.createProfesseur({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            numeroEnseignant: data.numeroEnseignant || undefined,
+            telephone: data.telephone || undefined,
+            matiereIds:
+              data.matiereIds && data.matiereIds.length > 0
+                ? data.matiereIds
+                : undefined,
+            niveauIds:
+              data.niveauIds && data.niveauIds.length > 0
+                ? data.niveauIds
+                : undefined,
+          });
+        } else {
+          // Créer un admin (utilisateur standard)
+          await adminService.createUser({
+            name: data.name,
+            email: data.email,
+            role: data.role,
+            password: data.password,
+            emailVerified: data.emailVerified,
+          });
+        }
+
         toast({
           title: "Succès",
           description: "Utilisateur créé avec succès",
@@ -196,9 +381,11 @@ export default function UsersPage() {
       mutate();
       onClose();
     } catch (error: any) {
+      const errorMessage = parseBackendErrors(error);
+
       toast({
-        title: "Erreur",
-        description: error.response?.data?.message || "Une erreur est survenue",
+        title: "Erreur de validation",
+        description: errorMessage,
         variant: "error",
       });
     }
@@ -220,23 +407,32 @@ export default function UsersPage() {
       });
       mutate();
     } catch (error: any) {
+      const errorMessage = parseBackendErrors(error);
+
       toast({
-        title: "Erreur",
-        description: error.response?.data?.message || "Une erreur est survenue",
+        title: "Erreur de suppression",
+        description: errorMessage,
         variant: "error",
       });
     }
   };
 
   const handleToggleStatus = async (user: User) => {
-    console.log("[TOGGLE] Début - User:", user.id, user.email, "isActive:", user.isActive);
-    
+    console.log(
+      "[TOGGLE] Début - User:",
+      user.id,
+      user.email,
+      "isActive:",
+      user.isActive,
+    );
+
     if (isCurrentUser(user)) {
       toast({
         title: "Erreur",
         description: "Vous ne pouvez pas modifier votre propre statut",
         variant: "error",
       });
+
       return;
     }
 
@@ -245,8 +441,9 @@ export default function UsersPage() {
     try {
       console.log("[TOGGLE] Appel API...");
       const result = await adminService.toggleUserStatus(user.id);
+
       console.log("[TOGGLE] Résultat API:", result);
-      
+
       const statusText = result.isActive ? "activé" : "désactivé";
 
       // Rafraîchir les données
@@ -259,9 +456,11 @@ export default function UsersPage() {
       });
     } catch (error: any) {
       console.error("[TOGGLE] Erreur:", error);
+      const errorMessage = parseBackendErrors(error);
+
       toast({
-        title: "Erreur",
-        description: error.response?.data?.message || "Une erreur est survenue",
+        title: "Erreur de changement de statut",
+        description: errorMessage,
         variant: "error",
       });
     } finally {
@@ -280,9 +479,11 @@ export default function UsersPage() {
       mutate();
       setRoleChangeUser(null);
     } catch (error: any) {
+      const errorMessage = parseBackendErrors(error);
+
       toast({
-        title: "Erreur",
-        description: error.response?.data?.message || "Une erreur est survenue",
+        title: "Erreur de changement de rôle",
+        description: errorMessage,
         variant: "error",
       });
     }
@@ -676,89 +877,422 @@ export default function UsersPage() {
       )}
 
       {/* Modal Création/Édition */}
-      <Modal isOpen={isOpen} size="2xl" onClose={onClose}>
+      <Modal
+        classNames={{
+          base:
+            selectedRole === "etudiant" || selectedRole === "enseignant"
+              ? "max-h-[90vh]"
+              : "",
+          body: "py-6",
+        }}
+        isOpen={isOpen}
+        scrollBehavior="inside"
+        size={
+          selectedRole === "etudiant" || selectedRole === "enseignant"
+            ? "5xl"
+            : "2xl"
+        }
+        onClose={onClose}
+      >
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalHeader>
               {editingUser ? "Éditer l'utilisateur" : "Créer un utilisateur"}
             </ModalHeader>
             <ModalBody>
-              <div className="space-y-4">
-                <Input
-                  {...register("name")}
-                  errorMessage={errors.name?.message}
-                  isInvalid={!!errors.name}
-                  label="Nom"
-                  placeholder="Nom complet"
-                  variant="bordered"
-                />
-
-                <Input
-                  {...register("email")}
-                  errorMessage={errors.email?.message}
-                  isInvalid={!!errors.email}
-                  label="Email"
-                  placeholder="email@exemple.com"
-                  type="email"
-                  variant="bordered"
-                />
-
-                <Select
-                  {...register("role")}
-                  defaultSelectedKeys={["etudiant"]}
-                  errorMessage={errors.role?.message}
-                  isInvalid={!!errors.role}
-                  label="Rôle"
-                  variant="bordered"
-                >
-                  <SelectItem key="admin">Admin</SelectItem>
-                  <SelectItem key="enseignant">Enseignant</SelectItem>
-                  <SelectItem key="etudiant">Étudiant</SelectItem>
-                </Select>
-
-                <Input
-                  {...register("password")}
-                  endContent={
-                    <button
-                      aria-label={
-                        isPasswordVisible
-                          ? "Masquer le mot de passe"
-                          : "Afficher le mot de passe"
-                      }
-                      className="focus:outline-none"
-                      type="button"
-                      onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                    >
-                      {isPasswordVisible ? (
-                        <EyeOff className="w-4 h-4 text-default-400" />
-                      ) : (
-                        <Eye className="w-4 h-4 text-default-400" />
-                      )}
-                    </button>
-                  }
-                  errorMessage={errors.password?.message}
-                  isInvalid={!!errors.password}
-                  label="Mot de passe"
-                  placeholder={
-                    editingUser
-                      ? "Laisser vide pour ne pas changer"
-                      : "Minimum 8 caractères"
-                  }
-                  type={isPasswordVisible ? "text" : "password"}
-                  variant="bordered"
-                />
-
-                <div className="flex items-center gap-2">
-                  <input
-                    {...register("emailVerified")}
-                    className="w-4 h-4"
-                    id="emailVerified"
-                    type="checkbox"
+              <div
+                className={`grid gap-8 ${selectedRole === "etudiant" || selectedRole === "enseignant" ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}
+              >
+                {/* Colonne gauche - Informations générales */}
+                <div className="space-y-4">
+                  <Input
+                    {...register("name")}
+                    errorMessage={errors.name?.message}
+                    isInvalid={!!errors.name}
+                    label="Nom"
+                    placeholder="Nom complet"
+                    variant="bordered"
                   />
-                  <label className="text-sm" htmlFor="emailVerified">
-                    Compte actif
-                  </label>
+
+                  <Input
+                    {...register("email")}
+                    errorMessage={errors.email?.message}
+                    isInvalid={!!errors.email}
+                    label="Email"
+                    placeholder="email@exemple.com"
+                    type="email"
+                    variant="bordered"
+                  />
+
+                  <Select
+                    {...register("role")}
+                    defaultSelectedKeys={["etudiant"]}
+                    errorMessage={errors.role?.message}
+                    isInvalid={!!errors.role}
+                    label="Rôle"
+                    variant="bordered"
+                  >
+                    <SelectItem key="admin">Admin</SelectItem>
+                    <SelectItem key="enseignant">Enseignant</SelectItem>
+                    <SelectItem key="etudiant">Étudiant</SelectItem>
+                  </Select>
+
+                  <Input
+                    {...register("password")}
+                    endContent={
+                      <button
+                        aria-label={
+                          isPasswordVisible
+                            ? "Masquer le mot de passe"
+                            : "Afficher le mot de passe"
+                        }
+                        className="focus:outline-none"
+                        type="button"
+                        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                      >
+                        {isPasswordVisible ? (
+                          <EyeOff className="w-4 h-4 text-default-400" />
+                        ) : (
+                          <Eye className="w-4 h-4 text-default-400" />
+                        )}
+                      </button>
+                    }
+                    errorMessage={errors.password?.message}
+                    isInvalid={!!errors.password}
+                    label="Mot de passe"
+                    placeholder={
+                      editingUser
+                        ? "Laisser vide pour ne pas changer"
+                        : "Minimum 8 caractères"
+                    }
+                    type={isPasswordVisible ? "text" : "password"}
+                    variant="bordered"
+                  />
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      {...register("emailVerified")}
+                      className="w-4 h-4"
+                      id="emailVerified"
+                      type="checkbox"
+                    />
+                    <label className="text-sm" htmlFor="emailVerified">
+                      Compte actif
+                    </label>
+                  </div>
                 </div>
+
+                {/* Colonne droite - Informations académiques (conditionnelle) */}
+                {selectedRole === "etudiant" && (
+                  <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 max-h-[500px] overflow-y-auto">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                        <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-blue-900 dark:text-blue-100">
+                          Informations Étudiant
+                        </h3>
+                        <p className="text-xs text-blue-600 dark:text-blue-300">
+                          Données académiques complémentaires
+                        </p>
+                      </div>
+                    </div>
+
+                    <Divider className="bg-blue-200 dark:bg-blue-700" />
+
+                    <Input
+                      {...register("numeroEtudiant")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Numéro étudiant *"
+                      placeholder="Ex: ETU-2024-001"
+                      variant="bordered"
+                    />
+
+                    <Input
+                      {...register("telephone")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Téléphone"
+                      placeholder="Ex: +261 34 00 000 00"
+                      variant="bordered"
+                    />
+
+                    <Controller
+                      control={control}
+                      name="dateNaissance"
+                      render={({ field }) => (
+                        <DatePicker
+                          showMonthAndYearPickers
+                          classNames={{
+                            base: "w-full",
+                          }}
+                          label="Date de naissance"
+                          value={field.value ? parseDate(field.value) : null}
+                          onChange={(date) => {
+                            field.onChange(date ? date.toString() : "");
+                          }}
+                        />
+                      )}
+                    />
+
+                    <Input
+                      {...register("anneeAdmission")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Année d'admission"
+                      placeholder="Ex: 2024-2025"
+                      variant="bordered"
+                    />
+
+                    <Input
+                      {...register("adresse")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Adresse"
+                      placeholder="Adresse complète"
+                      variant="bordered"
+                    />
+
+                    <Controller
+                      control={control}
+                      name="niveauId"
+                      render={({ field }) => (
+                        <Select
+                          isRequired
+                          classNames={{
+                            trigger: "bg-white dark:bg-default-100",
+                          }}
+                          errorMessage={errors.niveauId?.message}
+                          isInvalid={!!errors.niveauId}
+                          isLoading={loadingReferentiels}
+                          label="Niveau *"
+                          placeholder="Sélectionner un niveau"
+                          selectedKeys={
+                            field.value ? new Set([field.value]) : new Set()
+                          }
+                          variant="bordered"
+                          onSelectionChange={(keys) => {
+                            const selectedKey = Array.from(keys)[0] as string;
+
+                            field.onChange(selectedKey || "");
+                          }}
+                        >
+                          {niveaux.map((niveau) => (
+                            <SelectItem key={niveau.id}>
+                              {niveau.nom} ({niveau.code})
+                            </SelectItem>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </div>
+                )}
+
+                {selectedRole === "enseignant" && (
+                  <div className="space-y-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 max-h-[500px] overflow-y-auto">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/40">
+                        <BookOpen className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-green-900 dark:text-green-100">
+                          Informations Enseignant
+                        </h3>
+                        <p className="text-xs text-green-600 dark:text-green-300">
+                          Données professionnelles complémentaires
+                        </p>
+                      </div>
+                    </div>
+
+                    <Divider className="bg-green-200 dark:bg-green-700" />
+
+                    <Input
+                      {...register("numeroEnseignant")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Numéro enseignant *"
+                      placeholder="Ex: ENS-2024-001"
+                      variant="bordered"
+                    />
+
+                    <Input
+                      {...register("telephone")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Téléphone"
+                      placeholder="Ex: +261 34 00 000 00"
+                      variant="bordered"
+                    />
+
+                    <Input
+                      {...register("grade")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Grade"
+                      placeholder="Ex: Maître de conférence, Professeur..."
+                      variant="bordered"
+                    />
+
+                    <Input
+                      {...register("specialite")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Spécialité"
+                      placeholder="Ex: Intelligence Artificielle"
+                      variant="bordered"
+                    />
+
+                    <Input
+                      {...register("departement")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Département"
+                      placeholder="Ex: Informatique"
+                      variant="bordered"
+                    />
+
+                    <Input
+                      {...register("bureau")}
+                      classNames={{
+                        inputWrapper: "bg-white dark:bg-default-100",
+                      }}
+                      label="Bureau"
+                      placeholder="Ex: B-204"
+                      variant="bordered"
+                    />
+
+                    <Controller
+                      control={control}
+                      name="dateEmbauche"
+                      render={({ field }) => (
+                        <DatePicker
+                          showMonthAndYearPickers
+                          classNames={{
+                            base: "w-full",
+                          }}
+                          label="Date d'embauche"
+                          value={field.value ? parseDate(field.value) : null}
+                          onChange={(date) => {
+                            field.onChange(date ? date.toString() : "");
+                          }}
+                        />
+                      )}
+                    />
+
+                    <Controller
+                      control={control}
+                      name="matiereIds"
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          classNames={{
+                            trigger: "bg-white dark:bg-default-100",
+                          }}
+                          isLoading={loadingReferentiels}
+                          label="Matières enseignées"
+                          placeholder="Sélectionner les matières"
+                          selectedKeys={new Set(field.value || [])}
+                          selectionMode="multiple"
+                          variant="bordered"
+                          onSelectionChange={(keys) => {
+                            const selectedKeys = Array.from(keys) as string[];
+
+                            field.onChange(selectedKeys);
+                          }}
+                        >
+                          {matieres.map((matiere) => (
+                            <SelectItem key={matiere.id}>
+                              {matiere.nom} ({matiere.code})
+                            </SelectItem>
+                          ))}
+                        </Select>
+                      )}
+                    />
+
+                    {/* Afficher les matières sélectionnées */}
+                    {watch("matiereIds") && watch("matiereIds")!.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {watch("matiereIds")!.map((matiereId) => {
+                          const matiere = matieres.find(
+                            (m) => m.id === matiereId,
+                          );
+
+                          return matiere ? (
+                            <Chip
+                              key={matiereId}
+                              color="success"
+                              size="sm"
+                              variant="flat"
+                            >
+                              {matiere.nom}
+                            </Chip>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+
+                    <Controller
+                      control={control}
+                      name="niveauIds"
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          classNames={{
+                            trigger: "bg-white dark:bg-default-100",
+                          }}
+                          isLoading={loadingReferentiels}
+                          label="Niveaux enseignés"
+                          placeholder="Sélectionner les niveaux"
+                          selectedKeys={new Set(field.value || [])}
+                          selectionMode="multiple"
+                          variant="bordered"
+                          onSelectionChange={(keys) => {
+                            const selectedKeys = Array.from(keys) as string[];
+
+                            field.onChange(selectedKeys);
+                          }}
+                        >
+                          {niveaux.map((niveau) => (
+                            <SelectItem key={niveau.id}>
+                              {niveau.nom} ({niveau.code})
+                            </SelectItem>
+                          ))}
+                        </Select>
+                      )}
+                    />
+
+                    {/* Afficher les niveaux sélectionnés */}
+                    {watch("niveauIds") && watch("niveauIds")!.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {watch("niveauIds")!.map((niveauId) => {
+                          const niveau = niveaux.find((n) => n.id === niveauId);
+
+                          return niveau ? (
+                            <Chip
+                              key={niveauId}
+                              color="primary"
+                              size="sm"
+                              variant="flat"
+                            >
+                              {niveau.nom}
+                            </Chip>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </ModalBody>
             <ModalFooter>

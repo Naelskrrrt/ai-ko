@@ -65,7 +65,7 @@ export default function Home() {
   }
 
   // Pendant l'hydratation, utiliser le thème par défaut pour éviter les erreurs d'hydratation
-  const logoSrc =
+  const _logoSrc =
     isSSR || theme === "dark"
       ? "/logo-capt_dark-mode.png"
       : "/logo-capt_light-mode.png";

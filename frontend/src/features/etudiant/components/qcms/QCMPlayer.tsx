@@ -29,7 +29,7 @@ interface QCMPlayerProps {
   userId: string;
 }
 
-export function QCMPlayer({ qcmId, userId }: QCMPlayerProps) {
+export function QCMPlayer({ qcmId, userId: _userId }: QCMPlayerProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -41,7 +41,7 @@ export function QCMPlayer({ qcmId, userId }: QCMPlayerProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resultatId, setResultatId] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [dateDebutQCM, setDateDebutQCM] = useState<string>("");
+  const [_dateDebutQCM, setDateDebutQCM] = useState<string>("");
 
   const {
     isOpen: isSubmitModalOpen,

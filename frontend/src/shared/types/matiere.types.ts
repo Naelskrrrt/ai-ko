@@ -34,5 +34,3 @@ export interface MatiereUpdate {
   icone?: string;
   actif?: boolean;
 }
-
-

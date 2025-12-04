@@ -14,6 +14,7 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    unoptimized: false,
     remotePatterns: [
       {
         protocol: 'https',
@@ -25,7 +26,13 @@ const nextConfig = {
         hostname: '*.googleusercontent.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'googleusercontent.com',
+        pathname: '/**',
+      },
     ],
+    domains: ['lh3.googleusercontent.com', 'googleusercontent.com'],
   },
   webpack: (config) => {
     config.resolve.alias = {

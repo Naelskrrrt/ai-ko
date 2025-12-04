@@ -5,14 +5,33 @@ from typing import Dict, Any, Optional, List
 from app.repositories.mention_repository import MentionRepository
 from app.repositories.etablissement_repository import EtablissementRepository
 from app.models.mention import Mention
+from app.models.etablissement import Etablissement
+from app import db
 
 
 class MentionService:
     """Service pour la gestion des Mentions"""
 
+    DEFAULT_ETABLISSEMENT_CODE = "DEFAULT"
+
     def __init__(self):
         self.mention_repo = MentionRepository()
         self.etablissement_repo = EtablissementRepository()
+
+    def _get_or_create_default_etablissement(self) -> Etablissement:
+        """Récupère ou crée l'établissement par défaut"""
+        etablissement = self.etablissement_repo.get_by_code(self.DEFAULT_ETABLISSEMENT_CODE)
+        if not etablissement:
+            etablissement = Etablissement(
+                code=self.DEFAULT_ETABLISSEMENT_CODE,
+                nom="Établissement par défaut",
+                type_etablissement="université",
+                pays="Madagascar",
+                actif=True
+            )
+            db.session.add(etablissement)
+            db.session.commit()
+        return etablissement
 
     def get_all_mentions(self, actives_seulement: bool = False) -> List[Dict[str, Any]]:
         """Récupère toutes les mentions"""
@@ -53,14 +72,15 @@ class MentionService:
         if len(nom) < 3 or len(nom) > 200:
             raise ValueError("Le nom doit contenir entre 3 et 200 caractères")
         
-        # Validation etablissement_id
+        # Validation etablissement_id - utiliser l'établissement par défaut si non spécifié ou "default"
         etablissement_id = data.get('etablissement_id', '').strip()
-        if not etablissement_id:
-            raise ValueError("L'établissement est obligatoire")
-        
-        etablissement = self.etablissement_repo.get_by_id(etablissement_id)
-        if not etablissement:
-            raise ValueError("Établissement non trouvé")
+        if not etablissement_id or etablissement_id.lower() == 'default':
+            etablissement = self._get_or_create_default_etablissement()
+            etablissement_id = etablissement.id
+        else:
+            etablissement = self.etablissement_repo.get_by_id(etablissement_id)
+            if not etablissement:
+                raise ValueError("Établissement non trouvé")
         
         # Créer la mention
         mention = Mention(
@@ -126,6 +146,15 @@ class MentionService:
         mention = self.mention_repo.get_by_id(mention_id)
         if not mention:
             raise ValueError("Mention non trouvée")
+        
+        # Vérifier s'il y a des parcours associés à cette mention
+        if hasattr(mention, 'parcours'):
+            parcours_count = mention.parcours.count() if hasattr(mention.parcours, 'count') else len(list(mention.parcours))
+            if parcours_count > 0:
+                raise ValueError(
+                    f"Impossible de supprimer cette mention car {parcours_count} parcours y sont associés. "
+                    "Veuillez d'abord supprimer ces parcours."
+                )
         
         return self.mention_repo.delete(mention)
 

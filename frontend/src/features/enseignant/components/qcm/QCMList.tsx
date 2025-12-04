@@ -27,9 +27,9 @@ export function QCMList({ userId }: QCMListProps) {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
-    isOpen: isDeleteConfirmOpen,
+    isOpen: _isDeleteConfirmOpen,
     onOpen: onDeleteConfirmOpen,
-    onClose: onDeleteConfirmClose,
+    onClose: _onDeleteConfirmClose,
   } = useDisclosure();
   const [qcmToDelete, setQcmToDelete] = React.useState<string | null>(null);
   const { toast } = useToast();
@@ -84,7 +84,7 @@ export function QCMList({ userId }: QCMListProps) {
     onDeleteConfirmOpen();
   };
 
-  const confirmDelete = async () => {
+  const _confirmDelete = async () => {
     if (!qcmToDelete) return;
     try {
       await qcmService.deleteQCM(qcmToDelete);
@@ -161,7 +161,7 @@ export function QCMList({ userId }: QCMListProps) {
       <CreateQCMModal
         isOpen={isOpen}
         onClose={onClose}
-        onSuccess={(qcmId) => {
+        onSuccess={(_qcmId) => {
           mutate();
           onClose();
         }}

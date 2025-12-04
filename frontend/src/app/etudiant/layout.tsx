@@ -59,18 +59,21 @@ export default function EtudiantLayout({
     // Ne rien faire pendant le chargement
     if (loading) {
       setShouldRedirect(null);
+
       return;
     }
 
     // Si pas d'utilisateur, marquer pour redirection vers login
     if (!user) {
       setShouldRedirect("/login");
+
       return;
     }
 
     // Si utilisateur connecté mais pas étudiant, marquer pour redirection
     if (!hasRole("etudiant") && !hasRole("admin")) {
       setShouldRedirect("/");
+
       return;
     }
 

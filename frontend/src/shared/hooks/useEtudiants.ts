@@ -35,5 +35,3 @@ export function useEtudiant(id: string | null) {
     mutate,
   };
 }
-
-

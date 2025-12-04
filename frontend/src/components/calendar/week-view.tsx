@@ -100,7 +100,7 @@ export function WeekView({
   }, [currentDate, selectedDate]); // Se déclenche quand on change de date
 
   // Hook pour l'heure actuelle (pour la ligne d'heure actuelle)
-  const { currentTime, position } = useCurrentTime();
+  const { currentTime: _currentTime, position } = useCurrentTime();
 
   // État pour le redimensionnement
   const [isResizing, setIsResizing] = React.useState(false);
@@ -110,7 +110,7 @@ export function WeekView({
     startY: number;
     startTime: Date;
   } | null>(null);
-  const [resizeCooldown, setResizeCooldown] = React.useState(false);
+  const [_resizeCooldown, setResizeCooldown] = React.useState(false);
   const [previewEvent, setPreviewEvent] = React.useState<CalendarEvent | null>(
     null,
   );
@@ -383,10 +383,10 @@ export function WeekView({
     (e: MouseEvent) => {
       // Gestion des clics (si pas de drag ni de resize)
       if (mouseDownData && !isDragging && !isResizing) {
-        const timeDiff = Date.now() - mouseDownData.timestamp;
+        const _timeDiff = Date.now() - mouseDownData.timestamp;
         const deltaX = Math.abs(e.clientX - mouseDownData.startX);
         const deltaY = Math.abs(e.clientY - mouseDownData.startY);
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const _distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
         // Clic sur événement désactivé - seul le drag and drop est autorisé
 

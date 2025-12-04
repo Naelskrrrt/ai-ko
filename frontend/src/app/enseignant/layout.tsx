@@ -15,27 +15,28 @@ export default function EnseignantLayout({
   const { user, loading, hasRole } = useAuth();
   const router = useRouter();
   const [shouldRedirect, setShouldRedirect] = useState<string | null>(null);
-  const [showCompleteProfileModal, setShowCompleteProfileModal] = useState(false);
+  const [showCompleteProfileModal, setShowCompleteProfileModal] =
+    useState(false);
   const [hasShownModal, setHasShownModal] = useState(false);
 
   // Calculer les champs manquants du profil
   const missingFields = useMemo(() => {
     if (!user) return [];
-    
+
     const missing: string[] = [];
     const enseignantProfil = (user as any).enseignantProfil;
-    
+
     // Vérifier les champs utilisateur de base
     if (!user.telephone) missing.push("telephone");
     if (!user.adresse) missing.push("adresse");
-    
+
     // Vérifier les champs du profil enseignant
     if (enseignantProfil) {
       if (!enseignantProfil.grade) missing.push("grade");
       if (!enseignantProfil.specialite) missing.push("specialite");
       if (!enseignantProfil.departement) missing.push("departement");
     }
-    
+
     return missing;
   }, [user]);
 
@@ -46,12 +47,14 @@ export default function EnseignantLayout({
     // Si pas d'utilisateur, rediriger vers login
     if (!user) {
       setShouldRedirect("/login");
+
       return;
     }
 
     // Si pas enseignant ni admin, rediriger vers l'accueil
     if (!hasRole("enseignant") && !hasRole("admin")) {
       setShouldRedirect("/");
+
       return;
     }
 
@@ -61,6 +64,7 @@ export default function EnseignantLayout({
         setShowCompleteProfileModal(true);
         setHasShownModal(true);
       }, 1000);
+
       return () => clearTimeout(timer);
     }
   }, [user, loading, hasRole, missingFields, hasShownModal]);
@@ -104,12 +108,12 @@ export default function EnseignantLayout({
   return (
     <>
       <DashboardLayout>{children}</DashboardLayout>
-      
+
       <CompleteProfileModal
         isOpen={showCompleteProfileModal}
+        missingFields={missingFields}
         onClose={() => setShowCompleteProfileModal(false)}
         onComplete={() => setShowCompleteProfileModal(false)}
-        missingFields={missingFields}
       />
     </>
   );

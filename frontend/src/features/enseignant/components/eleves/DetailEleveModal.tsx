@@ -49,7 +49,7 @@ interface DetailEleveModalProps {
 export function DetailEleveModal({
   isOpen,
   onClose,
-  eleveId,
+  eleveId: _eleveId,
   eleveData,
 }: DetailEleveModalProps) {
   // Les enseignants n'ont pas accès à l'endpoint admin
@@ -155,9 +155,7 @@ export function DetailEleveModal({
                         Numéro étudiant
                       </p>
                       <p className="font-medium">
-                        {eleve.numeroEtudiant ||
-                          eleve.numero_etudiant ||
-                          "N/A"}
+                        {eleve.numeroEtudiant || eleve.numero_etudiant || "N/A"}
                       </p>
                     </div>
                   </div>

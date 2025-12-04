@@ -115,11 +115,14 @@ async function fetchUserData(token: string): Promise<AuthMeResponse | null> {
 
     if (response.ok) {
       const data = await response.json();
+
       return data;
     }
+
     return null;
   } catch (error) {
     console.error("[Middleware] Erreur fetch user data:", error);
+
     return null;
   }
 }
@@ -135,6 +138,7 @@ export async function middleware(request: NextRequest) {
   // Vérifier d'abord si c'est une route désactivée
   if (isDisabledRoute(pathname)) {
     const redirectUrl = new URL(token ? "/admin" : "/", request.url);
+
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -149,13 +153,16 @@ export async function middleware(request: NextRequest) {
     if (pathname === "/login" || pathname === "/register") {
       if (token) {
         const authData = await fetchUserData(token);
+
         if (authData && authData.user?.role) {
           // L'utilisateur a un rôle → rediriger vers son dashboard
           const dashboardPath = getDashboardByRole(authData.user.role);
+
           return NextResponse.redirect(new URL(dashboardPath, request.url));
         }
       }
     }
+
     return NextResponse.next();
   }
 
@@ -168,12 +175,14 @@ export async function middleware(request: NextRequest) {
 
     // Token présent, vérifier si l'utilisateur a déjà un rôle
     const authData = await fetchUserData(token);
+
     if (authData && authData.user?.role) {
       // L'utilisateur a déjà un rôle → rediriger vers son dashboard
       const dashboardPath = getDashboardByRole(authData.user.role);
+
       return NextResponse.redirect(new URL(dashboardPath, request.url));
     }
-    
+
     // Pas de rôle → laisser continuer l'onboarding (nouvelle inscription)
     return NextResponse.next();
   }
@@ -183,20 +192,22 @@ export async function middleware(request: NextRequest) {
     if (!token) {
       // Pas de token → Redirect login
       const loginUrl = new URL("/login", request.url);
+
       loginUrl.searchParams.set("redirect", pathname);
+
       return NextResponse.redirect(loginUrl);
     }
 
     // Token présent, vérifier le rôle
     const authData = await fetchUserData(token);
-    
+
     if (!authData) {
       // Token invalide → rediriger vers login
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
     const userRole = authData.user?.role;
-    
+
     if (!userRole) {
       // Pas de rôle (ne devrait pas arriver si l'utilisateur est déjà inscrit)
       // Rediriger vers login pour éviter les boucles
@@ -205,7 +216,7 @@ export async function middleware(request: NextRequest) {
 
     // Vérifier que l'utilisateur accède au bon dashboard
     const expectedDashboard = getDashboardByRole(userRole);
-    
+
     if (!pathname.startsWith(expectedDashboard)) {
       return NextResponse.redirect(new URL(expectedDashboard, request.url));
     }
@@ -227,17 +238,17 @@ export const config = {
  * DOCUMENTATION
  *
  * LOGIQUE SIMPLIFIÉE :
- * 
+ *
  * 1. INSCRIPTION (register) → Après inscription, l'utilisateur est redirigé
  *    vers l'onboarding pour choisir son rôle (etudiant/enseignant)
- * 
+ *
  * 2. CONNEXION (login) → L'utilisateur est redirigé directement vers son
  *    dashboard selon son rôle (pas d'onboarding)
- * 
+ *
  * 3. ONBOARDING → Accessible uniquement aux utilisateurs sans rôle
  *    (nouvelles inscriptions). Si l'utilisateur a déjà un rôle, il est
  *    redirigé vers son dashboard.
- * 
+ *
  * 4. DASHBOARD → Si des informations manquent dans le profil, un modal
  *    s'affiche pour compléter (pas de redirection vers onboarding)
  */

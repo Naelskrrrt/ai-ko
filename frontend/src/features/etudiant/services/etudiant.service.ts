@@ -82,7 +82,7 @@ export const etudiantService = {
   /**
    * Récupère les examens à venir pour l'étudiant
    */
-  async getUpcomingExams(userId: string): Promise<UpcomingExam[]> {
+  async getUpcomingExams(_userId: string): Promise<UpcomingExam[]> {
     // Récupérer les sessions disponibles formatées
     const response = await etudiantApi.get<any[]>(
       `/sessions/disponibles?format=examen`,

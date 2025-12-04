@@ -10,7 +10,6 @@ import { adminService } from "@/shared/services/api/admin.service";
 
 export function PendingUsersNotification() {
   const [pendingCount, setPendingCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
 
   // Charger le nombre initial d'utilisateurs en attente
@@ -19,8 +18,8 @@ export function PendingUsersNotification() {
       const response = await adminService.getPendingUsers();
 
       setPendingCount(response.total);
-    } catch (error) {
-      // Erreur lors du chargement du compteur
+    } catch {
+      // Erreur silencieuse lors du chargement du compteur
     }
   };
 

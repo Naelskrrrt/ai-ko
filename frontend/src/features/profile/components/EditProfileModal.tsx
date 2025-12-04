@@ -231,7 +231,7 @@ export function EditProfileModal({
 
       onSuccess?.();
       onClose();
-    } catch (error) {
+    } catch (_error) {
       // L'erreur est déjà gérée dans useUpdateProfile
     } finally {
       setIsSubmitting(false);
@@ -245,10 +245,7 @@ export function EditProfileModal({
     if (role === "enseignant") {
       const currentValue = getEnseignantValues("specialite") || [];
 
-      setEnseignantValue("specialite", [
-        ...currentValue,
-        newMatiere.id,
-      ]);
+      setEnseignantValue("specialite", [...currentValue, newMatiere.id]);
     }
     setIsCreateMatiereModalOpen(false);
   };

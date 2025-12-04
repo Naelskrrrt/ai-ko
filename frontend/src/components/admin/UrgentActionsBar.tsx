@@ -13,7 +13,10 @@ interface UrgentActionsBarProps {
   role: "admin" | "professeur";
 }
 
-export function UrgentActionsBar({ actions, role }: UrgentActionsBarProps) {
+export function UrgentActionsBar({
+  actions,
+  role: _role,
+}: UrgentActionsBarProps) {
   const router = useRouter();
 
   if (!actions || actions.length === 0) {
@@ -135,5 +138,3 @@ export function UrgentActionsBar({ actions, role }: UrgentActionsBarProps) {
     </div>
   );
 }
-
-

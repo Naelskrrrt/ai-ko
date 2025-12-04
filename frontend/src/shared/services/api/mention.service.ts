@@ -95,5 +95,3 @@ export const mentionService = {
     return response.data;
   },
 };
-
-

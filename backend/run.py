@@ -30,6 +30,37 @@ import click
 
 app = create_app()
 
+# Initialiser la base de données au démarrage (créer les tables si elles n'existent pas)
+def init_database():
+    """Initialise la base de données en créant les tables manquantes"""
+    with app.app_context():
+        try:
+            # Importer tous les modèles pour que SQLAlchemy les connaisse
+            from app.models import (
+                User, UserRole, QCM, Question,
+                Niveau, Matiere, Classe, SessionExamen, Resultat, AIModelConfig,
+                Etablissement, Mention, Parcours, Enseignant, Etudiant, AdminNotification
+            )
+            
+            # Vérifier si les tables existent
+            from sqlalchemy import inspect
+            inspector = inspect(db.engine)
+            existing_tables = inspector.get_table_names()
+            
+            if 'users' not in existing_tables:
+                print("[INFO] Tables non trouvées, création en cours...")
+                db.create_all()
+                print("[INFO] ✅ Tables créées avec succès!")
+            else:
+                print("[INFO] ✅ Base de données déjà initialisée")
+        except Exception as e:
+            print(f"[ERROR] Erreur lors de l'initialisation de la DB: {e}")
+            import traceback
+            traceback.print_exc()
+
+# Exécuter l'initialisation
+init_database()
+
 
 @app.shell_context_processor
 def make_shell_context():
