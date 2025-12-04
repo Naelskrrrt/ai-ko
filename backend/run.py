@@ -33,8 +33,9 @@ app = create_app()
 # Initialiser la base de données au démarrage (créer les tables si elles n'existent pas)
 def init_database():
     """Initialise la base de données en créant les tables manquantes"""
-    with app.app_context():
-        try:
+    print("[INFO] Début de l'initialisation de la base de données...")
+    try:
+        with app.app_context():
             # Importer tous les modèles pour que SQLAlchemy les connaisse
             from app.models import (
                 User, UserRole, QCM, Question,
@@ -53,13 +54,20 @@ def init_database():
                 print("[INFO] ✅ Tables créées avec succès!")
             else:
                 print("[INFO] ✅ Base de données déjà initialisée")
-        except Exception as e:
-            print(f"[ERROR] Erreur lors de l'initialisation de la DB: {e}")
-            import traceback
-            traceback.print_exc()
+    except Exception as e:
+        print(f"[ERROR] Erreur lors de l'initialisation de la DB: {e}")
+        import traceback
+        traceback.print_exc()
+        # Ne pas bloquer le démarrage - les migrations peuvent gérer ça
+        print("[WARNING] L'application va démarrer malgré l'erreur DB. Les endpoints health répondront.")
 
-# Exécuter l'initialisation
-init_database()
+print("[INFO] Initialisation de l'application Flask...")
+# Exécuter l'initialisation (non bloquant)
+try:
+    init_database()
+except Exception as e:
+    print(f"[ERROR] Erreur critique lors de l'init: {e}")
+print("[INFO] Application Flask prête à recevoir des requêtes.")
 
 
 @app.shell_context_processor
