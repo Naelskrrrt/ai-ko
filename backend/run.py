@@ -24,11 +24,31 @@ except ImportError:
 except Exception as e:
     print(f"[WARNING] Erreur lors du chargement du .env: {e}")
 
-from app import create_app, db
-from app.extensions import socketio
-import click
+import sys
+print(f"[INFO] Python version: {sys.version}")
+print(f"[INFO] DATABASE_URL défini: {'Oui' if os.getenv('DATABASE_URL') else 'Non'}")
 
-app = create_app()
+print("[INFO] Import de l'application Flask...")
+try:
+    from app import create_app, db
+    from app.extensions import socketio
+    import click
+    print("[INFO] Imports réussis")
+except Exception as e:
+    print(f"[ERROR] Erreur lors des imports: {e}")
+    import traceback
+    traceback.print_exc()
+    raise
+
+print("[INFO] Création de l'application Flask...")
+try:
+    app = create_app()
+    print("[INFO] Application Flask créée avec succès")
+except Exception as e:
+    print(f"[ERROR] Erreur lors de la création de l'app: {e}")
+    import traceback
+    traceback.print_exc()
+    raise
 
 # Initialiser la base de données au démarrage (créer les tables si elles n'existent pas)
 def init_database():
