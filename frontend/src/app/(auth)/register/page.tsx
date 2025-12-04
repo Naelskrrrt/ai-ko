@@ -91,8 +91,7 @@ export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [, setBackendFieldErrors] =
-    useState<BackendFieldErrors>({});
+  const [, setBackendFieldErrors] = useState<BackendFieldErrors>({});
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);

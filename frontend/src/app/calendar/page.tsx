@@ -106,7 +106,7 @@ function CalendarPageContent() {
       updateEvent(event.id, event);
     } else {
       // Pour la création, on passe seulement les données sans id, createdAt, updatedAt
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       const {
         id: _id,
         createdAt: _createdAt,

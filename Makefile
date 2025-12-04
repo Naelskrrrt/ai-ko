@@ -114,8 +114,16 @@ test-cov:
 
 # Production deployment
 deploy-check:
-	@echo "🔍 Vérification pré-déploiement..."
+	@echo "🔍 Vérification pré-déploiement BACKEND..."
 	cd backend && python scripts/pre_deploy_check.py
+	@echo ""
+	@echo "🔍 Vérification pré-déploiement FRONTEND..."
+	cd frontend && node scripts/pre_deploy_check.js --skip-build
+
+deploy-check-full:
+	@echo "🔍 Vérification complète pré-déploiement (avec build)..."
+	cd backend && python scripts/pre_deploy_check.py
+	cd frontend && node scripts/pre_deploy_check.js
 
 deploy-backend: deploy-check
 	cd backend && railway up

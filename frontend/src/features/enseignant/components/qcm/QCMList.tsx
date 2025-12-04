@@ -26,9 +26,7 @@ interface QCMListProps {
 export function QCMList({ userId }: QCMListProps) {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    onOpen: onDeleteConfirmOpen,
-  } = useDisclosure();
+  const { onOpen: onDeleteConfirmOpen } = useDisclosure();
   const [qcmToDelete, setQcmToDelete] = React.useState<string | null>(null);
   const { toast } = useToast();
 

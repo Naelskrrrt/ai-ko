@@ -1,38 +1,87 @@
 #!/bin/bash
-# Hook pre-push pour vérifier le backend avant déploiement
-# Installe ce hook avec: cp scripts/git-hooks/pre-push .git/hooks/ && chmod +x .git/hooks/pre-push
+# Hook pre-push pour vérifier le backend ET le frontend avant déploiement
+# Installe ce hook avec: ./backend/scripts/install-hooks.sh
 
 echo "🔍 Exécution des vérifications pré-déploiement..."
 
-# Se positionner dans le répertoire backend
+# Se positionner dans le répertoire racine du repo
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Si exécuté depuis .git/hooks, remonter différemment
+if [[ "$SCRIPT_DIR" == *".git/hooks"* ]]; then
+    REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+fi
+
 BACKEND_DIR="$REPO_ROOT/backend"
+FRONTEND_DIR="$REPO_ROOT/frontend"
+
+FAILED=0
 
 # Vérifier si on pousse vers main
 while read local_ref local_sha remote_ref remote_sha
 do
     if [[ "$remote_ref" == *"main"* ]] || [[ "$remote_ref" == *"master"* ]]; then
+        echo ""
         echo "📦 Push vers la branche principale détecté..."
+        echo ""
         
-        # Exécuter le script de vérification
+        # === BACKEND ===
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🐍 VÉRIFICATION BACKEND"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
         if [ -f "$BACKEND_DIR/scripts/pre_deploy_check.py" ]; then
             cd "$BACKEND_DIR"
             python scripts/pre_deploy_check.py
             
             if [ $? -ne 0 ]; then
                 echo ""
-                echo "❌ Les vérifications pré-déploiement ont échoué!"
-                echo "   Corrigez les problèmes avant de push vers main."
-                echo ""
-                echo "   Pour forcer le push (non recommandé): git push --no-verify"
-                exit 1
+                echo "❌ Vérifications BACKEND échouées!"
+                FAILED=1
             fi
         else
-            echo "⚠️  Script pre_deploy_check.py non trouvé"
+            echo "⚠️  Script backend/scripts/pre_deploy_check.py non trouvé"
+        fi
+        
+        echo ""
+        
+        # === FRONTEND ===
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "⚛️  VÉRIFICATION FRONTEND"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
+        if [ -f "$FRONTEND_DIR/scripts/pre_deploy_check.js" ]; then
+            cd "$FRONTEND_DIR"
+            # Utiliser --skip-build pour un check rapide (le build complet prend trop de temps)
+            node scripts/pre_deploy_check.js --skip-build
+            
+            if [ $? -ne 0 ]; then
+                echo ""
+                echo "❌ Vérifications FRONTEND échouées!"
+                FAILED=1
+            fi
+        else
+            echo "⚠️  Script frontend/scripts/pre_deploy_check.js non trouvé"
+        fi
+        
+        # Résultat final
+        if [ $FAILED -ne 0 ]; then
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "❌ ÉCHEC DES VÉRIFICATIONS PRÉ-DÉPLOIEMENT"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo ""
+            echo "   Corrigez les problèmes avant de push vers main."
+            echo ""
+            echo "   Pour forcer le push (non recommandé):"
+            echo "   git push --no-verify"
+            echo ""
+            exit 1
         fi
     fi
 done
 
-echo "✅ Vérifications pré-déploiement passées!"
+echo ""
+echo "✅ Toutes les vérifications pré-déploiement passées!"
 exit 0
