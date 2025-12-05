@@ -114,8 +114,19 @@ export function CreateMatiereModal({
   };
 
   return (
-    <Modal isOpen={isOpen} scrollBehavior="inside" size="2xl" onClose={onClose}>
-      <ModalContent>
+    <Modal
+      classNames={{
+        base: "max-h-[90vh]",
+        header: "flex-shrink-0",
+        body: "overflow-y-auto",
+        footer: "flex-shrink-0",
+      }}
+      isOpen={isOpen}
+      scrollBehavior="inside"
+      size="2xl"
+      onClose={onClose}
+    >
+      <ModalContent className="max-h-[90vh] flex flex-col">
         {(onCloseModal: () => void) => (
           <>
             <ModalHeader className="flex flex-col gap-1">

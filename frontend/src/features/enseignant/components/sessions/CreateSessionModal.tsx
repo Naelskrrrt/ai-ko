@@ -364,17 +364,17 @@ export function CreateSessionModal({
     <>
       <Modal
         classNames={{
-          base: "bg-background",
-          header: "border-b border-divider",
-          body: "py-6",
-          footer: "border-t border-divider",
+          base: "bg-background max-h-[90vh]",
+          header: "border-b border-divider flex-shrink-0",
+          body: "py-6 overflow-y-auto",
+          footer: "border-t border-divider flex-shrink-0",
         }}
         isOpen={isOpen}
         scrollBehavior="inside"
         size="3xl"
         onClose={handleClose}
       >
-        <ModalContent>
+        <ModalContent className="max-h-[90vh] flex flex-col">
           <ModalHeader className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
@@ -384,8 +384,11 @@ export function CreateSessionModal({
             </div>
           </ModalHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalBody>
+          <form
+            className="flex flex-col flex-1 overflow-hidden"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <ModalBody className="flex-1 overflow-y-auto">
               <div className="space-y-6">
                 {/* Informations de base */}
                 <div className="space-y-4">
@@ -785,26 +788,25 @@ export function CreateSessionModal({
                   isInvalid={!!errors.notePassage}
                 />
               </div>
-              <div className="flex justify-end">
-                <Button
-                  isDisabled={isSubmitting}
-                  variant="light"
-                  onPress={handleClose}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  color="primary"
-                  isLoading={isSubmitting}
-                  startContent={<Plus className="w-4 h-4" />}
-                  type="submit"
-                >
-                  Créer la session
-                </Button>
-              </div>
             </ModalBody>
 
-            <ModalFooter className="pt-4 pb-4" />
+            <ModalFooter className="flex justify-end gap-2">
+              <Button
+                isDisabled={isSubmitting}
+                variant="light"
+                onPress={handleClose}
+              >
+                Annuler
+              </Button>
+              <Button
+                color="primary"
+                isLoading={isSubmitting}
+                startContent={<Plus className="w-4 h-4" />}
+                type="submit"
+              >
+                Créer la session
+              </Button>
+            </ModalFooter>
           </form>
         </ModalContent>
       </Modal>

@@ -147,8 +147,18 @@ export function QCMStatisticsModal({
   }
 
   return (
-    <Modal isOpen={isOpen} scrollBehavior="inside" size="5xl" onClose={onClose}>
-      <ModalContent>
+    <Modal
+      classNames={{
+        base: "max-h-[90vh]",
+        header: "flex-shrink-0",
+        body: "overflow-y-auto",
+      }}
+      isOpen={isOpen}
+      scrollBehavior="inside"
+      size="5xl"
+      onClose={onClose}
+    >
+      <ModalContent className="max-h-[90vh] flex flex-col">
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2">

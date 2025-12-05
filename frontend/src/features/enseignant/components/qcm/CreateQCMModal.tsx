@@ -56,10 +56,10 @@ export function CreateQCMModal({
   return (
     <Modal
       classNames={{
-        base: "bg-background",
-        header: "border-b border-divider",
-        body: "py-6",
-        footer: "border-t border-divider",
+        base: "bg-background max-h-[90vh]",
+        header: "border-b border-divider flex-shrink-0",
+        body: "py-6 overflow-y-auto",
+        footer: "border-t border-divider flex-shrink-0",
       }}
       isDismissable={!isSubmitting && !isPolling}
       isKeyboardDismissDisabled={isSubmitting || isPolling}
@@ -68,14 +68,14 @@ export function CreateQCMModal({
       size="4xl"
       onClose={isSubmitting || isPolling ? undefined : onClose}
     >
-      <ModalContent>
+      <ModalContent className="max-h-[90vh] flex flex-col">
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <h2 className="text-xl font-semibold">Générer un nouveau QCM</h2>
           </div>
         </ModalHeader>
-        <ModalBody>
+        <ModalBody className="flex-1 overflow-y-auto">
           <QCMGenerateForm
             formRef={formRef}
             isModal={true}

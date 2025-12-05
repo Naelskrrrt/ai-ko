@@ -77,15 +77,25 @@ export function DetailEleveModal({
   const eleve = eleveData;
 
   return (
-    <Modal isOpen={isOpen} scrollBehavior="inside" size="3xl" onClose={onClose}>
-      <ModalContent>
+    <Modal
+      classNames={{
+        base: "max-h-[90vh]",
+        header: "flex-shrink-0",
+        body: "overflow-y-auto",
+      }}
+      isOpen={isOpen}
+      scrollBehavior="inside"
+      size="3xl"
+      onClose={onClose}
+    >
+      <ModalContent className="max-h-[90vh] flex flex-col">
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <User className="h-5 w-5" />
             <span>Détails de l'élève</span>
           </div>
         </ModalHeader>
-        <ModalBody>
+        <ModalBody className="flex-1 overflow-y-auto">
           <div className="space-y-6">
             {/* Informations personnelles */}
             <Card className="border-none shadow-sm">
