@@ -388,7 +388,11 @@ class MesMatieres(Resource):
             if not user or user.role != UserRole.ETUDIANT:
                 api.abort(403, "Accès réservé aux étudiants")
             
-            matieres = [m.to_dict() for m in user.matieres_etudiees.filter_by(actif=True).all()]
+            # Récupérer le profil étudiant pour accéder aux matières
+            if not user.etudiant_profil:
+                return [], 200
+            
+            matieres = [m.to_dict() for m in user.etudiant_profil.matieres.filter_by(actif=True).all()]
             return matieres, 200
         except Exception as e:
             logger.error(f"Erreur récupération matières étudiant: {e}", exc_info=True)
@@ -444,7 +448,9 @@ class MesMatieres(Resource):
             
             # Retourner les matières mises à jour
             user = user_repo.get_by_id(user_id)  # Recharger pour avoir les nouvelles relations
-            matieres = [m.to_dict() for m in user.matieres_etudiees.filter_by(actif=True).all()]
+            if not user.etudiant_profil:
+                return [], 200
+            matieres = [m.to_dict() for m in user.etudiant_profil.matieres.filter_by(actif=True).all()]
             return matieres, 200
             
         except Exception as e:

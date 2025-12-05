@@ -654,7 +654,10 @@ class EnvoyerAuxEleves(Resource):
             
             nombre_etudiants = 0
             for etudiant in etudiants:
-                matieres = etudiant.matieres_etudiees.filter_by(actif=True).all()
+                # Utiliser le profil étudiant pour accéder aux matières
+                if not etudiant.etudiant_profil:
+                    continue
+                matieres = etudiant.etudiant_profil.matieres.filter_by(actif=True).all()
                 matieres_ids = [m.id for m in matieres]
                 if qcm_obj.matiere_id in matieres_ids:
                     nombre_etudiants += 1

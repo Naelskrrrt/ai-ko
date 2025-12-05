@@ -34,8 +34,13 @@ class QCMEtudiantService:
             logger.warning(f"Étudiant {etudiant_id} non trouvé ou n'est pas un étudiant")
             return []
         
+        # Récupérer le profil étudiant pour accéder aux matières
+        if not etudiant.etudiant_profil:
+            logger.warning(f"Étudiant {etudiant_id} n'a pas de profil étudiant")
+            return []
+        
         # Récupérer les matières suivies par l'étudiant (actives uniquement)
-        matieres = etudiant.matieres_etudiees.filter_by(actif=True).all()
+        matieres = etudiant.etudiant_profil.matieres.filter_by(actif=True).all()
         matieres_ids = [m.id for m in matieres]
         
         logger.info(f"Étudiant {etudiant_id} suit {len(matieres_ids)} matière(s): {[m.nom for m in matieres]}")
@@ -73,6 +78,10 @@ class QCMEtudiantService:
         if not qcm.matiere_id:
             return False
         
-        matieres_ids = [m.id for m in etudiant.matieres_etudiees.filter_by(actif=True).all()]
+        # Vérifier via le profil étudiant
+        if not etudiant.etudiant_profil:
+            return False
+        
+        matieres_ids = [m.id for m in etudiant.etudiant_profil.matieres.filter_by(actif=True).all()]
         return qcm.matiere_id in matieres_ids
 
