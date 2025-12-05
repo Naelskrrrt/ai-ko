@@ -27,9 +27,9 @@ COPY . .
 EXPOSE 5000
 
 # Commande de démarrage - shell form pour interpréter $PORT
-# - workers 2 : permet de gérer plusieurs requêtes simultanées
-# - threads 2 : threads par worker pour meilleure concurrence
-# - timeout 120 : timeout raisonnable
+# - workers 1 : IMPORTANT - un seul worker pour que le task_manager en mémoire fonctionne
+#               (les tâches asynchrones sont stockées en mémoire, pas en Redis)
+# - threads 4 : threads par worker pour gérer la concurrence
+# - timeout 180 : timeout plus long pour la génération de QCM
 # - keep-alive 5 : maintient les connexions
-# - preload : charge l'app avant de forker (économise la mémoire)
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --threads 2 --timeout 120 --keep-alive 5 --preload run:app"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --threads 4 --timeout 180 --keep-alive 5 run:app"]

@@ -1,5 +1,6 @@
 # Procfile pour Railway/Heroku
-web: gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --preload run:app
+# IMPORTANT: 1 worker car le task_manager utilise la mémoire partagée (pas Redis)
+web: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 180 run:app
 
 
 
