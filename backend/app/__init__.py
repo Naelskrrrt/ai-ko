@@ -205,12 +205,16 @@ def create_app(config=None):
     from app.api.admin import bp as admin_bp
     from app.api.seed import bp as seed_bp
     from app.api.referentiels import bp as referentiels_bp
+    from app.api.qcm_api import bp as qcm_api_bp
+    from app.api.users_api import bp as users_api_bp
     app.register_blueprint(health_bp, url_prefix='/api')
     app.register_blueprint(auth_bp)
     app.register_blueprint(docs_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(seed_bp, url_prefix='/api')
     app.register_blueprint(referentiels_bp)  # Niveaux et Matières
+    app.register_blueprint(qcm_api_bp)  # QCM étudiant, QCM, résultats, sessions
+    app.register_blueprint(users_api_bp)  # Enseignants, Étudiants, Classes
 
     # Importer les événements WebSocket (nécessaire pour enregistrer les handlers)
     from app.events import notifications

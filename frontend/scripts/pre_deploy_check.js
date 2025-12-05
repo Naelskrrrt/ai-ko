@@ -7,6 +7,12 @@
  *   node scripts/pre_deploy_check.js
  *   pnpm pre-deploy-check
  * 
+ * Options:
+ *   --skip-build     Ignorer le build Next.js
+ *   --skip-api       Ignorer la vérification des endpoints API
+ *   --api-url=URL    URL de l'API backend pour les tests
+ *   --production     Tester avec l'URL de production
+ * 
  * Ce script doit passer AVANT tout push vers main.
  */
 
@@ -18,10 +24,20 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Parse arguments
+const args = process.argv.slice(2);
+const hasFlag = (name) => args.includes(`--${name}`);
+const getArg = (name) => {
+  const arg = args.find(a => a.startsWith(`--${name}=`));
+  return arg ? arg.split('=')[1] : null;
+};
+
 // Couleurs pour l'affichage
 const RED = '\x1b[91m';
 const GREEN = '\x1b[92m';
 const YELLOW = '\x1b[93m';
+const CYAN = '\x1b[96m';
+const BOLD = '\x1b[1m';
 const RESET = '\x1b[0m';
 
 function printError(msg) {
@@ -253,11 +269,58 @@ function checkDependencies() {
 }
 
 /**
+ * Analyse statique du code backend pour détecter les problèmes d'API
+ */
+function checkBackendCode() {
+  console.log('\n📄 Analyse statique du code Backend...');
+  
+  const skipApi = hasFlag('skip-api');
+  if (skipApi) {
+    printWarning('Analyse Backend ignorée (--skip-api)');
+    return { success: true, skipped: true };
+  }
+  
+  const backendDir = path.join(__dirname, '..', '..', 'backend');
+  
+  if (!fs.existsSync(backendDir)) {
+    printWarning(`Backend non trouvé: ${backendDir}`);
+    return { success: true, skipped: true };
+  }
+  
+  // Exécuter le script d'analyse
+  const result = runCommand('node scripts/check_api_endpoints.js', { silent: true });
+  
+  if (result.success) {
+    printSuccess('Analyse Backend: Aucun problème critique');
+    return { success: true };
+  } else {
+    const output = result.output || result.error || '';
+    
+    // Vérifier s'il y a des namespaces non enregistrés (critique)
+    if (output.includes('namespace(s) non enregistré')) {
+      printError('Namespaces non enregistrés détectés dans le backend');
+      printInfo('Exécutez: pnpm check-api --verbose pour plus de détails');
+      return { success: false, critical: true };
+    }
+    
+    // Warnings pour les endpoints manquants
+    if (output.includes('potentiellement manquant')) {
+      printWarning('Endpoints potentiellement manquants (vérification recommandée)');
+      printInfo('Exécutez: pnpm check-api --verbose pour plus de détails');
+      return { success: true, warnings: true };
+    }
+    
+    printSuccess('Analyse Backend terminée');
+    return { success: true };
+  }
+}
+
+/**
  * Fonction principale
  */
-async function main() {
+function main() {
   console.log('\n' + '='.repeat(60));
-  console.log('🔍 VÉRIFICATION PRÉ-DÉPLOIEMENT FRONTEND');
+  console.log(`${BOLD}${CYAN}🔍 VÉRIFICATION PRÉ-DÉPLOIEMENT FRONTEND${RESET}`);
   console.log('='.repeat(60));
   
   // Changer vers le répertoire frontend
@@ -272,8 +335,12 @@ async function main() {
   const tsOk = checkTypeScript();
   const lintOk = checkESLint();
   
+  // Analyse statique du code backend
+  const backendResult = checkBackendCode();
+  const backendOk = backendResult.success || backendResult.skipped;
+  
   // Le build est optionnel car il prend du temps
-  const skipBuild = process.argv.includes('--skip-build');
+  const skipBuild = hasFlag('skip-build');
   let buildOk = true;
   
   if (skipBuild) {
@@ -286,9 +353,14 @@ async function main() {
   // Résultat final
   console.log('\n' + '='.repeat(60));
   
-  if (!hasErrors && tsOk && lintOk && buildOk) {
-    printSuccess('TOUTES LES VÉRIFICATIONS PASSÉES ✅');
-    console.log('   Le frontend est prêt pour le déploiement.');
+  if (!hasErrors && tsOk && lintOk && buildOk && backendOk) {
+    if (backendResult.warnings) {
+      printWarning('VÉRIFICATIONS PASSÉES (avec warnings backend) ⚠️');
+      console.log('   Vérifiez les endpoints backend avant le déploiement.');
+    } else {
+      printSuccess('TOUTES LES VÉRIFICATIONS PASSÉES ✅');
+      console.log('   Le frontend est prêt pour le déploiement.');
+    }
     console.log('='.repeat(60) + '\n');
     process.exit(0);
   } else {
@@ -299,7 +371,9 @@ async function main() {
   }
 }
 
-main().catch(err => {
+try {
+  main();
+} catch (err) {
   printError(`Erreur inattendue: ${err.message}`);
   process.exit(1);
-});
+}

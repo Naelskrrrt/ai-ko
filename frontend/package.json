@@ -11,6 +11,8 @@
     "type-check": "tsc --noEmit",
     "pre-deploy-check": "node scripts/pre_deploy_check.js",
     "pre-deploy-check:quick": "node scripts/pre_deploy_check.js --skip-build",
+    "check-api": "node scripts/check_api_endpoints.js",
+    "check-api:verbose": "node scripts/check_api_endpoints.js --verbose",
     "ngrok:frontend": "node scripts/ngrok-frontend.js",
     "ngrok:backend": "node scripts/ngrok-backend.js"
   },

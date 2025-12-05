@@ -1,0 +1,2567 @@
+{
+  "timestamp": "2025-12-05T03:10:46.741Z",
+  "summary": {
+    "backendRoutes": 119,
+    "backendNamespaces": 13,
+    "frontendAPICalls": 104,
+    "issues": {
+      "missingBackendRoutes": 45,
+      "unregisteredNamespaces": 0,
+      "unregisteredBlueprints": 0
+    }
+  },
+  "issues": {
+    "missingBackendRoutes": [
+      {
+        "method": "GET",
+        "endpoint": "/api/auth/oauth/google",
+        "files": [
+          "src\\app\\(auth)\\login\\page.tsx",
+          "src\\app\\api\\auth\\oauth\\google\\route.ts",
+          "src\\app\\api\\test-backend\\route.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "files": [
+          "src\\app\\api\\auth\\login\\route.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/logout",
+        "files": [
+          "src\\app\\api\\auth\\logout\\route.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/refresh",
+        "files": [
+          "src\\app\\api\\auth\\refresh\\route.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/auth/me",
+        "files": [
+          "src\\app\\api\\auth\\session\\route.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/health",
+        "files": [
+          "src\\app\\api\\test-backend\\route.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/auth/refresh",
+        "files": [
+          "src\\app\\api\\[...path]\\route.ts"
+        ]
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/auth/me",
+        "files": [
+          "src\\components\\modals\\CompleteProfileModal.tsx"
+        ]
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/enseignant/me",
+        "files": [
+          "src\\components\\modals\\CompleteProfileModal.tsx"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/matieres",
+        "files": [
+          "src\\features\\enseignant\\services\\enseignant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/niveaux",
+        "files": [
+          "src\\features\\enseignant\\services\\enseignant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/classes",
+        "files": [
+          "src\\features\\enseignant\\services\\enseignant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/qcm",
+        "files": [
+          "src\\features\\enseignant\\services\\qcm.service.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/qcm",
+        "files": [
+          "src\\features\\enseignant\\services\\qcm.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/sessions",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/sessions/:param",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/sessions",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/sessions/:param",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/sessions/:param",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "endpoint": "/api/sessions/:param/demarrer",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "endpoint": "/api/sessions/:param/terminer",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "endpoint": "/api/sessions/:param/pause",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "endpoint": "/api/sessions/:param/reprendre",
+        "files": [
+          "src\\features\\enseignant\\services\\session.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/users/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/etudiants/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/professeurs/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/ai-configs/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/admin/pending-users",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/admin/users/:param/activate",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/admin/users/:param/reject",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/auth/logout",
+        "files": [
+          "src\\shared\\services\\api\\auth.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/etudiants/me",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/etudiants/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/etudiants/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/etudiants/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/etudiants/:param/matieres",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/etudiants/:param/matieres/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/etudiants/:param/matieres/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/etudiants/:param/classes",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/etudiants/:param/classes/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/etudiants/mention/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/etudiants/parcours/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/etudiants/niveau/:param",
+        "files": [
+          "src\\shared\\services\\api\\etudiant.service.ts"
+        ]
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/matieres/:param",
+        "files": [
+          "src\\shared\\services\\api\\matiere.service.ts"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/matieres/:param",
+        "files": [
+          "src\\shared\\services\\api\\matiere.service.ts"
+        ]
+      }
+    ],
+    "unregisteredNamespaces": [],
+    "unregisteredBlueprints": []
+  },
+  "backendNamespaces": {
+    "classe": {
+      "name": "classes",
+      "file": "classe.py",
+      "registered": true,
+      "prefix": "/classes",
+      "registeredIn": "users_api.py"
+    },
+    "correction": {
+      "name": "correction",
+      "file": "correction.py",
+      "registered": true,
+      "prefix": "/correction",
+      "registeredIn": "qcm_api.py"
+    },
+    "enseignant": {
+      "name": "enseignants",
+      "file": "enseignant.py",
+      "registered": true,
+      "prefix": "/enseignants",
+      "registeredIn": "users_api.py"
+    },
+    "etablissement": {
+      "name": "etablissements",
+      "file": "etablissement.py",
+      "registered": true,
+      "prefix": "/etablissements",
+      "registeredIn": "referentiels.py"
+    },
+    "etudiant": {
+      "name": "etudiants",
+      "file": "etudiant.py",
+      "registered": true,
+      "prefix": "/etudiants",
+      "registeredIn": "users_api.py"
+    },
+    "matiere": {
+      "name": "matieres",
+      "file": "matiere.py",
+      "registered": true,
+      "prefix": "/matieres",
+      "registeredIn": "referentiels.py"
+    },
+    "mention": {
+      "name": "mentions",
+      "file": "mention.py",
+      "registered": true,
+      "prefix": "/mentions",
+      "registeredIn": "referentiels.py"
+    },
+    "niveau": {
+      "name": "niveaux",
+      "file": "niveau.py",
+      "registered": true,
+      "prefix": "/niveaux",
+      "registeredIn": "referentiels.py"
+    },
+    "parcours": {
+      "name": "parcours",
+      "file": "parcours.py",
+      "registered": true,
+      "prefix": "/parcours",
+      "registeredIn": "referentiels.py"
+    },
+    "qcm": {
+      "name": "qcm",
+      "file": "qcm.py",
+      "registered": true,
+      "prefix": "/qcm",
+      "registeredIn": "qcm_api.py"
+    },
+    "qcm_etudiant": {
+      "name": "qcm-etudiant",
+      "file": "qcm_etudiant.py",
+      "registered": true,
+      "prefix": "/qcm-etudiant",
+      "registeredIn": "qcm_api.py"
+    },
+    "resultat": {
+      "name": "resultats",
+      "file": "resultat.py",
+      "registered": true,
+      "prefix": "/resultats",
+      "registeredIn": "qcm_api.py"
+    },
+    "session_examen": {
+      "name": "sessions",
+      "file": "session_examen.py",
+      "registered": true,
+      "prefix": "/sessions-examen",
+      "registeredIn": "qcm_api.py"
+    }
+  },
+  "backendRoutes": {
+    "admin:/users": {
+      "path": "/users",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/users/<user_id>": {
+      "path": "/users/<user_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/users/<user_id>/role": {
+      "path": "/users/<user_id>/role",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/users/<user_id>/status": {
+      "path": "/users/<user_id>/status",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/qcm": {
+      "path": "/qcm",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/qcm/<qcm_id>": {
+      "path": "/qcm/<qcm_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/questions": {
+      "path": "/questions",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/questions/<question_id>": {
+      "path": "/questions/<question_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/statistics/dashboard": {
+      "path": "/statistics/dashboard",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/statistics/metrics": {
+      "path": "/statistics/metrics",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/statistics/users-by-role": {
+      "path": "/statistics/users-by-role",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/statistics/qcms-by-status": {
+      "path": "/statistics/qcms-by-status",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/etudiants": {
+      "path": "/etudiants",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/etudiants/<etudiant_id>": {
+      "path": "/etudiants/<etudiant_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/etudiants/<etudiant_id>/assign": {
+      "path": "/etudiants/<etudiant_id>/assign",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/professeurs": {
+      "path": "/professeurs",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/professeurs/<professeur_id>": {
+      "path": "/professeurs/<professeur_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/professeurs/<professeur_id>/assign": {
+      "path": "/professeurs/<professeur_id>/assign",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/matieres/<matiere_id>/professeurs": {
+      "path": "/matieres/<matiere_id>/professeurs",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/ai-configs": {
+      "path": "/ai-configs",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/ai-configs/default": {
+      "path": "/ai-configs/default",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/ai-configs/<config_id>": {
+      "path": "/ai-configs/<config_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/ai-configs/<config_id>/set-default": {
+      "path": "/ai-configs/<config_id>/set-default",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/ai-configs/<config_id>/apply": {
+      "path": "/ai-configs/<config_id>/apply",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/ai-configs/init-defaults": {
+      "path": "/ai-configs/init-defaults",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/sessions": {
+      "path": "/sessions",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/sessions/<session_id>": {
+      "path": "/sessions/<session_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/resultats": {
+      "path": "/resultats",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/resultats/<resultat_id>": {
+      "path": "/resultats/<resultat_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/resultats/stats": {
+      "path": "/resultats/stats",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/pending-users": {
+      "path": "/pending-users",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/users/<user_id>/activate": {
+      "path": "/users/<user_id>/activate",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/users/<user_id>/reject": {
+      "path": "/users/<user_id>/reject",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "admin:/notifications": {
+      "path": "/notifications",
+      "methods": [
+        "GET"
+      ],
+      "file": "admin.py",
+      "namespace": null,
+      "module": "admin"
+    },
+    "auth:/register": {
+      "path": "/register",
+      "methods": [
+        "GET"
+      ],
+      "file": "auth.py",
+      "namespace": null,
+      "module": "auth"
+    },
+    "auth:/login": {
+      "path": "/login",
+      "methods": [
+        "GET"
+      ],
+      "file": "auth.py",
+      "namespace": null,
+      "module": "auth"
+    },
+    "auth:/logout": {
+      "path": "/logout",
+      "methods": [
+        "GET"
+      ],
+      "file": "auth.py",
+      "namespace": null,
+      "module": "auth"
+    },
+    "auth:/me": {
+      "path": "/me",
+      "methods": [
+        "GET"
+      ],
+      "file": "auth.py",
+      "namespace": null,
+      "module": "auth"
+    },
+    "auth:/complete-profile": {
+      "path": "/complete-profile",
+      "methods": [
+        "GET"
+      ],
+      "file": "auth.py",
+      "namespace": null,
+      "module": "auth"
+    },
+    "auth:/oauth/google": {
+      "path": "/oauth/google",
+      "methods": [
+        "GET"
+      ],
+      "file": "auth.py",
+      "namespace": null,
+      "module": "auth"
+    },
+    "auth:/oauth/google/callback": {
+      "path": "/oauth/google/callback",
+      "methods": [
+        "GET"
+      ],
+      "file": "auth.py",
+      "namespace": null,
+      "module": "auth"
+    },
+    "classe:/<string:classe_id>": {
+      "path": "/<string:classe_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "classe.py",
+      "namespace": "classes",
+      "module": "classe"
+    },
+    "classe:/niveau/<string:niveau_id>": {
+      "path": "/niveau/<string:niveau_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "classe.py",
+      "namespace": "classes",
+      "module": "classe"
+    },
+    "correction:/submit": {
+      "path": "/submit",
+      "methods": [
+        "POST"
+      ],
+      "file": "correction.py",
+      "namespace": "correction",
+      "module": "correction"
+    },
+    "correction:/batch": {
+      "path": "/batch",
+      "methods": [
+        "POST"
+      ],
+      "file": "correction.py",
+      "namespace": "correction",
+      "module": "correction"
+    },
+    "correction:/tasks/<string:task_id>": {
+      "path": "/tasks/<string:task_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "correction.py",
+      "namespace": "correction",
+      "module": "correction"
+    },
+    "enseignant:/me": {
+      "path": "/me",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/statistiques": {
+      "path": "/<string:enseignant_id>/statistiques",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>": {
+      "path": "/<string:enseignant_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/matieres": {
+      "path": "/<string:enseignant_id>/matieres",
+      "methods": [
+        "GET",
+        "PUT"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/matieres/<string:matiere_id>": {
+      "path": "/<string:enseignant_id>/matieres/<string:matiere_id>",
+      "methods": [
+        "POST",
+        "DELETE"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/niveaux": {
+      "path": "/<string:enseignant_id>/niveaux",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/niveaux/<string:niveau_id>": {
+      "path": "/<string:enseignant_id>/niveaux/<string:niveau_id>",
+      "methods": [
+        "POST"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/parcours": {
+      "path": "/<string:enseignant_id>/parcours",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/parcours/<string:parcours_id>": {
+      "path": "/<string:enseignant_id>/parcours/<string:parcours_id>",
+      "methods": [
+        "POST"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/mentions": {
+      "path": "/<string:enseignant_id>/mentions",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/etablissement/<string:etablissement_id>": {
+      "path": "/etablissement/<string:etablissement_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/etudiants": {
+      "path": "/<string:enseignant_id>/etudiants",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "enseignant:/<string:enseignant_id>/etudiants/export-pdf": {
+      "path": "/<string:enseignant_id>/etudiants/export-pdf",
+      "methods": [
+        "GET"
+      ],
+      "file": "enseignant.py",
+      "namespace": "enseignants",
+      "module": "enseignant"
+    },
+    "etablissement:/<string:etablissement_id>": {
+      "path": "/<string:etablissement_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "etablissement.py",
+      "namespace": "etablissements",
+      "module": "etablissement"
+    },
+    "etablissement:/type/<string:type_etablissement>": {
+      "path": "/type/<string:type_etablissement>",
+      "methods": [
+        "GET"
+      ],
+      "file": "etablissement.py",
+      "namespace": "etablissements",
+      "module": "etablissement"
+    },
+    "health:/health": {
+      "path": "/health",
+      "methods": [
+        "GET"
+      ],
+      "file": "health.py",
+      "namespace": null,
+      "module": "health"
+    },
+    "health:/health/detailed": {
+      "path": "/health/detailed",
+      "methods": [
+        "GET"
+      ],
+      "file": "health.py",
+      "namespace": null,
+      "module": "health"
+    },
+    "health:/health/ready": {
+      "path": "/health/ready",
+      "methods": [
+        "GET"
+      ],
+      "file": "health.py",
+      "namespace": null,
+      "module": "health"
+    },
+    "health:/health/live": {
+      "path": "/health/live",
+      "methods": [
+        "GET"
+      ],
+      "file": "health.py",
+      "namespace": null,
+      "module": "health"
+    },
+    "matiere:/<string:matiere_id>": {
+      "path": "/<string:matiere_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "matiere.py",
+      "namespace": "matieres",
+      "module": "matiere"
+    },
+    "mention:/<string:mention_id>": {
+      "path": "/<string:mention_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "mention.py",
+      "namespace": "mentions",
+      "module": "mention"
+    },
+    "mention:/etablissement/<string:etablissement_id>": {
+      "path": "/etablissement/<string:etablissement_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "mention.py",
+      "namespace": "mentions",
+      "module": "mention"
+    },
+    "niveau:/<string:niveau_id>": {
+      "path": "/<string:niveau_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "niveau.py",
+      "namespace": "niveaux",
+      "module": "niveau"
+    },
+    "niveau:/cycle/<string:cycle>": {
+      "path": "/cycle/<string:cycle>",
+      "methods": [
+        "GET"
+      ],
+      "file": "niveau.py",
+      "namespace": "niveaux",
+      "module": "niveau"
+    },
+    "parcours:/<string:parcours_id>": {
+      "path": "/<string:parcours_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "parcours.py",
+      "namespace": "parcours",
+      "module": "parcours"
+    },
+    "parcours:/mention/<string:mention_id>": {
+      "path": "/mention/<string:mention_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "parcours.py",
+      "namespace": "parcours",
+      "module": "parcours"
+    },
+    "qcm:/<string:qcm_id>": {
+      "path": "/<string:qcm_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/generate/text": {
+      "path": "/generate/text",
+      "methods": [
+        "POST"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/generate/document": {
+      "path": "/generate/document",
+      "methods": [
+        "POST"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/tasks/<string:task_id>": {
+      "path": "/tasks/<string:task_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/<string:qcm_id>/publish": {
+      "path": "/<string:qcm_id>/publish",
+      "methods": [
+        "PATCH"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/<string:qcm_id>/envoyer_aux_eleves": {
+      "path": "/<string:qcm_id>/envoyer_aux_eleves",
+      "methods": [
+        "POST"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/<string:qcm_id>/questions": {
+      "path": "/<string:qcm_id>/questions",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/<string:qcm_id>/questions/<string:question_id>": {
+      "path": "/<string:qcm_id>/questions/<string:question_id>",
+      "methods": [
+        "PUT",
+        "DELETE"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm:/<string:qcm_id>/statistiques": {
+      "path": "/<string:qcm_id>/statistiques",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm.py",
+      "namespace": "qcm",
+      "module": "qcm"
+    },
+    "qcm_etudiant:/disponibles": {
+      "path": "/disponibles",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "qcm_etudiant:/<string:qcm_id>": {
+      "path": "/<string:qcm_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "qcm_etudiant:/<string:qcm_id>/acces": {
+      "path": "/<string:qcm_id>/acces",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "qcm_etudiant:/<string:qcm_id>/demarrer": {
+      "path": "/<string:qcm_id>/demarrer",
+      "methods": [
+        "POST"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "qcm_etudiant:/<string:qcm_id>/soumettre": {
+      "path": "/<string:qcm_id>/soumettre",
+      "methods": [
+        "POST"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "qcm_etudiant:/resultat/<string:resultat_id>": {
+      "path": "/resultat/<string:resultat_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "qcm_etudiant:/matieres": {
+      "path": "/matieres",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "qcm_etudiant:/matieres/mes-matieres": {
+      "path": "/matieres/mes-matieres",
+      "methods": [
+        "GET"
+      ],
+      "file": "qcm_etudiant.py",
+      "namespace": "qcm-etudiant",
+      "module": "qcm_etudiant"
+    },
+    "resultat:/<string:resultat_id>": {
+      "path": "/<string:resultat_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/session/<string:session_id>/etudiant": {
+      "path": "/session/<string:session_id>/etudiant",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/session/<string:session_id>": {
+      "path": "/session/<string:session_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/demarrer": {
+      "path": "/demarrer",
+      "methods": [
+        "POST"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/temps-restant": {
+      "path": "/<string:resultat_id>/temps-restant",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/soumettre": {
+      "path": "/<string:resultat_id>/soumettre",
+      "methods": [
+        "POST"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/commentaire": {
+      "path": "/<string:resultat_id>/commentaire",
+      "methods": [
+        "POST"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/regenerer-commentaire": {
+      "path": "/<string:resultat_id>/regenerer-commentaire",
+      "methods": [
+        "POST"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/etudiant/<string:etudiant_id>": {
+      "path": "/etudiant/<string:etudiant_id>",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/session/<string:session_id>/statistiques": {
+      "path": "/session/<string:session_id>/statistiques",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/etudiant/<string:etudiant_id>/statistiques": {
+      "path": "/etudiant/<string:etudiant_id>/statistiques",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/etudiant/<string:etudiant_id>/stats": {
+      "path": "/etudiant/<string:etudiant_id>/stats",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/etudiant/<string:etudiant_id>/recent": {
+      "path": "/etudiant/<string:etudiant_id>/recent",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/etudiant/<string:etudiant_id>/historique": {
+      "path": "/etudiant/<string:etudiant_id>/historique",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/publier": {
+      "path": "/<string:resultat_id>/publier",
+      "methods": [
+        "POST"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/depublier": {
+      "path": "/<string:resultat_id>/depublier",
+      "methods": [
+        "POST"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/session/<string:session_id>/publier-tous": {
+      "path": "/session/<string:session_id>/publier-tous",
+      "methods": [
+        "POST"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/export-pdf": {
+      "path": "/<string:resultat_id>/export-pdf",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/session/<string:session_id>/export-pdf": {
+      "path": "/session/<string:session_id>/export-pdf",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "resultat:/<string:resultat_id>/details-etudiant": {
+      "path": "/<string:resultat_id>/details-etudiant",
+      "methods": [
+        "GET"
+      ],
+      "file": "resultat.py",
+      "namespace": "resultats",
+      "module": "resultat"
+    },
+    "seed:/seed/init-db": {
+      "path": "/seed/init-db",
+      "methods": [
+        "GET"
+      ],
+      "file": "seed.py",
+      "namespace": null,
+      "module": "seed"
+    },
+    "seed:/seed/enrichir": {
+      "path": "/seed/enrichir",
+      "methods": [
+        "GET"
+      ],
+      "file": "seed.py",
+      "namespace": null,
+      "module": "seed"
+    },
+    "seed:/seed/users": {
+      "path": "/seed/users",
+      "methods": [
+        "GET"
+      ],
+      "file": "seed.py",
+      "namespace": null,
+      "module": "seed"
+    },
+    "session_examen:/<string:session_id>": {
+      "path": "/<string:session_id>",
+      "methods": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ],
+      "file": "session_examen.py",
+      "namespace": "sessions",
+      "module": "session_examen"
+    },
+    "session_examen:/<string:session_id>/demarrer": {
+      "path": "/<string:session_id>/demarrer",
+      "methods": [
+        "PATCH"
+      ],
+      "file": "session_examen.py",
+      "namespace": "sessions",
+      "module": "session_examen"
+    },
+    "session_examen:/<string:session_id>/terminer": {
+      "path": "/<string:session_id>/terminer",
+      "methods": [
+        "PATCH"
+      ],
+      "file": "session_examen.py",
+      "namespace": "sessions",
+      "module": "session_examen"
+    },
+    "session_examen:/<string:session_id>/pause": {
+      "path": "/<string:session_id>/pause",
+      "methods": [
+        "PATCH"
+      ],
+      "file": "session_examen.py",
+      "namespace": "sessions",
+      "module": "session_examen"
+    },
+    "session_examen:/<string:session_id>/reprendre": {
+      "path": "/<string:session_id>/reprendre",
+      "methods": [
+        "PATCH"
+      ],
+      "file": "session_examen.py",
+      "namespace": "sessions",
+      "module": "session_examen"
+    },
+    "session_examen:/disponibles": {
+      "path": "/disponibles",
+      "methods": [
+        "GET"
+      ],
+      "file": "session_examen.py",
+      "namespace": "sessions",
+      "module": "session_examen"
+    },
+    "session_examen:/<string:session_id>/questions": {
+      "path": "/<string:session_id>/questions",
+      "methods": [
+        "GET"
+      ],
+      "file": "session_examen.py",
+      "namespace": "sessions",
+      "module": "session_examen"
+    }
+  },
+  "frontendAPICalls": {
+    "GET:/api/auth/oauth/google": {
+      "method": "GET",
+      "endpoint": "/api/auth/oauth/google",
+      "originalEndpoints": [
+        "/api/auth/oauth/google"
+      ],
+      "files": [
+        "src\\app\\(auth)\\login\\page.tsx",
+        "src\\app\\api\\auth\\oauth\\google\\route.ts",
+        "src\\app\\api\\test-backend\\route.ts"
+      ]
+    },
+    "POST:/auth/login": {
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "originalEndpoints": [
+        "/auth/login"
+      ],
+      "files": [
+        "src\\app\\api\\auth\\login\\route.ts"
+      ]
+    },
+    "POST:/auth/logout": {
+      "method": "POST",
+      "endpoint": "/auth/logout",
+      "originalEndpoints": [
+        "/auth/logout"
+      ],
+      "files": [
+        "src\\app\\api\\auth\\logout\\route.ts"
+      ]
+    },
+    "POST:/auth/refresh": {
+      "method": "POST",
+      "endpoint": "/auth/refresh",
+      "originalEndpoints": [
+        "/auth/refresh"
+      ],
+      "files": [
+        "src\\app\\api\\auth\\refresh\\route.ts"
+      ]
+    },
+    "GET:/auth/me": {
+      "method": "GET",
+      "endpoint": "/auth/me",
+      "originalEndpoints": [
+        "/auth/me"
+      ],
+      "files": [
+        "src\\app\\api\\auth\\session\\route.ts"
+      ]
+    },
+    "GET:/api/health": {
+      "method": "GET",
+      "endpoint": "/api/health",
+      "originalEndpoints": [
+        "/api/health"
+      ],
+      "files": [
+        "src\\app\\api\\test-backend\\route.ts"
+      ]
+    },
+    "POST:/api/auth/refresh": {
+      "method": "POST",
+      "endpoint": "/api/auth/refresh",
+      "originalEndpoints": [
+        "/api/auth/refresh"
+      ],
+      "files": [
+        "src\\app\\api\\[...path]\\route.ts"
+      ]
+    },
+    "PUT:/api/auth/me": {
+      "method": "PUT",
+      "endpoint": "/api/auth/me",
+      "originalEndpoints": [
+        "/api/auth/me"
+      ],
+      "files": [
+        "src\\components\\modals\\CompleteProfileModal.tsx"
+      ]
+    },
+    "PUT:/api/enseignant/me": {
+      "method": "PUT",
+      "endpoint": "/api/enseignant/me",
+      "originalEndpoints": [
+        "/api/enseignant/me"
+      ],
+      "files": [
+        "src\\components\\modals\\CompleteProfileModal.tsx"
+      ]
+    },
+    "GET:/api/enseignants/me": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/me",
+      "originalEndpoints": [
+        "/api/enseignants/me"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\enseignant.service.ts",
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param/statistiques": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param/statistiques",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/statistiques"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/matieres": {
+      "method": "GET",
+      "endpoint": "/api/matieres",
+      "originalEndpoints": [
+        "/api/matieres"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/niveaux": {
+      "method": "GET",
+      "endpoint": "/api/niveaux",
+      "originalEndpoints": [
+        "/api/niveaux"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/classes": {
+      "method": "GET",
+      "endpoint": "/api/classes",
+      "originalEndpoints": [
+        "/api/classes"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/qcm": {
+      "method": "GET",
+      "endpoint": "/api/qcm",
+      "originalEndpoints": [
+        "/api/qcm"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "GET:/api/qcm/:param": {
+      "method": "GET",
+      "endpoint": "/api/qcm/:param",
+      "originalEndpoints": [
+        "/api/qcm/${id}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "POST:/api/qcm": {
+      "method": "POST",
+      "endpoint": "/api/qcm",
+      "originalEndpoints": [
+        "/api/qcm"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "PUT:/api/qcm/:param": {
+      "method": "PUT",
+      "endpoint": "/api/qcm/:param",
+      "originalEndpoints": [
+        "/api/qcm/${id}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "DELETE:/api/qcm/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/qcm/:param",
+      "originalEndpoints": [
+        "/api/qcm/${id}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "PATCH:/api/qcm/:param/publish": {
+      "method": "PATCH",
+      "endpoint": "/api/qcm/:param/publish",
+      "originalEndpoints": [
+        "/api/qcm/${id}/publish"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "POST:/api/qcm/:param/envoyer_aux_eleves": {
+      "method": "POST",
+      "endpoint": "/api/qcm/:param/envoyer_aux_eleves",
+      "originalEndpoints": [
+        "/api/qcm/${id}/envoyer_aux_eleves"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "GET:/api/qcm/:param/questions": {
+      "method": "GET",
+      "endpoint": "/api/qcm/:param/questions",
+      "originalEndpoints": [
+        "/api/qcm/${qcmId}/questions"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "POST:/api/qcm/:param/questions": {
+      "method": "POST",
+      "endpoint": "/api/qcm/:param/questions",
+      "originalEndpoints": [
+        "/api/qcm/${qcmId}/questions"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "PUT:/api/qcm/:param/questions/:param": {
+      "method": "PUT",
+      "endpoint": "/api/qcm/:param/questions/:param",
+      "originalEndpoints": [
+        "/api/qcm/${qcmId}/questions/${questionId}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "DELETE:/api/qcm/:param/questions/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/qcm/:param/questions/:param",
+      "originalEndpoints": [
+        "/api/qcm/${qcmId}/questions/${questionId}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "POST:/api/qcm/generate/text": {
+      "method": "POST",
+      "endpoint": "/api/qcm/generate/text",
+      "originalEndpoints": [
+        "/api/qcm/generate/text"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "POST:/api/qcm/generate/document": {
+      "method": "POST",
+      "endpoint": "/api/qcm/generate/document",
+      "originalEndpoints": [
+        "/api/qcm/generate/document"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "GET:/api/qcm/tasks/:param": {
+      "method": "GET",
+      "endpoint": "/api/qcm/tasks/:param",
+      "originalEndpoints": [
+        "/api/qcm/tasks/${taskId}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "GET:/api/qcm/:param/statistiques": {
+      "method": "GET",
+      "endpoint": "/api/qcm/:param/statistiques",
+      "originalEndpoints": [
+        "/api/qcm/${qcmId}/statistiques"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\qcm.service.ts"
+      ]
+    },
+    "GET:/api/sessions": {
+      "method": "GET",
+      "endpoint": "/api/sessions",
+      "originalEndpoints": [
+        "/api/sessions"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "GET:/api/sessions/:param": {
+      "method": "GET",
+      "endpoint": "/api/sessions/:param",
+      "originalEndpoints": [
+        "/api/sessions/${id}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "POST:/api/sessions": {
+      "method": "POST",
+      "endpoint": "/api/sessions",
+      "originalEndpoints": [
+        "/api/sessions"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "PUT:/api/sessions/:param": {
+      "method": "PUT",
+      "endpoint": "/api/sessions/:param",
+      "originalEndpoints": [
+        "/api/sessions/${id}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "DELETE:/api/sessions/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/sessions/:param",
+      "originalEndpoints": [
+        "/api/sessions/${id}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "PATCH:/api/sessions/:param/demarrer": {
+      "method": "PATCH",
+      "endpoint": "/api/sessions/:param/demarrer",
+      "originalEndpoints": [
+        "/api/sessions/${id}/demarrer"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "PATCH:/api/sessions/:param/terminer": {
+      "method": "PATCH",
+      "endpoint": "/api/sessions/:param/terminer",
+      "originalEndpoints": [
+        "/api/sessions/${id}/terminer"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "PATCH:/api/sessions/:param/pause": {
+      "method": "PATCH",
+      "endpoint": "/api/sessions/:param/pause",
+      "originalEndpoints": [
+        "/api/sessions/${id}/pause"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "PATCH:/api/sessions/:param/reprendre": {
+      "method": "PATCH",
+      "endpoint": "/api/sessions/:param/reprendre",
+      "originalEndpoints": [
+        "/api/sessions/${id}/reprendre"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "GET:/api/resultats/session/:param": {
+      "method": "GET",
+      "endpoint": "/api/resultats/session/:param",
+      "originalEndpoints": [
+        "/api/resultats/session/${sessionId}"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "GET:/api/resultats/session/:param/statistiques": {
+      "method": "GET",
+      "endpoint": "/api/resultats/session/:param/statistiques",
+      "originalEndpoints": [
+        "/api/resultats/session/${sessionId}/statistiques"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "POST:/api/resultats/:param/publier": {
+      "method": "POST",
+      "endpoint": "/api/resultats/:param/publier",
+      "originalEndpoints": [
+        "/api/resultats/${resultatId}/publier"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "POST:/api/resultats/:param/depublier": {
+      "method": "POST",
+      "endpoint": "/api/resultats/:param/depublier",
+      "originalEndpoints": [
+        "/api/resultats/${resultatId}/depublier"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "POST:/api/resultats/session/:param/publier-tous": {
+      "method": "POST",
+      "endpoint": "/api/resultats/session/:param/publier-tous",
+      "originalEndpoints": [
+        "/api/resultats/session/${sessionId}/publier-tous"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "GET:/api/resultats/:param/export-pdf": {
+      "method": "GET",
+      "endpoint": "/api/resultats/:param/export-pdf",
+      "originalEndpoints": [
+        "/api/resultats/${resultatId}/export-pdf"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "GET:/api/resultats/session/:param/export-pdf": {
+      "method": "GET",
+      "endpoint": "/api/resultats/session/:param/export-pdf",
+      "originalEndpoints": [
+        "/api/resultats/session/${sessionId}/export-pdf"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "GET:/api/resultats/:param/details-etudiant": {
+      "method": "GET",
+      "endpoint": "/api/resultats/:param/details-etudiant",
+      "originalEndpoints": [
+        "/api/resultats/${resultatId}/details-etudiant"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "POST:/api/resultats/:param/commentaire": {
+      "method": "POST",
+      "endpoint": "/api/resultats/:param/commentaire",
+      "originalEndpoints": [
+        "/api/resultats/${resultatId}/commentaire"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "POST:/api/resultats/:param/regenerer-commentaire": {
+      "method": "POST",
+      "endpoint": "/api/resultats/:param/regenerer-commentaire",
+      "originalEndpoints": [
+        "/api/resultats/${resultatId}/regenerer-commentaire"
+      ],
+      "files": [
+        "src\\features\\enseignant\\services\\session.service.ts"
+      ]
+    },
+    "GET:/api/qcm-etudiant/:param": {
+      "method": "GET",
+      "endpoint": "/api/qcm-etudiant/:param",
+      "originalEndpoints": [
+        "/api/qcm-etudiant/${qcmId}"
+      ],
+      "files": [
+        "src\\features\\etudiant\\services\\qcms.service.ts"
+      ]
+    },
+    "POST:/api/qcm-etudiant/:param/demarrer": {
+      "method": "POST",
+      "endpoint": "/api/qcm-etudiant/:param/demarrer",
+      "originalEndpoints": [
+        "/api/qcm-etudiant/${qcmId}/demarrer"
+      ],
+      "files": [
+        "src\\features\\etudiant\\services\\qcms.service.ts"
+      ]
+    },
+    "POST:/api/qcm-etudiant/:param/soumettre": {
+      "method": "POST",
+      "endpoint": "/api/qcm-etudiant/:param/soumettre",
+      "originalEndpoints": [
+        "/api/qcm-etudiant/${qcmId}/soumettre"
+      ],
+      "files": [
+        "src\\features\\etudiant\\services\\qcms.service.ts"
+      ]
+    },
+    "GET:/api/qcm-etudiant/resultat/:param": {
+      "method": "GET",
+      "endpoint": "/api/qcm-etudiant/resultat/:param",
+      "originalEndpoints": [
+        "/api/qcm-etudiant/resultat/${resultatId}"
+      ],
+      "files": [
+        "src\\features\\etudiant\\services\\qcms.service.ts"
+      ]
+    },
+    "DELETE:/api/admin/users/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/admin/users/:param",
+      "originalEndpoints": [
+        "/api/admin/users/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\admin.service.ts"
+      ]
+    },
+    "DELETE:/api/admin/etudiants/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/admin/etudiants/:param",
+      "originalEndpoints": [
+        "/api/admin/etudiants/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\admin.service.ts"
+      ]
+    },
+    "DELETE:/api/admin/professeurs/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/admin/professeurs/:param",
+      "originalEndpoints": [
+        "/api/admin/professeurs/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\admin.service.ts"
+      ]
+    },
+    "DELETE:/api/admin/ai-configs/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/admin/ai-configs/:param",
+      "originalEndpoints": [
+        "/api/admin/ai-configs/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\admin.service.ts"
+      ]
+    },
+    "GET:/api/admin/pending-users": {
+      "method": "GET",
+      "endpoint": "/api/admin/pending-users",
+      "originalEndpoints": [
+        "/api/admin/pending-users"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\admin.service.ts"
+      ]
+    },
+    "POST:/api/admin/users/:param/activate": {
+      "method": "POST",
+      "endpoint": "/api/admin/users/:param/activate",
+      "originalEndpoints": [
+        "/api/admin/users/${userId}/activate"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\admin.service.ts"
+      ]
+    },
+    "POST:/api/admin/users/:param/reject": {
+      "method": "POST",
+      "endpoint": "/api/admin/users/:param/reject",
+      "originalEndpoints": [
+        "/api/admin/users/${userId}/reject"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\admin.service.ts"
+      ]
+    },
+    "POST:/api/auth/logout": {
+      "method": "POST",
+      "endpoint": "/api/auth/logout",
+      "originalEndpoints": [
+        "/api/auth/logout"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\auth.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param",
+      "originalEndpoints": [
+        "/api/enseignants/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "PUT:/api/enseignants/:param": {
+      "method": "PUT",
+      "endpoint": "/api/enseignants/:param",
+      "originalEndpoints": [
+        "/api/enseignants/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "DELETE:/api/enseignants/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/enseignants/:param",
+      "originalEndpoints": [
+        "/api/enseignants/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param/matieres": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param/matieres",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/matieres"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "POST:/api/enseignants/:param/matieres/:param": {
+      "method": "POST",
+      "endpoint": "/api/enseignants/:param/matieres/:param",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/matieres/${matiereId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "DELETE:/api/enseignants/:param/matieres/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/enseignants/:param/matieres/:param",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/matieres/${matiereId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param/niveaux": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param/niveaux",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/niveaux"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "POST:/api/enseignants/:param/niveaux/:param": {
+      "method": "POST",
+      "endpoint": "/api/enseignants/:param/niveaux/:param",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/niveaux/${niveauId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param/parcours": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param/parcours",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/parcours"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "POST:/api/enseignants/:param/parcours/:param": {
+      "method": "POST",
+      "endpoint": "/api/enseignants/:param/parcours/:param",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/parcours/${parcoursId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param/mentions": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param/mentions",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/mentions"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/etablissement/:param": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/etablissement/:param",
+      "originalEndpoints": [
+        "/api/enseignants/etablissement/${etablissementId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param/etudiants": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param/etudiants",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/etudiants"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/enseignants/:param/etudiants/export-pdf": {
+      "method": "GET",
+      "endpoint": "/api/enseignants/:param/etudiants/export-pdf",
+      "originalEndpoints": [
+        "/api/enseignants/${enseignantId}/etudiants/export-pdf"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\enseignant.service.ts"
+      ]
+    },
+    "GET:/api/etablissements/:param": {
+      "method": "GET",
+      "endpoint": "/api/etablissements/:param",
+      "originalEndpoints": [
+        "/api/etablissements/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etablissement.service.ts"
+      ]
+    },
+    "PUT:/api/etablissements/:param": {
+      "method": "PUT",
+      "endpoint": "/api/etablissements/:param",
+      "originalEndpoints": [
+        "/api/etablissements/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etablissement.service.ts"
+      ]
+    },
+    "DELETE:/api/etablissements/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/etablissements/:param",
+      "originalEndpoints": [
+        "/api/etablissements/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etablissement.service.ts"
+      ]
+    },
+    "GET:/api/etablissements/type/:param": {
+      "method": "GET",
+      "endpoint": "/api/etablissements/type/:param",
+      "originalEndpoints": [
+        "/api/etablissements/type/${type}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etablissement.service.ts"
+      ]
+    },
+    "GET:/api/etudiants/me": {
+      "method": "GET",
+      "endpoint": "/api/etudiants/me",
+      "originalEndpoints": [
+        "/api/etudiants/me"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "GET:/api/etudiants/:param": {
+      "method": "GET",
+      "endpoint": "/api/etudiants/:param",
+      "originalEndpoints": [
+        "/api/etudiants/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "PUT:/api/etudiants/:param": {
+      "method": "PUT",
+      "endpoint": "/api/etudiants/:param",
+      "originalEndpoints": [
+        "/api/etudiants/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "DELETE:/api/etudiants/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/etudiants/:param",
+      "originalEndpoints": [
+        "/api/etudiants/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "GET:/api/etudiants/:param/matieres": {
+      "method": "GET",
+      "endpoint": "/api/etudiants/:param/matieres",
+      "originalEndpoints": [
+        "/api/etudiants/${etudiantId}/matieres"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "POST:/api/etudiants/:param/matieres/:param": {
+      "method": "POST",
+      "endpoint": "/api/etudiants/:param/matieres/:param",
+      "originalEndpoints": [
+        "/api/etudiants/${etudiantId}/matieres/${matiereId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "DELETE:/api/etudiants/:param/matieres/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/etudiants/:param/matieres/:param",
+      "originalEndpoints": [
+        "/api/etudiants/${etudiantId}/matieres/${matiereId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "GET:/api/etudiants/:param/classes": {
+      "method": "GET",
+      "endpoint": "/api/etudiants/:param/classes",
+      "originalEndpoints": [
+        "/api/etudiants/${etudiantId}/classes"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "POST:/api/etudiants/:param/classes/:param": {
+      "method": "POST",
+      "endpoint": "/api/etudiants/:param/classes/:param",
+      "originalEndpoints": [
+        "/api/etudiants/${etudiantId}/classes/${classeId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "GET:/api/etudiants/mention/:param": {
+      "method": "GET",
+      "endpoint": "/api/etudiants/mention/:param",
+      "originalEndpoints": [
+        "/api/etudiants/mention/${mentionId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "GET:/api/etudiants/parcours/:param": {
+      "method": "GET",
+      "endpoint": "/api/etudiants/parcours/:param",
+      "originalEndpoints": [
+        "/api/etudiants/parcours/${parcoursId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "GET:/api/etudiants/niveau/:param": {
+      "method": "GET",
+      "endpoint": "/api/etudiants/niveau/:param",
+      "originalEndpoints": [
+        "/api/etudiants/niveau/${niveauId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\etudiant.service.ts"
+      ]
+    },
+    "GET:/api/matieres/:param": {
+      "method": "GET",
+      "endpoint": "/api/matieres/:param",
+      "originalEndpoints": [
+        "/api/matieres/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\matiere.service.ts"
+      ]
+    },
+    "PUT:/api/matieres/:param": {
+      "method": "PUT",
+      "endpoint": "/api/matieres/:param",
+      "originalEndpoints": [
+        "/api/matieres/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\matiere.service.ts"
+      ]
+    },
+    "DELETE:/api/matieres/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/matieres/:param",
+      "originalEndpoints": [
+        "/api/matieres/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\matiere.service.ts"
+      ]
+    },
+    "GET:/api/mentions/:param": {
+      "method": "GET",
+      "endpoint": "/api/mentions/:param",
+      "originalEndpoints": [
+        "/api/mentions/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\mention.service.ts"
+      ]
+    },
+    "PUT:/api/mentions/:param": {
+      "method": "PUT",
+      "endpoint": "/api/mentions/:param",
+      "originalEndpoints": [
+        "/api/mentions/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\mention.service.ts"
+      ]
+    },
+    "DELETE:/api/mentions/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/mentions/:param",
+      "originalEndpoints": [
+        "/api/mentions/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\mention.service.ts"
+      ]
+    },
+    "GET:/api/mentions/etablissement/:param": {
+      "method": "GET",
+      "endpoint": "/api/mentions/etablissement/:param",
+      "originalEndpoints": [
+        "/api/mentions/etablissement/${etablissementId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\mention.service.ts"
+      ]
+    },
+    "GET:/api/niveaux/:param": {
+      "method": "GET",
+      "endpoint": "/api/niveaux/:param",
+      "originalEndpoints": [
+        "/api/niveaux/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\niveau.service.ts"
+      ]
+    },
+    "PUT:/api/niveaux/:param": {
+      "method": "PUT",
+      "endpoint": "/api/niveaux/:param",
+      "originalEndpoints": [
+        "/api/niveaux/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\niveau.service.ts"
+      ]
+    },
+    "DELETE:/api/niveaux/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/niveaux/:param",
+      "originalEndpoints": [
+        "/api/niveaux/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\niveau.service.ts"
+      ]
+    },
+    "GET:/api/parcours/:param": {
+      "method": "GET",
+      "endpoint": "/api/parcours/:param",
+      "originalEndpoints": [
+        "/api/parcours/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\parcours.service.ts"
+      ]
+    },
+    "PUT:/api/parcours/:param": {
+      "method": "PUT",
+      "endpoint": "/api/parcours/:param",
+      "originalEndpoints": [
+        "/api/parcours/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\parcours.service.ts"
+      ]
+    },
+    "DELETE:/api/parcours/:param": {
+      "method": "DELETE",
+      "endpoint": "/api/parcours/:param",
+      "originalEndpoints": [
+        "/api/parcours/${id}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\parcours.service.ts"
+      ]
+    },
+    "GET:/api/parcours/mention/:param": {
+      "method": "GET",
+      "endpoint": "/api/parcours/mention/:param",
+      "originalEndpoints": [
+        "/api/parcours/mention/${mentionId}"
+      ],
+      "files": [
+        "src\\shared\\services\\api\\parcours.service.ts"
+      ]
+    }
+  }
+}
