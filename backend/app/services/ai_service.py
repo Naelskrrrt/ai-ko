@@ -36,13 +36,14 @@ class AIService:
         # - microsoft/Phi-3-mini-4k-instruct
         # - Qwen/Qwen2.5-1.5B-Instruct
         self.model = os.getenv(
-            'HF_MODEL', "mistralai/Mistral-7B-Instruct-v0.2")
+            'HF_MODEL', "meta-llama/Llama-3.2-3B-Instruct")
         # Liste des modèles de fallback (sans le modèle principal pour éviter les doublons)
+        # Modèles compatibles avec router.huggingface.co/v1/chat/completions
         all_fallbacks = [
-            "mistralai/Mistral-7B-Instruct-v0.2",
             "meta-llama/Llama-3.2-3B-Instruct",
-            "microsoft/Phi-3-mini-4k-instruct",
-            "Qwen/Qwen2.5-1.5B-Instruct"
+            "meta-llama/Llama-3.1-8B-Instruct",
+            "Qwen/Qwen2.5-72B-Instruct",
+            "mistralai/Mistral-Nemo-Instruct-2407"
         ]
         # Exclure le modèle principal de la liste de fallback
         self.fallback_models = [m for m in all_fallbacks if m != self.model]
