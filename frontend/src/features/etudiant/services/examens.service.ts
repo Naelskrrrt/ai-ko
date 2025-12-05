@@ -78,7 +78,7 @@ export const examensService = {
   async getAll(_userId: string): Promise<Examen[]> {
     // Récupérer les sessions disponibles formatées
     const response = await examensApi.get<any[]>(
-      `/sessions/disponibles?format=examen`,
+      `/sessions-examen/disponibles?format=examen`,
     );
 
     // Transformer en format Examen[]
@@ -90,7 +90,7 @@ export const examensService = {
    */
   async getById(examId: string): Promise<Examen> {
     const response = await examensApi.get<any>(
-      `/sessions/${examId}?format=examen`,
+      `/sessions-examen/${examId}?format=examen`,
     );
 
     return transformSessionToExamen(response.data);

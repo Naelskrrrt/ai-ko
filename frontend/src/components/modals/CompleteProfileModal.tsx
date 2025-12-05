@@ -86,7 +86,7 @@ export function CompleteProfileModal({
       // Mettre à jour le profil enseignant si nécessaire
       if (formData.grade || formData.specialite || formData.departement) {
         const enseignantUpdateResponse = await fetch(
-          `${apiUrl}/api/enseignant/me`,
+          `${apiUrl}/api/enseignants/me`,
           {
             method: "PUT",
             headers: {

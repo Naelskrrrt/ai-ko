@@ -17,6 +17,9 @@ const sessionApi = axios.create({
   withCredentials: true,
 });
 
+// Constante pour le préfixe des sessions (backend utilise sessions-examen)
+const SESSIONS_PREFIX = "/sessions-examen";
+
 // Intercepteur pour ajouter le token JWT aux requêtes
 sessionApi.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
@@ -133,7 +136,7 @@ export const sessionService = {
     qcm_id?: string;
     classe_id?: string;
   }): Promise<{ data: SessionExamen[]; total: number }> {
-    const response = await sessionApi.get("/sessions", { params });
+    const response = await sessionApi.get(SESSIONS_PREFIX, { params });
 
     return response.data;
   },
@@ -142,7 +145,7 @@ export const sessionService = {
    * Récupère une session par son ID
    */
   async getSessionById(id: string): Promise<SessionExamen> {
-    const response = await sessionApi.get(`/sessions/${id}`);
+    const response = await sessionApi.get(`${SESSIONS_PREFIX}/${id}`);
 
     return response.data;
   },
@@ -153,7 +156,7 @@ export const sessionService = {
   async createSession(data: SessionFormData): Promise<SessionExamen> {
     // Convertir les données de camelCase en snake_case pour le backend
     const convertedData = convertToSnakeCase(data);
-    const response = await sessionApi.post("/sessions", convertedData);
+    const response = await sessionApi.post(SESSIONS_PREFIX, convertedData);
 
     return response.data;
   },
@@ -167,7 +170,10 @@ export const sessionService = {
   ): Promise<SessionExamen> {
     // Convertir les données de camelCase en snake_case pour le backend
     const convertedData = convertToSnakeCase(data);
-    const response = await sessionApi.put(`/sessions/${id}`, convertedData);
+    const response = await sessionApi.put(
+      `${SESSIONS_PREFIX}/${id}`,
+      convertedData,
+    );
 
     return response.data;
   },
@@ -176,14 +182,16 @@ export const sessionService = {
    * Supprime une session
    */
   async deleteSession(id: string): Promise<void> {
-    await sessionApi.delete(`/sessions/${id}`);
+    await sessionApi.delete(`${SESSIONS_PREFIX}/${id}`);
   },
 
   /**
    * Démarre une session (change le statut en 'en_cours')
    */
   async demarrerSession(id: string): Promise<SessionExamen> {
-    const response = await sessionApi.patch(`/sessions/${id}/demarrer`);
+    const response = await sessionApi.patch(
+      `${SESSIONS_PREFIX}/${id}/demarrer`,
+    );
 
     return response.data;
   },
@@ -192,7 +200,9 @@ export const sessionService = {
    * Termine une session (change le statut en 'terminee')
    */
   async terminerSession(id: string): Promise<SessionExamen> {
-    const response = await sessionApi.patch(`/sessions/${id}/terminer`);
+    const response = await sessionApi.patch(
+      `${SESSIONS_PREFIX}/${id}/terminer`,
+    );
 
     return response.data;
   },
@@ -201,7 +211,7 @@ export const sessionService = {
    * Met une session en pause (change le statut en 'en_pause')
    */
   async mettreEnPause(id: string): Promise<SessionExamen> {
-    const response = await sessionApi.patch(`/sessions/${id}/pause`);
+    const response = await sessionApi.patch(`${SESSIONS_PREFIX}/${id}/pause`);
 
     return response.data;
   },
@@ -210,7 +220,9 @@ export const sessionService = {
    * Reprend une session en pause (change le statut en 'en_cours')
    */
   async reprendreSession(id: string): Promise<SessionExamen> {
-    const response = await sessionApi.patch(`/sessions/${id}/reprendre`);
+    const response = await sessionApi.patch(
+      `${SESSIONS_PREFIX}/${id}/reprendre`,
+    );
 
     return response.data;
   },

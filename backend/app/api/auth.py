@@ -134,6 +134,41 @@ def logout():
     return response
 
 
+@bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=False)  # Accepter un token access pour le rafraîchir
+def refresh_token():
+    """Rafraîchir le token JWT"""
+    try:
+        user_id = get_jwt_identity()
+        
+        if not user_id:
+            return jsonify({'message': 'Token invalide'}), 401
+        
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({'message': 'Utilisateur non trouvé'}), 404
+        
+        # Créer un nouveau token
+        new_access_token = create_access_token(
+            identity=str(user.id),
+            expires_delta=timedelta(days=7)
+        )
+        
+        response = make_response(jsonify({
+            'token': new_access_token,
+            'user': user_response_schema.dump(user.to_dict())
+        }), 200)
+        
+        # Mettre à jour le cookie
+        set_access_cookies(response, new_access_token)
+        
+        return response
+        
+    except Exception as e:
+        return jsonify({'message': f'Erreur lors du rafraîchissement: {str(e)}'}), 500
+
+
 @bp.route('/me', methods=['GET'])
 @jwt_required(optional=True)
 def get_me():

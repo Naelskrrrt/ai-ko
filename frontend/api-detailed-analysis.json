@@ -1,0 +1,226 @@
+{
+  "timestamp": "2025-12-05T03:23:26.843Z",
+  "summary": {
+    "total": 23,
+    "falsePositives": 23,
+    "wrongPaths": 0,
+    "notImplemented": 0
+  },
+  "categories": {
+    "falsePositives": [
+      {
+        "method": "GET",
+        "endpoint": "/api/auth/oauth/google",
+        "files": [
+          "src\\app\\(auth)\\login\\page.tsx",
+          "src\\app\\api\\auth\\oauth\\google\\route.ts",
+          "src\\app\\api\\test-backend\\route.ts"
+        ],
+        "reason": "Route OAuth Google existe dans auth.py",
+        "backendExists": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "files": [
+          "src\\app\\api\\auth\\login\\route.ts"
+        ],
+        "reason": "Route proxy Next.js → Backend utilise /api/auth/*",
+        "backendRoute": "/api/auth/login"
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/logout",
+        "files": [
+          "src\\app\\api\\auth\\logout\\route.ts"
+        ],
+        "reason": "Route proxy Next.js → Backend utilise /api/auth/*",
+        "backendRoute": "/api/auth/logout"
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/refresh",
+        "files": [
+          "src\\app\\api\\auth\\refresh\\route.ts"
+        ],
+        "reason": "Route proxy Next.js → Backend utilise /api/auth/*",
+        "backendRoute": "/api/auth/refresh"
+      },
+      {
+        "method": "GET",
+        "endpoint": "/auth/me",
+        "files": [
+          "src\\app\\api\\auth\\session\\route.ts"
+        ],
+        "reason": "Route proxy Next.js → Backend utilise /api/auth/*",
+        "backendRoute": "/api/auth/me"
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/health",
+        "files": [
+          "src\\app\\api\\test-backend\\route.ts"
+        ],
+        "reason": "Route /api/health existe dans health.py",
+        "backendExists": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/auth/refresh",
+        "files": [
+          "src\\app\\api\\[...path]\\route.ts"
+        ],
+        "reason": "Route POST /api/auth/refresh existe maintenant dans auth.py",
+        "backendExists": true
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/auth/me",
+        "files": [
+          "src\\components\\modals\\CompleteProfileModal.tsx"
+        ],
+        "reason": "Route PUT /api/auth/me existe dans auth.py",
+        "backendExists": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/matieres",
+        "files": [
+          "src\\features\\enseignant\\services\\enseignant.service.ts"
+        ],
+        "reason": "Route existe (namespace enregistré avec routes list)",
+        "backendExists": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/niveaux",
+        "files": [
+          "src\\features\\enseignant\\services\\enseignant.service.ts"
+        ],
+        "reason": "Route existe (namespace enregistré avec routes list)",
+        "backendExists": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/classes",
+        "files": [
+          "src\\features\\enseignant\\services\\enseignant.service.ts"
+        ],
+        "reason": "Route existe (namespace enregistré avec routes list)",
+        "backendExists": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/qcm",
+        "files": [
+          "src\\features\\enseignant\\services\\qcm.service.ts"
+        ],
+        "reason": "Route existe (namespace enregistré avec routes list)",
+        "backendExists": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/qcm",
+        "files": [
+          "src\\features\\enseignant\\services\\qcm.service.ts"
+        ],
+        "reason": "Route existe (namespace enregistré avec routes list)",
+        "backendExists": true
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/users/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ],
+        "reason": "Route admin existe (non détectée par analyse statique car dans blueprint séparé)",
+        "backendExists": true
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/etudiants/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ],
+        "reason": "Route admin existe (non détectée par analyse statique car dans blueprint séparé)",
+        "backendExists": true
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/professeurs/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ],
+        "reason": "Route admin existe (non détectée par analyse statique car dans blueprint séparé)",
+        "backendExists": true
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/admin/ai-configs/:param",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ],
+        "reason": "Route admin existe (non détectée par analyse statique car dans blueprint séparé)",
+        "backendExists": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/admin/pending-users",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ],
+        "reason": "Route admin existe (non détectée par analyse statique car dans blueprint séparé)",
+        "backendExists": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/admin/users/:param/activate",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ],
+        "reason": "Route admin existe (non détectée par analyse statique car dans blueprint séparé)",
+        "backendExists": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/admin/users/:param/reject",
+        "files": [
+          "src\\shared\\services\\api\\admin.service.ts"
+        ],
+        "reason": "Route admin existe (non détectée par analyse statique car dans blueprint séparé)",
+        "backendExists": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/api/auth/logout",
+        "files": [
+          "src\\shared\\services\\api\\auth.service.ts"
+        ],
+        "reason": "Route POST /api/auth/logout existe dans auth.py",
+        "backendExists": true
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/matieres/:param",
+        "files": [
+          "src\\shared\\services\\api\\matiere.service.ts"
+        ],
+        "reason": "Route existe dans matiere.py",
+        "backendExists": true
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/matieres/:param",
+        "files": [
+          "src\\shared\\services\\api\\matiere.service.ts"
+        ],
+        "reason": "Route existe dans matiere.py",
+        "backendExists": true
+      }
+    ],
+    "missingNamespaceRoutes": [],
+    "wrongPath": [],
+    "notImplemented": [],
+    "proxyRoutes": []
+  }
+}
