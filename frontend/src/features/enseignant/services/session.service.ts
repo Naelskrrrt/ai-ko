@@ -6,6 +6,8 @@ import type {
 
 import axios from "axios";
 
+import { addAuthHeader } from "@/shared/lib/auth-token";
+
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -21,24 +23,8 @@ const sessionApi = axios.create({
 const SESSIONS_PREFIX = "/sessions-examen";
 
 // Intercepteur pour ajouter le token JWT aux requêtes
-sessionApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+sessionApi.interceptors.request.use((config) => addAuthHeader(config));
 
 // Intercepteur pour gérer les erreurs
 sessionApi.interceptors.response.use(

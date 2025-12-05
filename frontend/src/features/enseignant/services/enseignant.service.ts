@@ -7,6 +7,8 @@ import type {
 
 import axios from "axios";
 
+import { addAuthHeader } from "@/shared/lib/auth-token";
+
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -19,24 +21,8 @@ const enseignantApi = axios.create({
 });
 
 // Intercepteur pour ajouter le token JWT aux requêtes
-enseignantApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+enseignantApi.interceptors.request.use((config) => addAuthHeader(config));
 
 // Intercepteur pour gérer les erreurs
 enseignantApi.interceptors.response.use(

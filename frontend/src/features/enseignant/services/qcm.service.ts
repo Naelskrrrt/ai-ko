@@ -10,6 +10,8 @@ import type {
 
 import axios from "axios";
 
+import { addAuthHeader } from "@/shared/lib/auth-token";
+
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -22,28 +24,8 @@ const qcmApi = axios.create({
 });
 
 // Intercepteur pour ajouter le token JWT aux requêtes
-qcmApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    // Essayer d'abord les cookies
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    // Si pas dans les cookies, essayer localStorage
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    if (token) {
-      // Nettoyer le token (enlever les espaces, guillemets, etc.)
-      token = token.trim().replace(/^["']|["']$/g, "");
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+qcmApi.interceptors.request.use((config) => addAuthHeader(config));
 
 // Intercepteur pour gérer les erreurs
 qcmApi.interceptors.response.use(

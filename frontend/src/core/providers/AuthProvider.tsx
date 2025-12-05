@@ -5,6 +5,10 @@ import type { User } from "@/shared/types/auth.types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { authService } from "@/shared/services/api/auth.service";
+import {
+  setAuthToken,
+  removeAuthToken,
+} from "@/shared/lib/auth-token";
 
 interface AuthResponse {
   user: User;
@@ -48,10 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (_error: any) {
       // Si getMe échoue (401, 403, timeout, erreur réseau, etc.), on considère l'utilisateur comme non connecté
       setUser(null);
-      // Nettoyer les tokens invalides
-      if (typeof document !== "undefined") {
-        document.cookie = "auth_token=; path=/; max-age=0; SameSite=Lax";
-        localStorage.removeItem("auth_token");
+      // Nettoyer les tokens invalides avec l'utilitaire centralisé
+      removeAuthToken();
+      if (typeof localStorage !== "undefined") {
         localStorage.removeItem("onboarding_token");
       }
     } finally {
@@ -70,10 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ): Promise<AuthResponse> => {
     const response = await authService.login({ email, password });
 
-    // Stocker le token dans un cookie ET localStorage
-    if (response.token && typeof document !== "undefined") {
-      document.cookie = `auth_token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
-      localStorage.setItem("auth_token", response.token);
+    // Stocker le token avec l'utilitaire centralisé
+    if (response.token) {
+      setAuthToken(response.token);
     }
     setUser(response.user);
 
@@ -88,12 +90,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       confirmPassword: password,
     });
 
-    // Stocker le token dans un cookie ET localStorage
-    if (response.token && typeof document !== "undefined") {
-      document.cookie = `auth_token=${response.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
-      localStorage.setItem("auth_token", response.token);
+    // Stocker le token avec l'utilitaire centralisé
+    if (response.token) {
+      setAuthToken(response.token);
       // Stocker aussi dans onboarding_token pour l'onboarding
-      localStorage.setItem("onboarding_token", response.token);
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("onboarding_token", response.token);
+      }
     }
     setUser(response.user);
 
@@ -110,11 +113,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // eslint-disable-next-line no-console
       console.warn("Erreur lors de la déconnexion (ignorée):", error);
     } finally {
-      // Toujours supprimer le cookie ET localStorage et réinitialiser l'utilisateur
-      if (typeof document !== "undefined") {
-        document.cookie = "auth_token=; path=/; max-age=0; SameSite=Lax";
-        localStorage.removeItem("auth_token");
-      }
+      // Toujours supprimer les tokens avec l'utilitaire centralisé
+      removeAuthToken();
       setUser(null);
     }
   };

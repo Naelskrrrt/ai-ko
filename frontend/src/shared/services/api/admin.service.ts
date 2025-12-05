@@ -30,27 +30,11 @@ const adminApi = axios.create({
   withCredentials: true,
 });
 
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+import { addAuthHeader } from "@/shared/lib/auth-token";
+
 // Intercepteur pour ajouter le token JWT aux requêtes
-adminApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    // Essayer d'abord les cookies
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    // Si pas dans les cookies, essayer localStorage
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+adminApi.interceptors.request.use((config) => addAuthHeader(config));
 
 // Intercepteur pour gérer les erreurs
 adminApi.interceptors.response.use(

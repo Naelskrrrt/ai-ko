@@ -9,6 +9,8 @@ import type {
 
 import axios from "axios";
 
+import { addAuthHeader } from "@/shared/lib/auth-token";
+
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -21,39 +23,8 @@ const matiereApi = axios.create({
 });
 
 // Intercepteur pour ajouter le token JWT (optionnel)
-matiereApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    // Essayer aussi access_token_cookie (Flask-JWT-Extended)
-    if (!token) {
-      token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("access_token_cookie="))
-        ?.split("=")[1];
-    }
-
-    // Si pas dans les cookies, essayer localStorage
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    // Si toujours pas de token, essayer onboarding_token (pendant l'onboarding)
-    if (!token) {
-      token = localStorage.getItem("onboarding_token") || undefined;
-    }
-
-    // Ajouter le token seulement s'il existe (authentification optionnelle)
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+matiereApi.interceptors.request.use((config) => addAuthHeader(config));
 
 export const matiereService = {
   /**

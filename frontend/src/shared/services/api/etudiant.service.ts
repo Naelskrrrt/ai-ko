@@ -23,24 +23,9 @@ const etudiantApi = axios.create({
 });
 
 // Intercepteur pour ajouter le token JWT
-etudiantApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+import { addAuthHeader } from "@/shared/lib/auth-token";
+etudiantApi.interceptors.request.use((config) => addAuthHeader(config));
 
 export const etudiantService = {
   /**

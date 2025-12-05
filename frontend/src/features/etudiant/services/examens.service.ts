@@ -6,6 +6,8 @@ import type {
 
 import axios from "axios";
 
+import { addAuthHeader } from "@/shared/lib/auth-token";
+
 import {
   transformSessionToExamen,
   transformQuestionToQuestion,
@@ -23,26 +25,8 @@ const examensApi = axios.create({
 });
 
 // Intercepteur pour ajouter le token JWT aux requêtes
-examensApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    // Essayer d'abord les cookies
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    // Si pas dans les cookies, essayer localStorage
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+examensApi.interceptors.request.use((config) => addAuthHeader(config));
 
 // Intercepteur pour logger les erreurs
 examensApi.interceptors.response.use(

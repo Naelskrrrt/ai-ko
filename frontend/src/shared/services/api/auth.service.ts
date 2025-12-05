@@ -7,6 +7,8 @@ import type {
 
 import axios from "axios";
 
+import { addAuthHeader } from "@/shared/lib/auth-token";
+
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -20,26 +22,8 @@ const authApi = axios.create({
 });
 
 // Intercepteur pour ajouter le token JWT aux requêtes
-authApi.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    // Essayer d'abord les cookies
-    let token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("auth_token="))
-      ?.split("=")[1];
-
-    // Si pas dans les cookies, essayer localStorage
-    if (!token) {
-      token = localStorage.getItem("auth_token") || undefined;
-    }
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
+// Utilise l'utilitaire centralisé qui priorise localStorage (cross-domain compatible)
+authApi.interceptors.request.use((config) => addAuthHeader(config));
 
 export const authService = {
   async register(data: RegisterCredentials): Promise<AuthResponse> {
