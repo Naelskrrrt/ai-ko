@@ -26,7 +26,7 @@ export const siteConfig = {
   ],
 
   // Pages qui utilisent le layout avec sidebar
-  sidebarPages: ["/admin"],
+  sidebarPages: ["/admin", "/etudiant", "/enseignant"],
 
   // Navigation dans la sidebar (pour utilisateurs non-admin - vide pour l'instant)
   sidebarNavItems: [
