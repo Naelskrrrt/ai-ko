@@ -163,7 +163,7 @@ def create_app(config=None):
             "origins": cors_origins,
             "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "X-CSRF-TOKEN"],
-            "expose_headers": ["Content-Type", "Authorization", "X-CSRF-TOKEN"],
+            "expose_headers": ["Content-Type", "Authorization", "X-CSRF-TOKEN", "Content-Disposition", "Content-Length"],
             "supports_credentials": True,
             "max_age": 3600
         },

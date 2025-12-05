@@ -513,13 +513,16 @@ class EnseignantEtudiantsExportPDF(Resource):
             enseignant = enseignant_service.get_enseignant_by_id(enseignant_id)
             enseignant_name = enseignant.get('user', {}).get(
                 'name', 'enseignant') if enseignant else 'enseignant'
-            filename = f"eleves_{enseignant_name.replace(' ', '_')}.pdf"
+            # Nettoyer le nom de fichier (enlever caractères spéciaux)
+            import re
+            filename = re.sub(r'[^\w\-_.]', '_', f"eleves_{enseignant_name}.pdf")
 
             return Response(
                 pdf_buffer,
                 mimetype='application/pdf',
                 headers={
-                    'Content-Disposition': f'attachment; filename="{filename}"'
+                    'Content-Disposition': f'attachment; filename="{filename}"',
+                    'Access-Control-Expose-Headers': 'Content-Disposition, Content-Length, Content-Type'
                 }
             )
         except ValueError as e:

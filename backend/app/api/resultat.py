@@ -705,8 +705,9 @@ class ExportPDFResultat(Resource):
     def get(self, resultat_id):
         """Exporte un résultat individuel en PDF (enseignant uniquement)"""
         try:
-            from flask import send_file
+            from flask import send_file, make_response
             from app.services.pdf_service import PDFService
+            import re
             
             require_admin_or_teacher()
             
@@ -717,14 +718,21 @@ class ExportPDFResultat(Resource):
             resultat = resultat_service.get_resultat_by_id(resultat_id)
             etudiant_name = resultat.get('etudiant', {}).get('name', 'etudiant').replace(' ', '_')
             session_titre = resultat.get('session', {}).get('titre', 'examen').replace(' ', '_')
-            filename = f"resultat_{etudiant_name}_{session_titre}.pdf"
+            # Nettoyer le nom de fichier (enlever caractères spéciaux)
+            filename = re.sub(r'[^\w\-_.]', '_', f"resultat_{etudiant_name}_{session_titre}.pdf")
             
-            return send_file(
+            # Créer la réponse avec send_file
+            response = make_response(send_file(
                 pdf_buffer,
                 mimetype='application/pdf',
                 as_attachment=True,
                 download_name=filename
-            )
+            ))
+            
+            # Ajouter explicitement les headers CORS pour le téléchargement
+            response.headers['Access-Control-Expose-Headers'] = 'Content-Disposition, Content-Length, Content-Type'
+            
+            return response
         except ValueError as e:
             logger.warning(f"Erreur validation export PDF: {e}")
             api.abort(400, str(e))
@@ -741,7 +749,7 @@ class ExportPDFSession(Resource):
     def get(self, session_id):
         """Exporte le récapitulatif d'une session en PDF (enseignant uniquement)"""
         try:
-            from flask import send_file
+            from flask import send_file, make_response
             from app.services.pdf_service import PDFService
             from app.repositories.session_examen_repository import SessionExamenRepository
             
@@ -758,14 +766,22 @@ class ExportPDFSession(Resource):
             session_repo = SessionExamenRepository()
             session = session_repo.get_by_id(session_id)
             session_titre = session.titre.replace(' ', '_') if session else 'session'
-            filename = f"recapitulatif_{session_titre}.pdf"
+            # Nettoyer le nom de fichier (enlever caractères spéciaux)
+            import re
+            filename = re.sub(r'[^\w\-_.]', '_', f"recapitulatif_{session_titre}.pdf")
             
-            return send_file(
+            # Créer la réponse avec send_file
+            response = make_response(send_file(
                 pdf_buffer,
                 mimetype='application/pdf',
                 as_attachment=True,
                 download_name=filename
-            )
+            ))
+            
+            # Ajouter explicitement les headers CORS pour le téléchargement
+            response.headers['Access-Control-Expose-Headers'] = 'Content-Disposition, Content-Length, Content-Type'
+            
+            return response
         except ValueError as e:
             logger.warning(f"Erreur validation export PDF session: {e}")
             logger.warning(traceback.format_exc())
